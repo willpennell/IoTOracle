@@ -1,0 +1,4 @@
+address requester = 0x3CA4D0d4c119BBe7dc60F7E173e65FE7839F28F3
+address callbackAddress = 0x3CA4D0d4c119BBe7dc60F7E173e65FE7839F28F3
+bytes IoTId = "rp42022"
+bool requiredResult = true
