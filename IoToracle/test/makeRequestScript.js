@@ -1,11 +1,14 @@
 const Web3 = require('web3');
+const util = require('util')
 const MyContract = require('../build/contracts/IoTOracleContract.json');
+// iot id
+const iotid = "rp4200938820xx"
+const iotidEncode = Web3.utils.asciiToHex(iotid)
 
-
-const iotid = 'rp42022'
+console.log(iotidEncode)
 const init = async () => {
-    const web3 = new Web3('http://localhost:7545');
-    const addr1 = "0xC19D4b3B2F17a08f6324d15D80E6F4d1F45C392e"
+    const web3 = new Web3('http://localhost:8546');
+    const addr1 = "0xa4F40B53B37eA6471df700E34F0dd5eb9253b98D"
     const id = await web3.eth.net.getId();
     const deployedNetwork = MyContract.networks[id];
     const contract = new web3.eth.Contract(
@@ -14,9 +17,11 @@ const init = async () => {
     )
     contract.methods.makeRequest(
         addr1,
-        iotid,
+        iotidEncode,
         true,
     ).send({from: addr1, gas: 1000000})
-
+    console.log("Pushed to Blockchain")
 }
+
+
 init();
