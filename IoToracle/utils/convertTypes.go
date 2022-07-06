@@ -14,7 +14,7 @@ type Request struct {
 
 func ConvertRequestTypes(a interface{}, b interface{}, c interface{}, d interface{}) Request {
 	// convert requestID to uint64
-	r1, _ := a.(big.Int)
+	r1, _ := a.(*big.Int)
 	r1conv := r1.Uint64()
 
 	// convert to bool
