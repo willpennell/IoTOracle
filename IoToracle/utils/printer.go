@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 )
 
 func DASHEDLINE() {
@@ -13,7 +14,14 @@ func CONNECTIONMESSAGE() {
 }
 
 func DATAMESSAGE() {
-	fmt.Println("DATA:")
+	color.HiMagenta("DATA:")
+}
+
+func NEWREQUEST() {
+	color.Green("--------------------NEW REQUEST--------------------")
+}
+func ENDREQUEST() {
+	color.Green("---------------------------------------------------")
 }
 
 func REQUESTMESSAGE(req Request) {
@@ -21,4 +29,8 @@ func REQUESTMESSAGE(req Request) {
 	fmt.Println(req.RequireResult)
 	fmt.Println(string(req.IotId))
 	fmt.Println(req.Requester)
+}
+
+func SUBSCRIBEDMESSAGE(oracle string) {
+	fmt.Printf("Subscribed to Events from %s - Smart Contract\n", oracle)
 }
