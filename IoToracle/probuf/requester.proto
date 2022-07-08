@@ -1,0 +1,12 @@
+service Requester{
+  // Sends a requester to node
+  rpc SendRequest (Request) returns (Response)
+}
+
+message Request{
+
+}
+
+message Response {
+  
+}

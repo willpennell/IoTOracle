@@ -28,10 +28,9 @@ func main() {
 	requests := make(p.RequestsSingleton)
 	scContractABI := p.IOTORACLECONTRACTABI()
 	client := establishConnection()
-
 	// run catch up
 	c.CatchUpPreviousRequests(client, scContractABI, requests)
 	// goroutine for subscribing to events
 	go c.SubscribeToEvents(client, scContractABI, requests)
-
+	wg.Wait()
 }

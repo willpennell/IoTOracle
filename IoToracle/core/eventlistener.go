@@ -16,7 +16,7 @@ func CatchUpPreviousRequests(client *ethclient.Client, contractABI abi.ABI, reqM
 	//contractAddress := common.HexToAddress("0x2cfAfFC93599Ae55c4aa1Bd513314b8b0A0460EF")
 	query := ethereum.FilterQuery{
 		FromBlock: big.NewInt(0),
-		ToBlock:   big.NewInt(15),
+		ToBlock:   big.NewInt(319),
 		Addresses: []common.Address{p.IOTORACLECONTRACTADDRESS},
 	}
 
@@ -48,10 +48,8 @@ func CatchUpPreviousRequests(client *ethclient.Client, contractABI abi.ABI, reqM
 
 func SubscribeToEvents(client *ethclient.Client, contractABI abi.ABI, reqMap p.RequestsSingleton) {
 
-	contractAddress := common.HexToAddress("0x2cfAfFC93599Ae55c4aa1Bd513314b8b0A0460EF")
-
 	query := ethereum.FilterQuery{
-		Addresses: []common.Address{contractAddress},
+		Addresses: []common.Address{p.IOTORACLECONTRACTADDRESS},
 	}
 
 	logs := make(chan types.Log)
@@ -60,7 +58,7 @@ func SubscribeToEvents(client *ethclient.Client, contractABI abi.ABI, reqMap p.R
 	if err != nil {
 		log.Fatal(err)
 	}
-	p.SUBSCRIBEDMESSAGE(contractAddress.Hex())
+	p.SUBSCRIBEDMESSAGE(p.IOTORACLECONTRACTADDRESS.Hex())
 
 	for {
 		select {
