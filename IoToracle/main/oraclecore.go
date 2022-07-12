@@ -22,7 +22,7 @@ func establishConnection() *ethclient.Client {
 
 func main() {
 	var wg sync.WaitGroup
-	wg.Add(1)
+	wg.Add(2)
 
 	// initialise Global Vars
 	requests := make(p.RequestsSingleton)
@@ -31,6 +31,9 @@ func main() {
 	// run catch up
 	c.CatchUpPreviousRequests(client, scContractABI, requests)
 	// goroutine for subscribing to events
-	go c.SubscribeToEvents(client, scContractABI, requests)
+
+	go c.SubscribeToEvents(client, scContractABI, requests, &wg)
+
+	go c.ServerSetup(&wg)
 	wg.Wait()
 }

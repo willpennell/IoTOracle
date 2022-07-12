@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"log"
 	"math/big"
+	"sync"
 )
 
 func CatchUpPreviousRequests(client *ethclient.Client, contractABI abi.ABI, reqMap p.RequestsSingleton) {
@@ -46,8 +47,8 @@ func CatchUpPreviousRequests(client *ethclient.Client, contractABI abi.ABI, reqM
 	}
 }
 
-func SubscribeToEvents(client *ethclient.Client, contractABI abi.ABI, reqMap p.RequestsSingleton) {
-
+func SubscribeToEvents(client *ethclient.Client, contractABI abi.ABI, reqMap p.RequestsSingleton, wg *sync.WaitGroup) {
+	defer wg.Done()
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{p.IOTORACLECONTRACTADDRESS},
 	}
@@ -61,10 +62,12 @@ func SubscribeToEvents(client *ethclient.Client, contractABI abi.ABI, reqMap p.R
 	p.SUBSCRIBEDMESSAGE(p.IOTORACLECONTRACTADDRESS.Hex())
 
 	for {
+
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case vLog := <-logs:
+
 			requestIoTInfo, err := contractABI.Unpack("RequestIoTInfo", vLog.Data)
 			if err != nil {
 				log.Fatal(err)
