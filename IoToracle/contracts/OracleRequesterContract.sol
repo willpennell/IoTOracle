@@ -7,28 +7,32 @@ contract OracleRequesterContract is Ownable{
     //
 
     address owner;
-    Request[100] public requests;
+
+    mapping (uint => Request) public requests;
     address[] public oracles;
     uint requestCounter = 1;
     uint pendingCounter = 1;
     struct Request {
         uint256 requestID;
-        address requester;
         address callbackAddress;
         bytes callbackFID;
         bytes IoTID;
         bytes dataType;
         bytes32 pHash;
         bytes requiredResult;
+        uint32 numberOfOracles;
+        address[] oracles;
     }
 
-    function OracleRequesterContract() public payable onlyOwner() {
+    function createRequest(address _callbackAddress, bytes _IoTID, ){
+
     }
 
-    function placeBid() public returns(bool) {
-        if (msg.sender )
-        return true;
-    }
+
+
+
+
+
 
 
 }
