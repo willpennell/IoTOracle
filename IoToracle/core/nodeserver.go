@@ -1,7 +1,7 @@
 package core
 
 import (
-	"IoToracle/probuf"
+	pb "IoToracle/probuf"
 	u "IoToracle/utils"
 	"context"
 	"fmt"
@@ -16,10 +16,25 @@ const (
 )
 
 type OracleNodeServer struct {
-	probuf.UnimplementedOracleNodeServiceServer
+	pb.UnimplementedOracleNodeServiceServer
 }
 
-func (s *OracleNodeServer) SendRequest(ctx context.Context, in *probuf.RequestToNode) (*probuf.ResponseFromNode, error) {
+func (s *OracleNodeServer) CheckForRequest(ctx context.Context, in *pb.AckClient) (*pb.AckServer, error) {
+	log.Printf("Recieved client Ack: %v", in.GetAck())
+	if in.GetAck() == true {
+		return &pb.AckServer{
+			Ack:       true,
+			RequestId: 0,
+		}, nil
+	} else {
+		return &pb.AckServer{
+			Ack:       false,
+			RequestId: 0,
+		}, nil
+	}
+}
+
+/*func (s *OracleNodeServer) SendRequest(ctx context.Context, in *pb.RequestToNode) (*pb.ResponseFromNode, error) {
 	log.Printf("Received: %v", in.GetRequestId())
 	_ = ctx
 	// logic to now wait for response from IoT device
@@ -30,7 +45,7 @@ func (s *OracleNodeServer) SendRequest(ctx context.Context, in *probuf.RequestTo
 		RequiredResult: in.GetRequireResult(),
 		ActualResult:   false,
 	}, nil
-}
+}*/
 
 func ServerSetup(wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -39,7 +54,7 @@ func ServerSetup(wg *sync.WaitGroup) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	probuf.RegisterOracleNodeServiceServer(s, &OracleNodeServer{})
+	pb.RegisterOracleNodeServiceServer(s, &OracleNodeServer{})
 	u.SERVERLISTENING(lis)
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)

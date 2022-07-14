@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var IOTORACLECONTRACTADDRESS = common.HexToAddress("0xadbC910AC565881C029c668C74012252EB142378")
+var IOTORACLECONTRACTADDRESS = common.HexToAddress("0xd2C08435e6107E60E057BbBFa12D53b9F98692fC")
 
 func IOTORACLECONTRACTABI() abi.ABI {
 	scabi, err := abi.JSON(strings.NewReader(ioto.IoTOracleContractMetaData.ABI))

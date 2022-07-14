@@ -7,6 +7,7 @@
 package probuf
 
 import (
+
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
@@ -76,7 +77,7 @@ type OracleNodeServiceServer interface {
 type UnimplementedOracleNodeServiceServer struct {
 }
 
-func (UnimplementedOracleNodeServiceServer) CheckForRequest(context.Context, *AckClient) (*AckServer, error) {
+func (UnimplementedOracleNodeServiceServer) CheckForRequest( context.Context, *AckClient) (*AckServer, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckForRequest not implemented")
 }
 func (UnimplementedOracleNodeServiceServer) SendRequest(context.Context, *RequestFromClient) (*ResponseToClient, error) {

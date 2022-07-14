@@ -2,20 +2,23 @@ module IoToracle
 
 go 1.18
 
-require github.com/ethereum/go-ethereum v1.10.20
+require (
+	github.com/ethereum/go-ethereum v1.10.20
+	github.com/fatih/color v1.13.0
+	google.golang.org/grpc v1.47.0
+	google.golang.org/protobuf v1.28.0
+)
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
 	github.com/btcsuite/btcd/btcec/v2 v2.2.0 // indirect
 	github.com/deckarep/golang-set v1.8.0 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
-	github.com/fatih/color v1.13.0 // indirect
 	github.com/go-ole/go-ole v1.2.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/kyokomi/emoji/v2 v2.2.9 // indirect
 	github.com/mattn/go-colorable v0.1.9 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/rjeczalik/notify v0.9.1 // indirect
@@ -27,8 +30,5 @@ require (
 	golang.org/x/sys v0.0.0-20220712014510-0a85c31ab51e // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20220711200234-e2551ce405a2 // indirect
-	google.golang.org/grpc v1.47.0 // indirect
-	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/natefinch/npipe.v2 v2.0.0-20160621034901-c1b8fa8bdcce // indirect
 )

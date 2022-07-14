@@ -10,9 +10,11 @@ var (
 	reqs RequestsSingleton
 )
 
-/*func MakeRequests() RequestsSingleton {
+func MakeRequests() RequestsSingleton {
 	once.Do(func() {
 		reqs = make(RequestsSingleton)
 	})
 	return reqs
-}*/
+}
+
+var Requests = MakeRequests()

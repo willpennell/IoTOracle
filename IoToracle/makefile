@@ -1,1 +1,0 @@
-protoc -I probuf/ probuf/oraclenodeservice.proto --go_out=plugins=grpc:/probuf

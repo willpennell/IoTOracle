@@ -10,7 +10,7 @@ contract("IoTOracleContract", (accounts) =>{
     before(async () => {
         IoTOracleInstance = await IoTOracleContract.deployed();
     });
-    it("should make call to IoTOracle.makeRequest() and return ID value: 1", async () => {
+    it("should make call to IoToracle.makeRequest() and return ID value: 1", async () => {
 
         const returnedRequestID = await IoTOracleInstance.makeRequest.call(
             callbackAddr, iotId, requiredResult, {from: callbackAddr}
