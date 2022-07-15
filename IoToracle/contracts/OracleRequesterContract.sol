@@ -1,19 +1,19 @@
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
 
-
-contract OracleRequesterContract is Ownable{
+contract OracleRequesterContract {
     //
 
     address owner;
 
-    mapping (uint => Request) public requests;
-    address[] public oracles;
+    Request[100] public requests;
+    mapping (address => bool) public oracles;
     uint requestCounter = 1;
     uint pendingCounter = 1;
+    // a single Request structure
     struct Request {
         uint256 requestID;
+        address requester;
         address callbackAddress;
         bytes callbackFID;
         bytes IoTID;
@@ -22,17 +22,100 @@ contract OracleRequesterContract is Ownable{
         bytes requiredResult;
         uint32 numberOfOracles;
         address[] oracles;
+        uint oracleCounter;
     }
 
-    function createRequest(address _callbackAddress, bytes _IoTID, ){
+    event OpenForBids(uint256, bytes);
+    event BidPlaced(address);
+    event ReleaseRequestDetails(uint256, bytes, bytes, bytes);
+
+    constructor() {
+        owner = msg.sender;
 
     }
 
+    function joinAsOracle() public oracleNotJoined() returns(bool){
+        oracles[msg.sender] = true;
+        return oracles[msg.sender];
+    }
+
+    // @notice user can call function create request
+    // @dev
+    // @param _callbackAddress could be different to address that called the function
+    // @param _callbackFID a particular function in a smart contract that is needed to be called based on request
+    // @param _IoTID the identifier of the IoT device oracle node will be subscribing to
+    // @param _dataType, true false answer, an event, continuous data over time?
+    // @param _requiredResult what is needed from IoT device
+    // @param _numberOfOracles number of oracle nodes that fetch IoT data
+    // @return the requestID so the user can keep track of request
+    function createRequest(
+        address _callbackAddress,
+        bytes _callbackFID,
+        bytes _IoTID,
+        bytes _dataType,
+        bytes _requiredResult,
+        uint32 _numberOfOracles) public payable returns(uint256) {
+        // assign id to request
+        requestId = requestCounter;
+        // log details of the request to array to cross reference later
+        requests[requestId].requestID = requestId;
+        requests[requestId].requester = msg.sender;
+        requests[requestId].callbackAddress = _callbackAddress;
+        requests[requestId].callbackFID = _callbackFID;
+        requests[requestId].IoTID = _IoTID;
+        requests[requestId].dataType = _dataType;
+        requests[requestId].requiredResult = _requiredResult;
+        requests[requestId].numberOfOracles = _numberOfOracles;
+        requests[requestId].oracles;
+        requests[requestId].oracleCounter = 0;
 
 
+        // create a hash of the _dataType and _requiredResult:
+        // we will use the actual result to test upon delivery.
+        bytes32 phash = keccak256(abi.encodePacked(_dataType, _requiredResult));
+        requests[requestId].pHash = phash;
+        // increment requestId ready for next create request function.
+        requestCounter++;
 
+        emit OpenForBids(requestId, requests[requestId].dataType);
 
+        return requestId;
+    }
 
+    // @notice off-chain oracle node places bid to fetch data, once threshold is reached, emits event details.
+    // @dev
+    // @param requestId oracle node wishes to bid on
+    // @return true to indicate bid successful
+    function placeBid(uint256 _requestID) public oracleHasJoined() returns(bool)  {
+        require(requests[_requestID].oracleCounter <= requests[_requestID].numberOfOracles);
+        requests[_requestID].oracles[requests[_requestId].oracleCounter];
+        requests[_requestID].oracleCounter++;
+        // also add a timeout
+        if (requests[_requestId].numberOfOracles == requests[_requestId].oracles.Length) {
+            emit ReleaseRequestDetails(requests[_requestID].requestID,
+                requests[_requestID].IoTID,
+                requests[_requestId].dataType);
+            return true;
+        }
+        emit BidPlaced(msg.sender);
+        return oracles[msg.sender];
+    }
 
+    //
 
+    // function deliveryResponse() {} returns result to user smart contract
+    function deliverResponse(uint256) {
+        // return single aggregation result
+    }
+
+    // @notice modifier to confirm calling address is an oracle node address already acknowledged
+    modifier oracleHasJoined() {
+        require(oracles[msg.sender] == true);
+        _;
+    }
+    // @notice modifier to confirm calling address is not yet an oracle node address acknowledged
+    modifier oracleNotJoined() {
+        require(msg.sender != true);
+        _;
+    }
 }
