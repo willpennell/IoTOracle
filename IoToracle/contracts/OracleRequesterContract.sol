@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 
@@ -21,13 +22,13 @@ contract OracleRequesterContract {
         bytes32 pHash;
         bytes requiredResult;
         uint32 numberOfOracles;
-        address[] oracles;
+        mapping (address => bool) oracles;
         uint oracleCounter;
     }
 
     event OpenForBids(uint256, bytes);
     event BidPlaced(address);
-    event ReleaseRequestDetails(uint256, bytes, bytes, bytes);
+    event ReleaseRequestDetails(uint256, bytes, bytes);
 
     constructor() {
         owner = msg.sender;
@@ -50,13 +51,13 @@ contract OracleRequesterContract {
     // @return the requestID so the user can keep track of request
     function createRequest(
         address _callbackAddress,
-        bytes _callbackFID,
-        bytes _IoTID,
-        bytes _dataType,
-        bytes _requiredResult,
+        bytes memory _callbackFID,
+        bytes memory _IoTID,
+        bytes memory _dataType,
+        bytes memory _requiredResult,
         uint32 _numberOfOracles) public payable returns(uint256) {
         // assign id to request
-        requestId = requestCounter;
+        uint256 requestId = requestCounter;
         // log details of the request to array to cross reference later
         requests[requestId].requestID = requestId;
         requests[requestId].requester = msg.sender;
@@ -66,7 +67,7 @@ contract OracleRequesterContract {
         requests[requestId].dataType = _dataType;
         requests[requestId].requiredResult = _requiredResult;
         requests[requestId].numberOfOracles = _numberOfOracles;
-        requests[requestId].oracles;
+        //requests[requestId].oracles;
         requests[requestId].oracleCounter = 0;
 
 
@@ -87,14 +88,14 @@ contract OracleRequesterContract {
     // @param requestId oracle node wishes to bid on
     // @return true to indicate bid successful
     function placeBid(uint256 _requestID) public oracleHasJoined() returns(bool)  {
-        require(requests[_requestID].oracleCounter <= requests[_requestID].numberOfOracles);
-        requests[_requestID].oracles[requests[_requestId].oracleCounter];
+        require(requests[_requestID].oracleCounter < requests[_requestID].numberOfOracles);
+        requests[_requestID].oracles[msg.sender] = true;
         requests[_requestID].oracleCounter++;
         // also add a timeout
-        if (requests[_requestId].numberOfOracles == requests[_requestId].oracles.Length) {
+        if (requests[_requestID].numberOfOracles == requests[_requestID].oracleCounter) {
             emit ReleaseRequestDetails(requests[_requestID].requestID,
                 requests[_requestID].IoTID,
-                requests[_requestId].dataType);
+                requests[_requestID].dataType);
             return true;
         }
         emit BidPlaced(msg.sender);
@@ -104,9 +105,9 @@ contract OracleRequesterContract {
     //
 
     // function deliveryResponse() {} returns result to user smart contract
-    function deliverResponse(uint256) {
+    /*function deliverResponse(uint256) {
         // return single aggregation result
-    }
+    }*/
 
     // @notice modifier to confirm calling address is an oracle node address already acknowledged
     modifier oracleHasJoined() {
@@ -115,7 +116,7 @@ contract OracleRequesterContract {
     }
     // @notice modifier to confirm calling address is not yet an oracle node address acknowledged
     modifier oracleNotJoined() {
-        require(msg.sender != true);
+        require(oracles[msg.sender] != true);
         _;
     }
 }
