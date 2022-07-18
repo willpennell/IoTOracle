@@ -1,5 +1,5 @@
-var IoTOracle = artifacts.require("IoTOracleContract");
+var OracleRequester = artifacts.require("OracleRequesterContract")
 
 module.exports = function(deployer) {
-    deployer.deploy(IoTOracle);
+    deployer.deploy(OracleRequester);
 }

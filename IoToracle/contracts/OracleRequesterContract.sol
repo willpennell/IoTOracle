@@ -5,9 +5,11 @@ pragma solidity ^0.8.0;
 contract OracleRequesterContract {
     //
 
-    address owner;
+    address payable public owner;
 
     Request[100] public requests;
+    bool[100] public pendingRequests;
+    Request[100] public completedRequests;
     mapping (address => bool) public oracles;
     uint requestCounter = 1;
     uint pendingCounter = 1;
@@ -20,10 +22,10 @@ contract OracleRequesterContract {
         bytes IoTID;
         bytes dataType;
         bytes32 pHash;
-        bytes requiredResult;
+        //bytes requiredResult;
         uint32 numberOfOracles;
-        mapping (address => bool) oracles;
-        uint oracleCounter;
+        mapping (address => bool) oraclesForRequest;
+        uint32 oracleCounter;
     }
 
     event OpenForBids(uint256, bytes);
@@ -31,9 +33,11 @@ contract OracleRequesterContract {
     event ReleaseRequestDetails(uint256, bytes, bytes);
 
     constructor() {
-        owner = msg.sender;
+        owner = payable(msg.sender);
 
     }
+
+    fallback() external{}
 
     function joinAsOracle() public oracleNotJoined() returns(bool){
         oracles[msg.sender] = true;
@@ -65,7 +69,7 @@ contract OracleRequesterContract {
         requests[requestId].callbackFID = _callbackFID;
         requests[requestId].IoTID = _IoTID;
         requests[requestId].dataType = _dataType;
-        requests[requestId].requiredResult = _requiredResult;
+        //requests[requestId].requiredResult = _requiredResult;
         requests[requestId].numberOfOracles = _numberOfOracles;
         //requests[requestId].oracles;
         requests[requestId].oracleCounter = 0;
@@ -76,6 +80,7 @@ contract OracleRequesterContract {
         bytes32 phash = keccak256(abi.encodePacked(_dataType, _requiredResult));
         requests[requestId].pHash = phash;
         // increment requestId ready for next create request function.
+        pendingRequests[requestId] = true;
         requestCounter++;
 
         emit OpenForBids(requestId, requests[requestId].dataType);
@@ -89,25 +94,44 @@ contract OracleRequesterContract {
     // @return true to indicate bid successful
     function placeBid(uint256 _requestID) public oracleHasJoined() returns(bool)  {
         require(requests[_requestID].oracleCounter < requests[_requestID].numberOfOracles);
-        requests[_requestID].oracles[msg.sender] = true;
+        requests[_requestID].oraclesForRequest[msg.sender] = true;
         requests[_requestID].oracleCounter++;
         // also add a timeout
+        emit BidPlaced(msg.sender);
         if (requests[_requestID].numberOfOracles == requests[_requestID].oracleCounter) {
             emit ReleaseRequestDetails(requests[_requestID].requestID,
                 requests[_requestID].IoTID,
                 requests[_requestID].dataType);
             return true;
         }
-        emit BidPlaced(msg.sender);
         return oracles[msg.sender];
     }
 
     //
 
     // function deliveryResponse() {} returns result to user smart contract
-    /*function deliverResponse(uint256) {
+    // TODO: MAKE SURE TO SET AGGREGATOR CONTRACT TO ONLY CALL THIS FUNCTION
+    function deliverResponse(uint256 _requestID, bytes memory _finalResult) public {
         // return single aggregation result
-    }*/
+    }
+
+    // getters
+    function getOracleForRequest(uint256 _requestID, address _orcAddr) public view returns(bool){
+        return requests[_requestID].oraclesForRequest[_orcAddr];
+    }
+    function getNumberOfOracles(uint256 _requestID) public view returns(uint32){
+        return requests[_requestID].numberOfOracles;
+    }
+    function getPHash(uint256 _requestID) public view returns(bytes32){
+        return requests[_requestID].pHash;
+    }
+    function getDataType(uint256 _requestID) public view returns(bytes memory) {
+        return requests[_requestID].dataType;
+    }
+    function moveCompletedRequest(uint256 _requestID) internal {
+        completedRequests[_requestID] = requests[_requestID];
+
+    }
 
     // @notice modifier to confirm calling address is an oracle node address already acknowledged
     modifier oracleHasJoined() {
