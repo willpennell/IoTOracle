@@ -5,6 +5,7 @@ import "./OracleRequesterContract.sol";
 
 contract AggregatorContract {
 
+    address payable public owner;
     // need an answers struct
     OracleRequesterContract orc;
     //orc = OracleRequesterContract() // address of deployed contract
@@ -23,9 +24,9 @@ contract AggregatorContract {
     event ResponseReceived(address, string);
     event AggregationCompleted(uint256, string);
 
-    constructor(address _addrs) {
+    constructor(address _addr) {
         // initialise the Oracle Request Contract contract
-        orc = new OracleRequesterContract(_addrs);
+        orc = OracleRequesterContract(_addr);
     }
 
     // @notice each oracle sends their response to through this function
@@ -35,11 +36,11 @@ contract AggregatorContract {
     // @param _actualResult the value the off-chain oracle has collected
     // @return bool, true to say answer has been submitted
     function receiveResponse(
-        uint256 _requestID
-        //bytes memory _actualResult
+        uint256 _requestID,
+        bytes memory _actualResult
     )
     public
-    //onlyAuthorisedOraclesYetToVote(_requestID)
+    onlyAuthorisedOraclesYetToVote(_requestID)
     returns(bool){
         if (answers[_requestID].oracleCounter < orc.getNumberOfOracles(_requestID)) {
             answers[_requestID].requestID = _requestID;
@@ -53,7 +54,7 @@ contract AggregatorContract {
         if(answers[_requestID].oracleCounter == orc.getNumberOfOracles(_requestID)) {
             // call aggregator function
             emit ResponseReceived(msg.sender, "response logged");
-            //orc.deliverResponse(_requestID, aggregation(_requestID));
+            orc.deliverResponse(_requestID, aggregation(_requestID));
         }
         return answers[_requestID].oracleHasSubmitted[msg.sender];
     }
@@ -87,22 +88,19 @@ contract AggregatorContract {
         // requires a threshold for false answers
         require(!(answers[_requestID].f > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
         emit AggregationCompleted(_requestID, "aggregation complete");
+        orc.deliverResponse(_requestID, finalResult);
         return finalResult;
     }
 
-    function getResultsInfo(uint256 _requestID) public returns(uint256) {
-
-        return uint256(orc.requests[_requestID].numberOfOracles);
-    }
 
 
-    /*modifier onlyAuthorisedOraclesYetToVote(uint256 _requestID) {
+    modifier onlyAuthorisedOraclesYetToVote(uint256 _requestID) {
         // checks that the oracle is in request list
         require(orc.getOracleForRequest(_requestID, msg.sender));
         // checks that the oracle hasn't yet voted.
-        //require(answers[_requestID].oracleHasSubmitted[msg.sender] == false);
+        require(answers[_requestID].oracleHasSubmitted[msg.sender] == false);
         _;
-    }*/
+    }
 }
 
 

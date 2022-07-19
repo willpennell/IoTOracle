@@ -1,5 +1,9 @@
 var OracleRequester = artifacts.require("OracleRequesterContract")
+var Aggregator = artifacts.require("AggregatorContract")
 
 module.exports = function(deployer) {
-    deployer.deploy(OracleRequester);
+    deployer.then(async () => {
+        await deployer.deploy(OracleRequester);
+        await deployer.deploy(Aggregator, OracleRequester.address);
+    });
 }

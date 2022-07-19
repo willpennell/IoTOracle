@@ -8,11 +8,10 @@ contract OracleRequesterContract {
     address payable public owner;
 
     Request[100] public requests;
-    bool[100] public pendingRequests;
-    Request[100] public completedRequests;
     mapping (address => bool) public oracles;
     uint requestCounter = 1;
     uint pendingCounter = 1;
+    enum Status{NOTSSTARTED, PENDING, COMPLETE}
     // a single Request structure
     struct Request {
         uint256 requestID;
@@ -26,11 +25,14 @@ contract OracleRequesterContract {
         uint32 numberOfOracles;
         mapping (address => bool) oraclesForRequest;
         uint32 oracleCounter;
+        Status status;
     }
 
     event OpenForBids(uint256, bytes);
     event BidPlaced(address);
     event ReleaseRequestDetails(uint256, bytes, bytes);
+    event StatusChange(Status, string);
+    event OracleJoined(address, string);
 
     constructor() {
         owner = payable(msg.sender);
@@ -41,6 +43,7 @@ contract OracleRequesterContract {
 
     function joinAsOracle() public oracleNotJoined() returns(bool){
         oracles[msg.sender] = true;
+        emit OracleJoined(msg.sender, "Welcome new node!");
         return oracles[msg.sender];
     }
 
@@ -59,33 +62,34 @@ contract OracleRequesterContract {
         bytes memory _IoTID,
         bytes memory _dataType,
         bytes memory _requiredResult,
-        uint32 _numberOfOracles) public payable returns(uint256) {
+        uint32 _numberOfOracles) public returns(uint256) {
         // assign id to request
-        uint256 requestId = requestCounter;
+        uint256 requestID = requestCounter;
         // log details of the request to array to cross reference later
-        requests[requestId].requestID = requestId;
-        requests[requestId].requester = msg.sender;
-        requests[requestId].callbackAddress = _callbackAddress;
-        requests[requestId].callbackFID = _callbackFID;
-        requests[requestId].IoTID = _IoTID;
-        requests[requestId].dataType = _dataType;
-        //requests[requestId].requiredResult = _requiredResult;
-        requests[requestId].numberOfOracles = _numberOfOracles;
-        //requests[requestId].oracles;
-        requests[requestId].oracleCounter = 0;
+        requests[requestID].requestID = requestID;
+        requests[requestID].requester = msg.sender;
+        requests[requestID].callbackAddress = _callbackAddress;
+        requests[requestID].callbackFID = _callbackFID;
+        requests[requestID].IoTID = _IoTID;
+        requests[requestID].dataType = _dataType;
+        //requests[requestId].requiredResult = _requiredResult; // do not need to store result put in a hash?
+        requests[requestID].numberOfOracles = _numberOfOracles;
+        requests[requestID].oracleCounter = 0;
+        requests[requestID].status = Status.PENDING;
+        emit StatusChange(requests[requestID].status, "PENDING");
 
 
         // create a hash of the _dataType and _requiredResult:
         // we will use the actual result to test upon delivery.
-        bytes32 phash = keccak256(abi.encodePacked(_dataType, _requiredResult));
-        requests[requestId].pHash = phash;
+        bytes32 phash = keccak256(abi.encodePacked(_dataType, _requiredResult)); // add required result to hash
+        requests[requestID].pHash = phash;
         // increment requestId ready for next create request function.
-        pendingRequests[requestId] = true;
+
         requestCounter++;
 
-        emit OpenForBids(requestId, requests[requestId].dataType);
+        emit OpenForBids(requestID, requests[requestID].dataType);
 
-        return requestId;
+        return requestID;
     }
 
     // @notice off-chain oracle node places bid to fetch data, once threshold is reached, emits event details.
@@ -110,27 +114,25 @@ contract OracleRequesterContract {
     //
 
     // function deliveryResponse() {} returns result to user smart contract
-    // TODO: MAKE SURE TO SET AGGREGATOR CONTRACT TO ONLY CALL THIS FUNCTION
     function deliverResponse(uint256 _requestID, bytes memory _finalResult) public {
         // return single aggregation result
+        _finalResult;
+        requests[_requestID].status = Status.COMPLETE;
+    emit StatusChange(requests[_requestID].status, "COMPLETE");
     }
 
     // getters
-    function getOracleForRequest(uint256 _requestID, address _orcAddr) public view returns(bool){
+    function getOracleForRequest(uint256 _requestID, address _orcAddr) external view returns(bool){
         return requests[_requestID].oraclesForRequest[_orcAddr];
     }
-    function getNumberOfOracles(uint256 _requestID) public view returns(uint32){
+    function getNumberOfOracles(uint256 _requestID) external view returns(uint32){
         return requests[_requestID].numberOfOracles;
     }
-    function getPHash(uint256 _requestID) public view returns(bytes32){
+    function getPHash(uint256 _requestID) external view returns(bytes32){
         return requests[_requestID].pHash;
     }
-    function getDataType(uint256 _requestID) public view returns(bytes memory) {
+    function getDataType(uint256 _requestID) external view returns(bytes memory) {
         return requests[_requestID].dataType;
-    }
-    function moveCompletedRequest(uint256 _requestID) internal {
-        completedRequests[_requestID] = requests[_requestID];
-
     }
 
     // @notice modifier to confirm calling address is an oracle node address already acknowledged
