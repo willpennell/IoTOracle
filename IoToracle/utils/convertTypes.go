@@ -1,18 +1,10 @@
 package utils
 
 import (
-	"github.com/ethereum/go-ethereum/common"
 	"math/big"
 )
 
-type Request struct {
-	RequestId     uint64
-	RequireResult bool
-	IotId         []byte
-	Requester     common.Address
-}
-
-func ConvertRequestTypes(a interface{}, b interface{}, c interface{}, d interface{}) Request {
+/*func ConvertRequestTypes(a interface{}, b interface{}, c interface{}, d interface{}) Request {
 	// convert requestID to uint64
 	r1, _ := a.(*big.Int)
 	r1conv := r1.Uint64()
@@ -31,4 +23,19 @@ func ConvertRequestTypes(a interface{}, b interface{}, c interface{}, d interfac
 		Requester:     r4,
 	}
 	return req
+}*/
+
+func ConvertOpenForBidsData(a interface{}, b interface{}) (Request, uint64) {
+	// covert RequestId
+	requestId, _ := a.(*big.Int)
+	requestIdConv := requestId.Uint64()
+
+	dataType, _ := b.([]byte)
+
+	request := Request{
+		RequestId: requestIdConv,
+		DataType:  dataType,
+		IotId:     nil,
+	}
+	return request, requestIdConv
 }

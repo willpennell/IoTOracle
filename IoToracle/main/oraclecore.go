@@ -1,6 +1,8 @@
 package main
 
 import (
+	c "IoToracle/config"
+	"IoToracle/core"
 	p "IoToracle/utils"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"log"
@@ -24,17 +26,18 @@ func main() {
 	wg.Add(2)
 
 	// initialise Global Vars
-	//requests := make(p.RequestsSingleton)
+	requests := p.Reqs
 	//OracleRequestContractABI := c.ORACLEREQUESTCONTRACTABI()
 	//AggregationContractABI := c.AGGREGATORCONTRACTABI()
 	client := establishConnection()
 
-	p.InitOracle(client)
+	nodeInfo := p.InitOracle(client)
 	// run catch up
 	//c.CatchUpPreviousRequests(client, OracleRequestContractABI, requests)
 	// goroutine for subscribing to events
 
-	//go c.SubscribeToEvents(client, OracleRequestContractABI, requests, &wg)
+	go core.SubscribeToORCEvents(client, c.ORACLEREQUESTCONTRACTABI(), &wg,
+		requests, nodeInfo)
 
 	//go c.ServerSetup(&wg)
 	//wg.Wait()

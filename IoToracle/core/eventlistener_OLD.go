@@ -47,7 +47,7 @@ func CatchUpPreviousRequests(client *ethclient.Client, contractABI abi.ABI, reqM
 	}
 }
 
-func SubscribeToEvents(client *ethclient.Client, contractABI abi.ABI, reqMap p.RequestsSingleton, wg *sync.WaitGroup) {
+func subscribeToEvents(client *ethclient.Client, contractABI abi.ABI, reqMap p.RequestsSingleton, wg *sync.WaitGroup) {
 	defer wg.Done()
 	query := ethereum.FilterQuery{
 		Addresses: []common.Address{p.IOTORACLECONTRACTADDRESS},

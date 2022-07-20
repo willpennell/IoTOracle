@@ -16,8 +16,7 @@ import (
 
 var ChainID = big.NewInt(5777)
 
-// TODO generate privatekey object
-
+// PrivateKey creates private key object to sign objects
 func PrivateKey(info OracleNodeInfo) *ecdsa.PrivateKey {
 	hexKey := info.PrivateKey
 	privateKeyBin, err := hexutil.Decode(hexKey)
@@ -31,8 +30,7 @@ func PrivateKey(info OracleNodeInfo) *ecdsa.PrivateKey {
 	return privateKey
 }
 
-// TODO generate nonce
-
+// Nonce creates a nonce for tx
 func Nonce(client *ethclient.Client, info OracleNodeInfo) uint64 {
 	nonce, err := client.PendingNonceAt(context.Background(), info.NodeAddress)
 	if err != nil {
@@ -41,7 +39,7 @@ func Nonce(client *ethclient.Client, info OracleNodeInfo) uint64 {
 	return nonce
 }
 
-// TODO generate gas
+// GasForFuncCall creates gas price for tx
 func GasForFuncCall(client *ethclient.Client) *big.Int {
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
@@ -50,8 +48,7 @@ func GasForFuncCall(client *ethclient.Client) *big.Int {
 	return gasPrice
 }
 
-// TODO generate auth
-
+// Auth creates auth binding for transactions
 func Auth(client *ethclient.Client, info OracleNodeInfo) *bind.TransactOpts {
 	auth, err := bind.NewKeyedTransactorWithChainID(PrivateKey(info), ChainID)
 	if err != nil {
@@ -64,17 +61,9 @@ func Auth(client *ethclient.Client, info OracleNodeInfo) *bind.TransactOpts {
 	return auth
 }
 
-// TODO generate instance
-// AggregatorContractInstance
-func AggregatorContractInstance(client *ethclient.Client) *abi.AggregatorContract {
-	AggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return AggInstance
-}
+// ****OracleRequestContract****
 
-// OracleRequestContractInstance OracleRequestContract
+// OracleRequestContractInstance creates instance of OracleRequestContract
 func OracleRequestContractInstance(client *ethclient.Client) *abi.OracleRequestContract {
 	ORCInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
 	if err != nil {
@@ -83,24 +72,65 @@ func OracleRequestContractInstance(client *ethclient.Client) *abi.OracleRequestC
 	return ORCInstance
 }
 
-// TODO generate tx JoinAsOracle
+// TxJoinAsOracle creates tx to join oracle network
 func TxJoinAsOracle(client *ethclient.Client, info OracleNodeInfo) *types.Transaction {
 	orcJoinAsOracle := OracleRequestContractInstance(client)
 	tx, err := orcJoinAsOracle.JoinAsOracle(Auth(client, info))
 	if err != nil {
 		log.Fatal(err)
 	}
+	PRINTTXHASH(tx)
 	return tx
 }
 
+// TxLeaveOracleNetwork run this at start of test to make sure the different parts of the contract are working
+func TxLeaveOracleNetwork(client *ethclient.Client, info OracleNodeInfo) *types.Transaction {
+	orcLeaveOracle := OracleRequestContractInstance(client)
+	tx, err := orcLeaveOracle.LeaveOracleNetwork(Auth(client, info))
+	if err != nil {
+		log.Fatal(err)
+	}
+	PRINTTXHASH(tx)
+	return tx
+}
+
+// TxPlaceBid creates tx to  place bid on request
+func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) (*types.Transaction, error) {
+	orcPLaceBid := OracleRequestContractInstance(client)
+	tx, err := orcPLaceBid.PlaceBid(Auth(client, info), requestID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	PRINTTXHASH(tx)
+	return tx, nil
+}
+
+// ***ToDoList***
 // TODO generate tx createRequest
-
-// TODO generate tx placeBids
-
-// TODO generate tx deliverResponse ???
-
+// TODO generate tx deliverResponse
 // TODO generate tx for getters
+// Do not need at the moment
 
-// AggregatorContract
+// ****AggregatorContract****
 
-// TODO generate tx recieveResponse
+// AggregatorContractInstance creates instance of the aggregator contract
+func AggregatorContractInstance(client *ethclient.Client) *abi.AggregatorContract {
+	AggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return AggInstance
+}
+
+// TxReceiveResponse generate tx to send result fetched to receiveResponse
+func TxReceiveResponse(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int, actualResult []byte) *types.Transaction {
+	aggReceiveResponse := AggregatorContractInstance(client)
+	tx, err := aggReceiveResponse.ReceiveResponse(Auth(client, info), requestID, actualResult)
+	if err != nil {
+		log.Fatal(err)
+	}
+	PRINTTXHASH(tx)
+	return tx
+}
+
+// ***ToDoList***

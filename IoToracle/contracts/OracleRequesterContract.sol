@@ -33,6 +33,7 @@ contract OracleRequesterContract {
     event ReleaseRequestDetails(uint256, bytes, bytes);
     event StatusChange(Status, string);
     event OracleJoined(address, string);
+    event OracleLeft(address, string);
 
     constructor() {
         owner = payable(msg.sender);
@@ -45,6 +46,12 @@ contract OracleRequesterContract {
         oracles[msg.sender] = true;
         emit OracleJoined(msg.sender, "Welcome new node!");
         return oracles[msg.sender];
+    }
+
+    function leaveOracleNetwork() public oracleHasJoined() returns(bool) {
+        delete oracles[msg.sender];
+        emit OracleLeft(msg.sender, "Node has left, Goodbye");
+        return true;
     }
 
     // @notice user can call function create request

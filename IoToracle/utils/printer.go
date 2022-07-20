@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fatih/color"
 	"net"
 )
@@ -27,9 +28,8 @@ func ENDREQUEST() {
 
 func REQUESTMESSAGE(req Request) {
 	fmt.Println(req.RequestId)
-	fmt.Println(req.RequireResult)
+	fmt.Println(req.DataType)
 	fmt.Println(string(req.IotId))
-	fmt.Println(req.Requester)
 }
 
 func SUBSCRIBEDMESSAGE(oracle string) {
@@ -37,5 +37,25 @@ func SUBSCRIBEDMESSAGE(oracle string) {
 }
 
 func SERVERLISTENING(lis net.Listener) {
-	color.Red("server listening at %v", lis.Addr())
+	color.Red("server listening at %v\n", lis.Addr())
+}
+
+func ORACLENODEHASJOINED() {
+	color.Green("Node has joined network\n")
+}
+
+func ORACLENODEHASLEFT() {
+	color.Red("NODE HAS LEFT NETWORK!\n")
+}
+
+func PRINTTXHASH(tx *types.Transaction) {
+	color.HiMagenta("Cost: %v\nHash: %v\n", tx.Cost(), tx.Hash())
+}
+
+func NEWBID() {
+	color.Green("-----------------NEW BID PLACED----------------")
+}
+
+func ENDBID() {
+	color.Green("-----------------------------------------------")
 }

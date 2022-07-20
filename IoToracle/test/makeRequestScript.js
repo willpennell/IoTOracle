@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const util = require('util')
-const MyContract = require('../build/contracts/IoTOracleContract.json');
+const MyContract = require('../build/contracts/OracleRequesterContract.json');
 // iot id
 const iotid = "rp42009389999ddmdnn"
 const iotidEncode = Web3.utils.asciiToHex(iotid)
