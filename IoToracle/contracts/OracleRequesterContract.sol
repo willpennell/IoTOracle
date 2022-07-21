@@ -128,6 +128,12 @@ contract OracleRequesterContract {
     emit StatusChange(requests[_requestID].status, "COMPLETE");
     }
 
+    function cancelRequest(uint256 _requestID) external cancelCheck(_requestID){
+        delete requests[_requestID];
+        requestCounter = 1;
+
+    }
+
     // getters
     function getOracleForRequest(uint256 _requestID, address _orcAddr) external view returns(bool){
         return requests[_requestID].oraclesForRequest[_orcAddr];
@@ -150,6 +156,11 @@ contract OracleRequesterContract {
     // @notice modifier to confirm calling address is not yet an oracle node address acknowledged
     modifier oracleNotJoined() {
         require(oracles[msg.sender] != true);
+        _;
+    }
+    //
+    modifier cancelCheck(uint256 _requestID) {
+        require(requests[_requestID].callbackAddress == msg.sender);
         _;
     }
 }

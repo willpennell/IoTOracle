@@ -1,6 +1,8 @@
 package utils
 
-//var once sync.Once
+import "sync"
+
+var once sync.Once
 
 type Request struct {
 	RequestId uint64
@@ -10,14 +12,14 @@ type Request struct {
 type RequestsSingleton map[uint64]Request
 
 var (
-	Reqs *RequestsSingleton
+	reqs RequestsSingleton
 )
 
-/*func MakeRequests() RequestsSingleton {
+func MakeRequests() RequestsSingleton {
 	once.Do(func() {
 		reqs = make(RequestsSingleton)
 	})
 	return reqs
 }
 
-var Requests = MakeRequests()*/
+var Requests = MakeRequests()

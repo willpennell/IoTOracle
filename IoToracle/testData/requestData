@@ -2,6 +2,6 @@ address requester = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4
 address callbackAddress = 0x0db4b258DfEC24FDAC43b75ee2fEAe1E214F7667
 bytes callbackFID = ''// ABI of this from contract look into
 bytes IoTID = 'rp41993'
-bytes dataType = '{type: bool, topic: 'PIRSensor', tAfter: '', tBefore: ''}'
+bytes dataType = '{"type": bool, "topic": "PIRSensor", "tAfter": null, "tBefore": null}'
 bytes requiredResult = '{result: true}'
 uint32 numberOfOracles = 3
