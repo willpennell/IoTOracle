@@ -5,3 +5,4 @@ bytes IoTID = 'rp41993'
 bytes dataType = '{"type": bool, "topic": "PIRSensor", "tAfter": null, "tBefore": null}'
 bytes requiredResult = '{result: true}'
 uint32 numberOfOracles = 3
+bytes actualResult = '{"result": true}'

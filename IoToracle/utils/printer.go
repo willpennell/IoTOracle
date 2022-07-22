@@ -72,3 +72,28 @@ func STATUSCHANGEMESSAGE(eventStatusChange *abi.OracleRequestContractStatusChang
 	color.Red("TO: %v\n", eventStatusChange.Arg1)
 	REQUESTLINE()
 }
+
+func RELEASEREQUESTDETAILS(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails) {
+	REQUESTLINE()
+	fmt.Println("Release Request Details:")
+	fmt.Println("RequestID: ", eventReleaseRequestDetails.Arg0)
+	fmt.Println("IoTID: ", string(eventReleaseRequestDetails.Arg1))
+	fmt.Println("Data Type: ", string(eventReleaseRequestDetails.Arg2))
+	REQUESTLINE()
+}
+
+func RESPONSERECIEVED(eventResponseReceived *abi.AggregatorContractResponseReceived) {
+	REQUESTLINE()
+	fmt.Println("Response Received:")
+	fmt.Println("Response From Address: ", eventResponseReceived.Arg0)
+	fmt.Println("Response Message: ", eventResponseReceived.Arg1)
+	REQUESTLINE()
+}
+
+func AGGREGATIONCOMPLETE(eventAggregationCompleted *abi.AggregatorContractAggregationCompleted) {
+	REQUESTLINE()
+	fmt.Println("Aggregation Complete:")
+	fmt.Println("RequestID: ", eventAggregationCompleted.Arg0)
+	fmt.Println("Aggregation Message: ", eventAggregationCompleted.Arg1)
+	REQUESTLINE()
+}

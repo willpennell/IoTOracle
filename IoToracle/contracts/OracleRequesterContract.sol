@@ -43,9 +43,9 @@ contract OracleRequesterContract {
     fallback() external{}
 
     function joinAsOracle() public oracleNotJoined() returns(bool){
-        oracles[msg.sender] = true;
+        oracles[address(msg.sender)] = true;
         emit OracleJoined(msg.sender, "Welcome new node!");
-        return oracles[msg.sender];
+        return oracles[address(msg.sender)];
     }
 
     function leaveOracleNetwork() public oracleHasJoined() returns(bool) {

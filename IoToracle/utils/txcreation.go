@@ -4,6 +4,7 @@ import (
 	abi "IoToracle/abitogo"
 	c "IoToracle/config"
 	"crypto/ecdsa"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -56,7 +57,7 @@ func Auth(client *ethclient.Client, info OracleNodeInfo) *bind.TransactOpts {
 	}
 	auth.Nonce = big.NewInt(int64(Nonce(client, info)))
 	auth.Value = big.NewInt(0)
-	auth.GasLimit = uint64(300000)
+	auth.GasLimit = uint64(3000000)
 	auth.GasPrice = GasForFuncCall(client)
 	return auth
 }
@@ -109,6 +110,18 @@ func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.In
 // TODO generate tx createRequest
 // TODO generate tx deliverResponse
 // TODO generate tx for getters
+
+func TxPhash(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) {
+	orcPLaceBid := OracleRequestContractInstance(client)
+	call := bind.CallOpts{Context: context.Background()}
+	pHash, err := orcPLaceBid.GetPHash(&call, requestID)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Solidity HASH: ", pHash)
+
+}
+
 // Do not need at the moment
 
 // ****AggregatorContract****
@@ -123,9 +136,9 @@ func AggregatorContractInstance(client *ethclient.Client) *abi.AggregatorContrac
 }
 
 // TxReceiveResponse generate tx to send result fetched to receiveResponse
-func TxReceiveResponse(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int, actualResult []byte) *types.Transaction {
+func TxReceiveResponse(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int, fetchedResult []byte) *types.Transaction {
 	aggReceiveResponse := AggregatorContractInstance(client)
-	tx, err := aggReceiveResponse.ReceiveResponse(Auth(client, info), requestID, actualResult)
+	tx, err := aggReceiveResponse.ReceiveResponse(Auth(client, info), requestID, fetchedResult)
 	if err != nil {
 		log.Fatal(err)
 	}

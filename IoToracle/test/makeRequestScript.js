@@ -11,14 +11,15 @@ const iotidEncode = Web3.utils.asciiToHex(iotid)
 // dataType
 const dt = '{"type": bool, "topic": "PIRSensor", "tAfter": null, "tBefore": null}'
 const dataTypeEncode = Web3.utils.asciiToHex(dt)
+
 //const dataTypeEncode = Web3.utils.asciiToHex()
 
 // requiredResult
 let rr = '{"result": true}'
 const requiredResultEncode = Web3.utils.asciiToHex(rr)
+console.log(requiredResultEncode)
 
 
-console.log(iotidEncode)
 const init = async () => {
     const web3 = new Web3('http://localhost:8546');
     const addr1 = "0x0db4b258DfEC24FDAC43b75ee2fEAe1E214F7667"

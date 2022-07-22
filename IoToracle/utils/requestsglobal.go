@@ -9,7 +9,7 @@ type Request struct {
 	DataType  []byte
 	IotId     []byte
 }
-type RequestsSingleton map[uint64]Request
+type RequestsSingleton map[uint64]*Request
 
 var (
 	reqs RequestsSingleton

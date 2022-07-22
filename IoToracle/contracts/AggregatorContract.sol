@@ -23,6 +23,7 @@ contract AggregatorContract {
 
     event ResponseReceived(address, string);
     event AggregationCompleted(uint256, string);
+    event LogHashes(bytes32, bytes32);
 
     constructor(address _addr) {
         // initialise the Oracle Request Contract contract
@@ -71,6 +72,10 @@ contract AggregatorContract {
         for (uint i=0; i<=answers[_requestID].oracleCounter; i++){
             address oracleAddress = answers[_requestID].oracleAddresses[i];
             // ensures actual result and required result are the same
+            bytes32 responseHash = keccak256(abi.encodePacked(
+                    answers[_requestID].dataType, answers[_requestID].oracleResults[oracleAddress]
+                ));
+            emit LogHashes(orc.getPHash(_requestID), responseHash);
             if (keccak256(abi.encodePacked(
                     answers[_requestID].dataType, answers[_requestID].oracleResults[oracleAddress]
                 )) == orc.getPHash(_requestID)){

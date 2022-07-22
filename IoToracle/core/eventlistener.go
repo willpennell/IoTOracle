@@ -4,8 +4,11 @@ import (
 	abi "IoToracle/abitogo"
 	c "IoToracle/config"
 	"IoToracle/utils"
+	"encoding/hex"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"golang.org/x/net/context"
 	"log"
@@ -29,7 +32,7 @@ func SubscribeToOracleRequestContractEvents(client *ethclient.Client, wg *sync.W
 	go EventOpenForBids(client, &w, nodeInfo)
 	go EventBidPlaced(client, &w)
 	go EventStatusChange(client, &w)
-	go EventReleaseRequestDetails(client, &w)
+	go EventReleaseRequestDetails(client, &w, nodeInfo)
 	w.Wait()
 }
 
@@ -61,7 +64,7 @@ func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo uti
 			utils.OPENFORBIDSMESSAGE(eventOpenForBids)
 
 			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1)
-			utils.Requests[id] = request
+			utils.Requests[id] = &request
 
 			time.Sleep(time.Second)
 			tx, err := utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
@@ -114,7 +117,7 @@ func EventBidPlaced(client *ethclient.Client, wg *sync.WaitGroup) {
 }
 
 // EventReleaseRequestDetails subscribe to ReleaseRequestDetails
-func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup) {
+func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
 	if err != nil {
@@ -138,14 +141,21 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventReleaseRequestDetails := <-channelReleaseRequestDetails:
-			id := eventReleaseRequestDetails.Arg0
-			utils.REQUESTLINE()
-			fmt.Println("Release Request Details:")
-			fmt.Println("RequestID: ", eventReleaseRequestDetails.Arg0)
-			fmt.Println("IoTID: ", string(eventReleaseRequestDetails.Arg1))
-			fmt.Println("Data Type: ", string(eventReleaseRequestDetails.Arg2))
-			utils.REQUESTLINE()
-			utils.Requests[int64(id)]
+
+			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails)
+			// call fetch to IoT
+
+			fmt.Println("Dummy response...")
+			// call a tx to send response to Aggregator Oracle
+			fr := `{"result": true}`
+			frEncode := hex.EncodeToString([]byte(fr))
+			fetchedResult := common.Hex2Bytes(frEncode)
+			userHash := crypto.Keccak256Hash(utils.Requests[eventReleaseRequestDetails.Arg0.Uint64()].DataType, fetchedResult)
+			fmt.Println("Golang HASH: ", userHash.Bytes())
+			utils.TxPhash(client, nodeInfo, eventReleaseRequestDetails.Arg0)
+
+			utils.TxReceiveResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, fetchedResult)
+
 		}
 	}
 	// Receive events from the channel
@@ -188,9 +198,10 @@ func EventStatusChange(client *ethclient.Client, wg *sync.WaitGroup) {
 func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var w sync.WaitGroup
-	w.Add(2)
+	w.Add(3)
 	go EventResponseReceived(client, &w)
 	go EventAggregationComplete(client, &w)
+	go EventLogHahses(client, &w)
 	w.Wait()
 }
 
@@ -219,12 +230,7 @@ func EventResponseReceived(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventResponseReceived := <-channelResponseReceived:
-			utils.REQUESTLINE()
-			fmt.Println("Response Received:")
-			fmt.Println("Response From Address: ", eventResponseReceived.Arg0)
-			fmt.Println("Response Message: ", eventResponseReceived.Arg1)
-			utils.REQUESTLINE()
-
+			utils.RESPONSERECIEVED(eventResponseReceived)
 		}
 	}
 	// Receive events from the channel
@@ -255,13 +261,38 @@ func EventAggregationComplete(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventAggregationCompleted := <-channelAggregationCompleted:
-			utils.REQUESTLINE()
-			fmt.Println("Aggregation Complete:")
-			fmt.Println("RequestID: ", eventAggregationCompleted.Arg0)
-			fmt.Println("Aggregation Message: ", eventAggregationCompleted.Arg1)
-			utils.REQUESTLINE()
+			utils.AGGREGATIONCOMPLETE(eventAggregationCompleted)
 
 		}
 	}
 	// Receive events from the channel
+}
+
+func EventLogHahses(client *ethclient.Client, wg *sync.WaitGroup) {
+	defer wg.Done()
+	aggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Watch for a Deposited event
+	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
+	// Setup a channel for results
+
+	channelLogHashes := make(chan *abi.AggregatorContractLogHashes)
+	// Start a goroutine which watches new events
+	sub, err := aggInstance.WatchLogHashes(watchOpts, channelLogHashes)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sub.Unsubscribe()
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case eventLogHahses := <-channelLogHashes:
+			fmt.Println("OG hash: ", eventLogHahses.Arg0)
+			fmt.Println("Result hash: ", eventLogHahses.Arg1)
+
+		}
+	}
 }

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"IoToracle/abitogo"
 	"math/big"
 )
 
@@ -40,13 +41,8 @@ func ConvertOpenForBidsData(a interface{}, b interface{}) (Request, uint64) {
 	return request, requestIdConv
 }
 
-func ConvertReleaseRequestDetailsData(a interface{}, b interface{}, c interface{}) (Request, uint64) {
-	requestId, _ := a.(*big.Int)
-	requestIdConv := requestId.Uint64()
-
-	dataType, _ := b.([]byte)
-
-	IoTId, _ := c.([]byte)
-
-	Requests[requestIdConv].IotId = IoTId
+func ConvertIoTID(eventReleaseRequestDetails *abitogo.OracleRequestContractReleaseRequestDetails) []byte {
+	IoTId := eventReleaseRequestDetails.Arg1
+	Requests[eventReleaseRequestDetails.Arg0.Uint64()].IotId = IoTId
+	return IoTId
 }
