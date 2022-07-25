@@ -36,7 +36,7 @@ const init = async () => {
         dataTypeEncode,
         requiredResultEncode,
         1
-    ).send({from: addr1, gas: 3000000})
+    ).send({from: addr1, gas: 3000000, value: 10**11})
     console.log("Pushed to Blockchain")
 }
 

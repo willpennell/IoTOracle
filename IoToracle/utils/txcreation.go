@@ -102,7 +102,7 @@ func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.In
 	if err != nil {
 		log.Fatal(err)
 	}
-	PRINTTXHASH(tx)
+	//PRINTTXHASH(tx)
 	return tx, nil
 }
 
@@ -142,7 +142,7 @@ func TxReceiveResponse(client *ethclient.Client, info OracleNodeInfo, requestID 
 	if err != nil {
 		log.Fatal(err)
 	}
-	PRINTTXHASH(tx)
+	//PRINTTXHASH(tx)
 	return tx
 }
 

@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "./AggregatorContract.sol";
 
 contract OracleRequesterContract {
     //
 
-    address payable public owner;
+    address public owner;
 
     Request[100] public requests;
     mapping (address => bool) public oracles;
     uint requestCounter = 1;
     uint pendingCounter = 1;
-    enum Status{NOTSSTARTED, PENDING, COMPLETE}
+    enum Status{PENDING, COMPLETE, CANCELLED}
     // a single Request structure
     struct Request {
         uint256 requestID;
@@ -24,9 +25,13 @@ contract OracleRequesterContract {
         //bytes requiredResult;
         uint32 numberOfOracles;
         mapping (address => bool) oraclesForRequest;
+        mapping (uint32 => address) oracleAddressAccess;
         uint32 oracleCounter;
         Status status;
+        uint8 cancelFlag;
+        uint fee;
     }
+    bool[100] public completedRequests;
 
     event OpenForBids(uint256, bytes);
     event BidPlaced(address);
@@ -35,8 +40,13 @@ contract OracleRequesterContract {
     event OracleJoined(address, string);
     event OracleLeft(address, string);
 
+    uint GAS_PRICE = 2 * 10**10;
+    uint FEE = GAS_PRICE * 2;
+    uint MIN_FEE = FEE + (GAS_PRICE * 3);
+
+
     constructor() {
-        owner = payable(msg.sender);
+        owner = msg.sender;
 
     }
 
@@ -69,7 +79,9 @@ contract OracleRequesterContract {
         bytes memory _IoTID,
         bytes memory _dataType,
         bytes memory _requiredResult,
-        uint32 _numberOfOracles) public returns(uint256) {
+        uint32 _numberOfOracles) external payable returns(uint256) {
+        // require msg.value has enough to pay oracles for each function call
+        require(msg.value >= MIN_FEE);
         // assign id to request
         uint256 requestID = requestCounter;
         // log details of the request to array to cross reference later
@@ -82,7 +94,10 @@ contract OracleRequesterContract {
         //requests[requestId].requiredResult = _requiredResult; // do not need to store result put in a hash?
         requests[requestID].numberOfOracles = _numberOfOracles;
         requests[requestID].oracleCounter = 0;
+
         requests[requestID].status = Status.PENDING;
+        requests[requestID].cancelFlag = 0;
+        requests[requestID].fee = msg.value;
         emit StatusChange(requests[requestID].status, "PENDING");
 
 
@@ -93,6 +108,7 @@ contract OracleRequesterContract {
         // increment requestId ready for next create request function.
 
         requestCounter++;
+        pendingCounter++;
 
         emit OpenForBids(requestID, requests[requestID].dataType);
 
@@ -103,10 +119,12 @@ contract OracleRequesterContract {
     // @dev
     // @param requestId oracle node wishes to bid on
     // @return true to indicate bid successful
-    function placeBid(uint256 _requestID) public oracleHasJoined() returns(bool)  {
+    function placeBid(uint256 _requestID) public oracleHasJoined() cancelFlagZero(_requestID) returns(bool)  {
         require(requests[_requestID].oracleCounter < requests[_requestID].numberOfOracles);
         requests[_requestID].oraclesForRequest[msg.sender] = true;
+        requests[_requestID].oracleAddressAccess[requests[_requestID].oracleCounter] = address(msg.sender);
         requests[_requestID].oracleCounter++;
+
         // also add a timeout
         emit BidPlaced(msg.sender);
         if (requests[_requestID].numberOfOracles == requests[_requestID].oracleCounter) {
@@ -121,17 +139,28 @@ contract OracleRequesterContract {
     //
 
     // function deliveryResponse() {} returns result to user smart contract
-    function deliverResponse(uint256 _requestID, bytes memory _finalResult) public {
+    function deliverResponse(uint256 _requestID, bytes memory _finalResult) public cancelFlagZero(_requestID) {
         // return single aggregation result
         _finalResult;
+        uint fee = requests[_requestID].fee / (requests[_requestID].numberOfOracles + 1);
+        // pay fees
+        for (uint32 i=0; i<requests[_requestID].numberOfOracles; i++) {
+            // pay each share to each oracle
+            payable(requests[_requestID].oracleAddressAccess[i]).transfer(fee);
+            requests[_requestID].fee -= fee;
+        }
         requests[_requestID].status = Status.COMPLETE;
-    emit StatusChange(requests[_requestID].status, "COMPLETE");
+        completedRequests[_requestID] = true;
+        emit StatusChange(requests[_requestID].status, "COMPLETE");
+        pendingCounter--;
     }
 
-    function cancelRequest(uint256 _requestID) external cancelCheck(_requestID){
-        delete requests[_requestID];
-        requestCounter = 1;
-
+    function cancelRequest(uint256 _requestID) external
+    cancelCheck(_requestID)
+    cancelFlagZero(_requestID){
+        requests[_requestID].cancelFlag = 1;
+        requests[_requestID].status = Status.CANCELLED;
+        //AggregatorContract(_aggAddr).cancelRequest(_requestID);
     }
 
     // getters
@@ -159,8 +188,15 @@ contract OracleRequesterContract {
         _;
     }
     //
+    modifier cancelFlagZero(uint256 _requestID) {
+        require(requests[_requestID].cancelFlag == 0);
+        _;
+    }
+
     modifier cancelCheck(uint256 _requestID) {
         require(requests[_requestID].callbackAddress == msg.sender);
         _;
     }
+
+
 }

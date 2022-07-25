@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"golang.org/x/net/context"
 	"log"
@@ -150,9 +149,7 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 			fr := `{"result": true}`
 			frEncode := hex.EncodeToString([]byte(fr))
 			fetchedResult := common.Hex2Bytes(frEncode)
-			userHash := crypto.Keccak256Hash(utils.Requests[eventReleaseRequestDetails.Arg0.Uint64()].DataType, fetchedResult)
-			fmt.Println("Golang HASH: ", userHash.Bytes())
-			utils.TxPhash(client, nodeInfo, eventReleaseRequestDetails.Arg0)
+			//userHash := crypto.Keccak256Hash(utils.Requests[eventReleaseRequestDetails.Arg0.Uint64()].DataType, fetchedResult)
 
 			utils.TxReceiveResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, fetchedResult)
 
@@ -198,10 +195,10 @@ func EventStatusChange(client *ethclient.Client, wg *sync.WaitGroup) {
 func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var w sync.WaitGroup
-	w.Add(3)
+	w.Add(2)
 	go EventResponseReceived(client, &w)
 	go EventAggregationComplete(client, &w)
-	go EventLogHahses(client, &w)
+	//go EventLogHahses(client, &w)
 	w.Wait()
 }
 

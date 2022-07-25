@@ -30,7 +30,7 @@ var (
 
 // AggregatorContractMetaData contains all meta data concerning the AggregatorContract contract.
 var AggregatorContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"ResponseReceived\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"addresspayable\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_actualResult\",\"type\":\"bytes\"}],\"name\":\"receiveResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"ResponseReceived\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"t\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"f\",\"type\":\"uint32\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"addresspayable\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_actualResult\",\"type\":\"bytes\"}],\"name\":\"receiveResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // AggregatorContractABI is the input ABI used to generate the binding from.
@@ -179,6 +179,76 @@ func (_AggregatorContract *AggregatorContractTransactorRaw) Transact(opts *bind.
 	return _AggregatorContract.Contract.contract.Transact(opts, method, params...)
 }
 
+// Answers is a free data retrieval call binding the contract method 0x17599cc5.
+//
+// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, bool lastOracle)
+func (_AggregatorContract *AggregatorContractCaller) Answers(opts *bind.CallOpts, arg0 *big.Int) (struct {
+	RequestID     *big.Int
+	DataType      []byte
+	OracleCounter *big.Int
+	T             uint32
+	F             uint32
+	CancelFlag    *big.Int
+	LastOracle    bool
+}, error) {
+	var out []interface{}
+	err := _AggregatorContract.contract.Call(opts, &out, "answers", arg0)
+
+	outstruct := new(struct {
+		RequestID     *big.Int
+		DataType      []byte
+		OracleCounter *big.Int
+		T             uint32
+		F             uint32
+		CancelFlag    *big.Int
+		LastOracle    bool
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.RequestID = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.DataType = *abi.ConvertType(out[1], new([]byte)).(*[]byte)
+	outstruct.OracleCounter = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.T = *abi.ConvertType(out[3], new(uint32)).(*uint32)
+	outstruct.F = *abi.ConvertType(out[4], new(uint32)).(*uint32)
+	outstruct.CancelFlag = *abi.ConvertType(out[5], new(*big.Int)).(**big.Int)
+	outstruct.LastOracle = *abi.ConvertType(out[6], new(bool)).(*bool)
+
+	return *outstruct, err
+
+}
+
+// Answers is a free data retrieval call binding the contract method 0x17599cc5.
+//
+// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, bool lastOracle)
+func (_AggregatorContract *AggregatorContractSession) Answers(arg0 *big.Int) (struct {
+	RequestID     *big.Int
+	DataType      []byte
+	OracleCounter *big.Int
+	T             uint32
+	F             uint32
+	CancelFlag    *big.Int
+	LastOracle    bool
+}, error) {
+	return _AggregatorContract.Contract.Answers(&_AggregatorContract.CallOpts, arg0)
+}
+
+// Answers is a free data retrieval call binding the contract method 0x17599cc5.
+//
+// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, bool lastOracle)
+func (_AggregatorContract *AggregatorContractCallerSession) Answers(arg0 *big.Int) (struct {
+	RequestID     *big.Int
+	DataType      []byte
+	OracleCounter *big.Int
+	T             uint32
+	F             uint32
+	CancelFlag    *big.Int
+	LastOracle    bool
+}, error) {
+	return _AggregatorContract.Contract.Answers(&_AggregatorContract.CallOpts, arg0)
+}
+
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
 //
 // Solidity: function owner() view returns(address)
@@ -208,6 +278,27 @@ func (_AggregatorContract *AggregatorContractSession) Owner() (common.Address, e
 // Solidity: function owner() view returns(address)
 func (_AggregatorContract *AggregatorContractCallerSession) Owner() (common.Address, error) {
 	return _AggregatorContract.Contract.Owner(&_AggregatorContract.CallOpts)
+}
+
+// CancelRequest is a paid mutator transaction binding the contract method 0x3015394c.
+//
+// Solidity: function cancelRequest(uint256 _requestID) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactor) CancelRequest(opts *bind.TransactOpts, _requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "cancelRequest", _requestID)
+}
+
+// CancelRequest is a paid mutator transaction binding the contract method 0x3015394c.
+//
+// Solidity: function cancelRequest(uint256 _requestID) returns(bool)
+func (_AggregatorContract *AggregatorContractSession) CancelRequest(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.CancelRequest(&_AggregatorContract.TransactOpts, _requestID)
+}
+
+// CancelRequest is a paid mutator transaction binding the contract method 0x3015394c.
+//
+// Solidity: function cancelRequest(uint256 _requestID) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactorSession) CancelRequest(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.CancelRequest(&_AggregatorContract.TransactOpts, _requestID)
 }
 
 // ReceiveResponse is a paid mutator transaction binding the contract method 0xf8f14f42.

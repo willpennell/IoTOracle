@@ -9,7 +9,7 @@ contract AggregatorContract {
     // need an answers struct
     OracleRequesterContract orc;
     //orc = OracleRequesterContract() // address of deployed contract
-    Answer[100] answers; // array of 100 Answer structs
+    Answer[100] public answers; // array of 100 Answer structs
     struct Answer {
         uint256 requestID; // the request ID
         bytes dataType; // data type of request 'bool' 'temp' etc
@@ -19,6 +19,8 @@ contract AggregatorContract {
         uint256 oracleCounter; // keep an index of the oracles
         uint32 t; // a true counter;
         uint32 f; // a false counter: we need this under (n-1)/3
+        uint cancelFlag;
+        bool lastOracle;
     }
 
     event ResponseReceived(address, string);
@@ -41,7 +43,7 @@ contract AggregatorContract {
         bytes memory _actualResult
     )
     public
-    onlyAuthorisedOraclesYetToVote(_requestID)
+    onlyAuthorisedOraclesYetToVote(_requestID) cancelFlagCheck(_requestID)
     returns(bool){
         if (answers[_requestID].oracleCounter < orc.getNumberOfOracles(_requestID)) {
             answers[_requestID].requestID = _requestID;
@@ -49,12 +51,14 @@ contract AggregatorContract {
             answers[_requestID].oracleHasSubmitted[msg.sender] = true;
             answers[_requestID].oracleAddresses[answers[_requestID].oracleCounter] = msg.sender;
             answers[_requestID].oracleCounter++;
+            answers[_requestID].cancelFlag = 0;
         }
         // if the counter has reached the number of oracles needed,
         // we can call the deliverResponse with the aggregation() method with returns a single result
         if(answers[_requestID].oracleCounter == orc.getNumberOfOracles(_requestID)) {
             // call aggregator function
             emit ResponseReceived(msg.sender, "response logged");
+            answers[_requestID].lastOracle = true;
             orc.deliverResponse(_requestID, aggregation(_requestID));
         }
         return answers[_requestID].oracleHasSubmitted[msg.sender];
@@ -64,21 +68,19 @@ contract AggregatorContract {
     // @dev
     // @param _requestID pass in requestID to index the answers
     // @return final result
-    function aggregation(uint256 _requestID) internal returns(bytes memory) {
+    function aggregation(uint256 _requestID) internal cancelFlagCheck(_requestID) returns(bytes memory) {
         // local finalResult initialised
         bytes memory finalResult;
         //gets dataType from ORC request struct which is then used for a hash of the params to match the results
         answers[_requestID].dataType = orc.getDataType(_requestID);
-        for (uint i=0; i<=answers[_requestID].oracleCounter; i++){
+        for (uint i=0; i<answers[_requestID].oracleCounter; i++){
             address oracleAddress = answers[_requestID].oracleAddresses[i];
             // ensures actual result and required result are the same
             bytes32 responseHash = keccak256(abi.encodePacked(
                     answers[_requestID].dataType, answers[_requestID].oracleResults[oracleAddress]
                 ));
             emit LogHashes(orc.getPHash(_requestID), responseHash);
-            if (keccak256(abi.encodePacked(
-                    answers[_requestID].dataType, answers[_requestID].oracleResults[oracleAddress]
-                )) == orc.getPHash(_requestID)){
+            if (responseHash == orc.getPHash(_requestID)){
                 // if correct increment the true count
                 answers[_requestID].t++;
                 if (finalResult.length <= 0) {
@@ -92,12 +94,22 @@ contract AggregatorContract {
         }
         // requires a threshold for false answers
         require(!(answers[_requestID].f > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
+
         emit AggregationCompleted(_requestID, "aggregation complete");
-        orc.deliverResponse(_requestID, finalResult);
         return finalResult;
     }
-
-
+   /* function getHashes(uint256 _requestID, address _oracleAddress) public view returns(bytes32, bytes32) {
+        bytes32 ogHash = orc.getPHash(_requestID);
+        bytes32 orcHash = keccak256(abi.encodePacked(
+                answers[_requestID].dataType, answers[_requestID].oracleResults[_oracleAddress]
+        ));
+        return (ogHash, orcHash);
+    }
+    function getResultInfo(uint256 _requestID, address _oracleAddress) public view returns(bytes memory, bytes memory){
+        bytes memory dataType = orc.getDataType(_requestID);
+        bytes memory answer = answers[_requestID].oracleResults[_oracleAddress];
+        return (dataType, answer);
+    }*/
 
     modifier onlyAuthorisedOraclesYetToVote(uint256 _requestID) {
         // checks that the oracle is in request list
@@ -106,6 +118,18 @@ contract AggregatorContract {
         require(answers[_requestID].oracleHasSubmitted[msg.sender] == false);
         _;
     }
+
+    function cancelRequest(uint256 _requestID) public cancelFlagCheck(_requestID) returns(bool){
+        answers[_requestID].cancelFlag = 1;
+        orc.cancelRequest(_requestID);
+        return true;
+    }
+
+    modifier cancelFlagCheck(uint256 _requestID) {
+        require(answers[_requestID].cancelFlag == 0);
+        _;
+    }
+
 }
 
 
