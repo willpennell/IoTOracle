@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/common/math"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -75,12 +76,15 @@ func OracleRequestContractInstance(client *ethclient.Client) *abi.OracleRequestC
 
 // TxJoinAsOracle creates tx to join oracle network
 func TxJoinAsOracle(client *ethclient.Client, info OracleNodeInfo) *types.Transaction {
+	auth := Auth(client, info)
+	stake := math.BigPow(10, 18) // 1 ether stake, when leaving the network it is returned.
+	auth.Value = stake
 	orcJoinAsOracle := OracleRequestContractInstance(client)
-	tx, err := orcJoinAsOracle.JoinAsOracle(Auth(client, info))
+	tx, err := orcJoinAsOracle.JoinAsOracle(auth)
 	if err != nil {
 		log.Fatal(err)
 	}
-	PRINTTXHASH(tx)
+	//PRINTTXHASH(tx)
 	return tx
 }
 
@@ -91,7 +95,7 @@ func TxLeaveOracleNetwork(client *ethclient.Client, info OracleNodeInfo) *types.
 	if err != nil {
 		log.Fatal(err)
 	}
-	PRINTTXHASH(tx)
+	//PRINTTXHASH(tx)
 	return tx
 }
 

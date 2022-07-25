@@ -23,6 +23,7 @@ func DATAMESSAGE() {
 func NEWREQUEST() {
 	color.Green("--------------------NEW REQUEST--------------------")
 }
+
 func REQUESTLINE() {
 	color.Green("---------------------------------------------------")
 }
@@ -65,8 +66,15 @@ func OPENFORBIDSMESSAGE(eventOpenForBids *abi.OracleRequestContractOpenForBids) 
 	REQUESTLINE()
 }
 
-func STATUSCHANGEMESSAGE(eventStatusChange *abi.OracleRequestContractStatusChange) {
+func BIDPLACEDMEASSGE(eventBidPlaced *abi.OracleRequestContractBidPlaced) {
+	color.Green("--------------------BID PLACED-----------------------")
+	fmt.Println("Bid Placed:")
+	fmt.Println("Oracle Node Address: ", eventBidPlaced.Arg0)
 	REQUESTLINE()
+}
+
+func STATUSCHANGEMESSAGE(eventStatusChange *abi.OracleRequestContractStatusChange) {
+	color.Green("--------------------NEW STATUS---------------------")
 	color.Red("Request Status Change:\n")
 	color.Red("Status Code: %v\n", eventStatusChange.Arg0)
 	color.Red("TO: %v\n", eventStatusChange.Arg1)
@@ -74,7 +82,7 @@ func STATUSCHANGEMESSAGE(eventStatusChange *abi.OracleRequestContractStatusChang
 }
 
 func RELEASEREQUESTDETAILS(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails) {
-	REQUESTLINE()
+	color.Green("--------------------REQUEST DETAILS-----------------")
 	fmt.Println("Release Request Details:")
 	fmt.Println("RequestID: ", eventReleaseRequestDetails.Arg0)
 	fmt.Println("IoTID: ", string(eventReleaseRequestDetails.Arg1))
@@ -91,9 +99,18 @@ func RESPONSERECIEVED(eventResponseReceived *abi.AggregatorContractResponseRecei
 }
 
 func AGGREGATIONCOMPLETE(eventAggregationCompleted *abi.AggregatorContractAggregationCompleted) {
-	REQUESTLINE()
+	color.Green("--------------------AGGREGATION--------------------")
 	fmt.Println("Aggregation Complete:")
 	fmt.Println("RequestID: ", eventAggregationCompleted.Arg0)
 	fmt.Println("Aggregation Message: ", eventAggregationCompleted.Arg1)
 	REQUESTLINE()
+}
+
+func ORACLEPAID(eventOraclePaid *abi.OracleRequestContractOraclePaid) {
+	color.Green("--------------------ORACLE PAID--------------------")
+	color.HiYellow("Oracle Address: %v\n", eventOraclePaid.Arg0)
+	color.HiYellow("Wei Earned: %v\n", eventOraclePaid.Arg1)
+	color.HiYellow("Message: %v\n", eventOraclePaid.Arg2)
+	REQUESTLINE()
+
 }

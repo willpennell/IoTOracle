@@ -39,6 +39,7 @@ contract OracleRequesterContract {
     event StatusChange(Status, string);
     event OracleJoined(address, string);
     event OracleLeft(address, string);
+    event OraclePaid(address, uint, string);
 
     uint GAS_PRICE = 2 * 10**10;
     uint FEE = GAS_PRICE * 2;
@@ -52,7 +53,8 @@ contract OracleRequesterContract {
 
     fallback() external{}
 
-    function joinAsOracle() public oracleNotJoined() returns(bool){
+    function joinAsOracle() public payable oracleNotJoined() returns(bool){
+        require(msg.value == 10**18);
         oracles[address(msg.sender)] = true;
         emit OracleJoined(msg.sender, "Welcome new node!");
         return oracles[address(msg.sender)];
@@ -60,6 +62,7 @@ contract OracleRequesterContract {
 
     function leaveOracleNetwork() public oracleHasJoined() returns(bool) {
         delete oracles[msg.sender];
+        payable(msg.sender).transfer(10**18);
         emit OracleLeft(msg.sender, "Node has left, Goodbye");
         return true;
     }
@@ -82,6 +85,8 @@ contract OracleRequesterContract {
         uint32 _numberOfOracles) external payable returns(uint256) {
         // require msg.value has enough to pay oracles for each function call
         require(msg.value >= MIN_FEE);
+        // makes sure the number that there is always an odd number of oracles so a majority can be reached.
+        require(!(_numberOfOracles % 2 == 0));
         // assign id to request
         uint256 requestID = requestCounter;
         // log details of the request to array to cross reference later
@@ -139,14 +144,15 @@ contract OracleRequesterContract {
     //
 
     // function deliveryResponse() {} returns result to user smart contract
-    function deliverResponse(uint256 _requestID, bytes memory _finalResult) public cancelFlagZero(_requestID) {
+    function deliverResponse(uint256 _requestID, bytes memory _finalResult, address[] memory _correctOracles) public cancelFlagZero(_requestID) {
         // return single aggregation result
         _finalResult;
-        uint fee = requests[_requestID].fee / (requests[_requestID].numberOfOracles + 1);
+        uint fee = requests[_requestID].fee / (requests[_requestID].numberOfOracles);
         // pay fees
-        for (uint32 i=0; i<requests[_requestID].numberOfOracles; i++) {
+        for (uint i=0; i<_correctOracles.length; i++) {
             // pay each share to each oracle
-            payable(requests[_requestID].oracleAddressAccess[i]).transfer(fee);
+            emit OraclePaid(_correctOracles[i], fee, "Oracle has been Paid!");
+            payable(_correctOracles[i]).transfer(fee);
             requests[_requestID].fee -= fee;
         }
         requests[_requestID].status = Status.COMPLETE;

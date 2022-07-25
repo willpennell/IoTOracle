@@ -16,6 +16,7 @@ contract AggregatorContract {
         mapping (address => bool) oracleHasSubmitted; // authorised oracles, marked true when voted
         mapping (address => bytes) oracleResults; // add their result to a map of their address
         mapping (uint => address) oracleAddresses; // uint to address to match counter and iterate through
+        address[] correctOracles;
         uint256 oracleCounter; // keep an index of the oracles
         uint32 t; // a true counter;
         uint32 f; // a false counter: we need this under (n-1)/3
@@ -59,7 +60,8 @@ contract AggregatorContract {
             // call aggregator function
             emit ResponseReceived(msg.sender, "response logged");
             answers[_requestID].lastOracle = true;
-            orc.deliverResponse(_requestID, aggregation(_requestID));
+            (bytes memory finalResult, address[] memory correctOracles) = aggregation(_requestID);
+            orc.deliverResponse(_requestID, finalResult, correctOracles);
         }
         return answers[_requestID].oracleHasSubmitted[msg.sender];
     }
@@ -68,7 +70,7 @@ contract AggregatorContract {
     // @dev
     // @param _requestID pass in requestID to index the answers
     // @return final result
-    function aggregation(uint256 _requestID) internal cancelFlagCheck(_requestID) returns(bytes memory) {
+    function aggregation(uint256 _requestID) internal cancelFlagCheck(_requestID) returns(bytes memory, address[] memory) {
         // local finalResult initialised
         bytes memory finalResult;
         //gets dataType from ORC request struct which is then used for a hash of the params to match the results
@@ -83,6 +85,7 @@ contract AggregatorContract {
             if (responseHash == orc.getPHash(_requestID)){
                 // if correct increment the true count
                 answers[_requestID].t++;
+                answers[_requestID].correctOracles.push(oracleAddress);
                 if (finalResult.length <= 0) {
                     // first response will assign its answer to the actual answer
                     finalResult = answers[_requestID].oracleResults[oracleAddress];
@@ -96,7 +99,7 @@ contract AggregatorContract {
         require(!(answers[_requestID].f > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
 
         emit AggregationCompleted(_requestID, "aggregation complete");
-        return finalResult;
+        return (finalResult, answers[_requestID].correctOracles);
     }
    /* function getHashes(uint256 _requestID, address _oracleAddress) public view returns(bytes32, bytes32) {
         bytes32 ogHash = orc.getPHash(_requestID);

@@ -27,11 +27,12 @@ import (
 func SubscribeToOracleRequestContractEvents(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	var w sync.WaitGroup
-	w.Add(4)
+	w.Add(5)
 	go EventOpenForBids(client, &w, nodeInfo)
 	go EventBidPlaced(client, &w)
 	go EventStatusChange(client, &w)
 	go EventReleaseRequestDetails(client, &w, nodeInfo)
+	go EventOraclePaid(client, &w)
 	w.Wait()
 }
 
@@ -105,10 +106,7 @@ func EventBidPlaced(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventBidPlaced := <-channelBidPlaced:
-			utils.REQUESTLINE()
-			fmt.Println("Bid Placed:")
-			fmt.Println("Oracle Node Address: ", eventBidPlaced.Arg0)
-			utils.REQUESTLINE()
+			utils.BIDPLACEDMEASSGE(eventBidPlaced)
 		}
 	}
 	// Receive events from the channel
@@ -184,6 +182,36 @@ func EventStatusChange(client *ethclient.Client, wg *sync.WaitGroup) {
 			log.Fatal(err)
 		case eventStatusChange := <-channelStatusChange:
 			utils.STATUSCHANGEMESSAGE(eventStatusChange)
+		}
+	}
+	// Receive events from the channel
+}
+
+func EventOraclePaid(client *ethclient.Client, wg *sync.WaitGroup) {
+	defer wg.Done()
+	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Watch for a Deposited event
+	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
+	// Setup a channel for results
+
+	channelOraclePaid := make(chan *abi.OracleRequestContractOraclePaid)
+	// Start a goroutine which watches new events
+
+	sub, err := orcInstance.WatchOraclePaid(watchOpts, channelOraclePaid)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sub.Unsubscribe()
+
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case eventOraclePaid := <-channelOraclePaid:
+			utils.ORACLEPAID(eventOraclePaid)
 		}
 	}
 	// Receive events from the channel
