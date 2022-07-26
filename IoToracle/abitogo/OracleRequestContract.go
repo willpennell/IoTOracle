@@ -30,7 +30,7 @@ var (
 
 // OracleRequestContractMetaData contains all meta data concerning the OracleRequestContract contract.
 var OracleRequestContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"BidPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"OpenForBids\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"OracleJoined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"OracleLeft\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"OraclePaid\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"ReleaseRequestDetails\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"enumOracleRequesterContract.Status\",\"name\":\"\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"StatusChange\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"completedRequests\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_callbackAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_callbackFID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_IoTID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_dataType\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_requiredResult\",\"type\":\"bytes\"},{\"internalType\":\"uint32\",\"name\":\"_numberOfOracles\",\"type\":\"uint32\"}],\"name\":\"createRequest\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_finalResult\",\"type\":\"bytes\"},{\"internalType\":\"address[]\",\"name\":\"_correctOracles\",\"type\":\"address[]\"}],\"name\":\"deliverResponse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getDataType\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getNumberOfOracles\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_orcAddr\",\"type\":\"address\"}],\"name\":\"getOracleForRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getPHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"joinAsOracle\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"leaveOracleNetwork\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"oracles\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"placeBid\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"requests\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"requester\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"callbackAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"callbackFID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"IoTID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"bytes32\",\"name\":\"pHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint32\",\"name\":\"numberOfOracles\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"oracleCounter\",\"type\":\"uint32\"},{\"internalType\":\"enumOracleRequesterContract.Status\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"cancelFlag\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"fee\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"BidPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"OpenForBids\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"OracleJoined\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"OracleLeft\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"OraclePaid\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"name\":\"ReleaseRequestDetails\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"enumOracleRequestContract.Status\",\"name\":\"\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"StatusChange\",\"type\":\"event\"},{\"stateMutability\":\"nonpayable\",\"type\":\"fallback\"},{\"inputs\":[],\"name\":\"aggregatorAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"completedRequests\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_callbackAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"_callbackFID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_IoTID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_dataType\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_requiredResult\",\"type\":\"bytes\"},{\"internalType\":\"uint32\",\"name\":\"_numberOfOracles\",\"type\":\"uint32\"}],\"name\":\"createRequest\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_finalResult\",\"type\":\"bytes\"},{\"internalType\":\"address[]\",\"name\":\"_correctOracles\",\"type\":\"address[]\"}],\"name\":\"deliverResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getDataType\",\"outputs\":[{\"internalType\":\"bytes\",\"name\":\"\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getNumberOfOracles\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_orcAddr\",\"type\":\"address\"}],\"name\":\"getOracleForRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getPHash\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"joinAsOracle\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"leaveOracleNetwork\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"oracles\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"placeBid\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"requests\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"requester\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"callbackAddress\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"callbackFID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"IoTID\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"bytes32\",\"name\":\"pHash\",\"type\":\"bytes32\"},{\"internalType\":\"uint32\",\"name\":\"numberOfOracles\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"oracleCounter\",\"type\":\"uint32\"},{\"internalType\":\"enumOracleRequestContract.Status\",\"name\":\"status\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"cancelFlag\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"fee\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_aggAddr\",\"type\":\"address\"}],\"name\":\"setAggregatorContract\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"stakeBalance\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}]",
 }
 
 // OracleRequestContractABI is the input ABI used to generate the binding from.
@@ -177,6 +177,37 @@ func (_OracleRequestContract *OracleRequestContractTransactorRaw) Transfer(opts 
 // Transact invokes the (paid) contract method with params as input values.
 func (_OracleRequestContract *OracleRequestContractTransactorRaw) Transact(opts *bind.TransactOpts, method string, params ...interface{}) (*types.Transaction, error) {
 	return _OracleRequestContract.Contract.contract.Transact(opts, method, params...)
+}
+
+// AggregatorAddr is a free data retrieval call binding the contract method 0x82762600.
+//
+// Solidity: function aggregatorAddr() view returns(address)
+func (_OracleRequestContract *OracleRequestContractCaller) AggregatorAddr(opts *bind.CallOpts) (common.Address, error) {
+	var out []interface{}
+	err := _OracleRequestContract.contract.Call(opts, &out, "aggregatorAddr")
+
+	if err != nil {
+		return *new(common.Address), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(common.Address)).(*common.Address)
+
+	return out0, err
+
+}
+
+// AggregatorAddr is a free data retrieval call binding the contract method 0x82762600.
+//
+// Solidity: function aggregatorAddr() view returns(address)
+func (_OracleRequestContract *OracleRequestContractSession) AggregatorAddr() (common.Address, error) {
+	return _OracleRequestContract.Contract.AggregatorAddr(&_OracleRequestContract.CallOpts)
+}
+
+// AggregatorAddr is a free data retrieval call binding the contract method 0x82762600.
+//
+// Solidity: function aggregatorAddr() view returns(address)
+func (_OracleRequestContract *OracleRequestContractCallerSession) AggregatorAddr() (common.Address, error) {
+	return _OracleRequestContract.Contract.AggregatorAddr(&_OracleRequestContract.CallOpts)
 }
 
 // CompletedRequests is a free data retrieval call binding the contract method 0xf0fbfbf3.
@@ -491,23 +522,54 @@ func (_OracleRequestContract *OracleRequestContractCallerSession) Requests(arg0 
 	return _OracleRequestContract.Contract.Requests(&_OracleRequestContract.CallOpts, arg0)
 }
 
+// StakeBalance is a free data retrieval call binding the contract method 0x4e7c57a6.
+//
+// Solidity: function stakeBalance(address ) view returns(uint256)
+func (_OracleRequestContract *OracleRequestContractCaller) StakeBalance(opts *bind.CallOpts, arg0 common.Address) (*big.Int, error) {
+	var out []interface{}
+	err := _OracleRequestContract.contract.Call(opts, &out, "stakeBalance", arg0)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// StakeBalance is a free data retrieval call binding the contract method 0x4e7c57a6.
+//
+// Solidity: function stakeBalance(address ) view returns(uint256)
+func (_OracleRequestContract *OracleRequestContractSession) StakeBalance(arg0 common.Address) (*big.Int, error) {
+	return _OracleRequestContract.Contract.StakeBalance(&_OracleRequestContract.CallOpts, arg0)
+}
+
+// StakeBalance is a free data retrieval call binding the contract method 0x4e7c57a6.
+//
+// Solidity: function stakeBalance(address ) view returns(uint256)
+func (_OracleRequestContract *OracleRequestContractCallerSession) StakeBalance(arg0 common.Address) (*big.Int, error) {
+	return _OracleRequestContract.Contract.StakeBalance(&_OracleRequestContract.CallOpts, arg0)
+}
+
 // CancelRequest is a paid mutator transaction binding the contract method 0x3015394c.
 //
-// Solidity: function cancelRequest(uint256 _requestID) returns()
+// Solidity: function cancelRequest(uint256 _requestID) returns(bool)
 func (_OracleRequestContract *OracleRequestContractTransactor) CancelRequest(opts *bind.TransactOpts, _requestID *big.Int) (*types.Transaction, error) {
 	return _OracleRequestContract.contract.Transact(opts, "cancelRequest", _requestID)
 }
 
 // CancelRequest is a paid mutator transaction binding the contract method 0x3015394c.
 //
-// Solidity: function cancelRequest(uint256 _requestID) returns()
+// Solidity: function cancelRequest(uint256 _requestID) returns(bool)
 func (_OracleRequestContract *OracleRequestContractSession) CancelRequest(_requestID *big.Int) (*types.Transaction, error) {
 	return _OracleRequestContract.Contract.CancelRequest(&_OracleRequestContract.TransactOpts, _requestID)
 }
 
 // CancelRequest is a paid mutator transaction binding the contract method 0x3015394c.
 //
-// Solidity: function cancelRequest(uint256 _requestID) returns()
+// Solidity: function cancelRequest(uint256 _requestID) returns(bool)
 func (_OracleRequestContract *OracleRequestContractTransactorSession) CancelRequest(_requestID *big.Int) (*types.Transaction, error) {
 	return _OracleRequestContract.Contract.CancelRequest(&_OracleRequestContract.TransactOpts, _requestID)
 }
@@ -535,21 +597,21 @@ func (_OracleRequestContract *OracleRequestContractTransactorSession) CreateRequ
 
 // DeliverResponse is a paid mutator transaction binding the contract method 0x9fbcc555.
 //
-// Solidity: function deliverResponse(uint256 _requestID, bytes _finalResult, address[] _correctOracles) returns()
+// Solidity: function deliverResponse(uint256 _requestID, bytes _finalResult, address[] _correctOracles) returns(bool)
 func (_OracleRequestContract *OracleRequestContractTransactor) DeliverResponse(opts *bind.TransactOpts, _requestID *big.Int, _finalResult []byte, _correctOracles []common.Address) (*types.Transaction, error) {
 	return _OracleRequestContract.contract.Transact(opts, "deliverResponse", _requestID, _finalResult, _correctOracles)
 }
 
 // DeliverResponse is a paid mutator transaction binding the contract method 0x9fbcc555.
 //
-// Solidity: function deliverResponse(uint256 _requestID, bytes _finalResult, address[] _correctOracles) returns()
+// Solidity: function deliverResponse(uint256 _requestID, bytes _finalResult, address[] _correctOracles) returns(bool)
 func (_OracleRequestContract *OracleRequestContractSession) DeliverResponse(_requestID *big.Int, _finalResult []byte, _correctOracles []common.Address) (*types.Transaction, error) {
 	return _OracleRequestContract.Contract.DeliverResponse(&_OracleRequestContract.TransactOpts, _requestID, _finalResult, _correctOracles)
 }
 
 // DeliverResponse is a paid mutator transaction binding the contract method 0x9fbcc555.
 //
-// Solidity: function deliverResponse(uint256 _requestID, bytes _finalResult, address[] _correctOracles) returns()
+// Solidity: function deliverResponse(uint256 _requestID, bytes _finalResult, address[] _correctOracles) returns(bool)
 func (_OracleRequestContract *OracleRequestContractTransactorSession) DeliverResponse(_requestID *big.Int, _finalResult []byte, _correctOracles []common.Address) (*types.Transaction, error) {
 	return _OracleRequestContract.Contract.DeliverResponse(&_OracleRequestContract.TransactOpts, _requestID, _finalResult, _correctOracles)
 }
@@ -615,6 +677,27 @@ func (_OracleRequestContract *OracleRequestContractSession) PlaceBid(_requestID 
 // Solidity: function placeBid(uint256 _requestID) returns(bool)
 func (_OracleRequestContract *OracleRequestContractTransactorSession) PlaceBid(_requestID *big.Int) (*types.Transaction, error) {
 	return _OracleRequestContract.Contract.PlaceBid(&_OracleRequestContract.TransactOpts, _requestID)
+}
+
+// SetAggregatorContract is a paid mutator transaction binding the contract method 0x9967cf60.
+//
+// Solidity: function setAggregatorContract(address _aggAddr) returns(bool)
+func (_OracleRequestContract *OracleRequestContractTransactor) SetAggregatorContract(opts *bind.TransactOpts, _aggAddr common.Address) (*types.Transaction, error) {
+	return _OracleRequestContract.contract.Transact(opts, "setAggregatorContract", _aggAddr)
+}
+
+// SetAggregatorContract is a paid mutator transaction binding the contract method 0x9967cf60.
+//
+// Solidity: function setAggregatorContract(address _aggAddr) returns(bool)
+func (_OracleRequestContract *OracleRequestContractSession) SetAggregatorContract(_aggAddr common.Address) (*types.Transaction, error) {
+	return _OracleRequestContract.Contract.SetAggregatorContract(&_OracleRequestContract.TransactOpts, _aggAddr)
+}
+
+// SetAggregatorContract is a paid mutator transaction binding the contract method 0x9967cf60.
+//
+// Solidity: function setAggregatorContract(address _aggAddr) returns(bool)
+func (_OracleRequestContract *OracleRequestContractTransactorSession) SetAggregatorContract(_aggAddr common.Address) (*types.Transaction, error) {
+	return _OracleRequestContract.Contract.SetAggregatorContract(&_OracleRequestContract.TransactOpts, _aggAddr)
 }
 
 // Fallback is a paid mutator transaction binding the contract fallback function.

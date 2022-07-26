@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const util = require('util')
-const MyContract = require('../build/contracts/OracleRequesterContract.json');
+const MyContract = require('../build/contracts/OracleRequestContract.json');
 
 // callbackFID
 const cbfd = '{"function":"Test1"}'
@@ -22,7 +22,7 @@ console.log(requiredResultEncode)
 
 const init = async () => {
     const web3 = new Web3('http://localhost:8546');
-    const addr1 = "0x0db4b258DfEC24FDAC43b75ee2fEAe1E214F7667"
+    const addr1 = "0x3CA4D0d4c119BBe7dc60F7E173e65FE7839F28F3"
     const id = await web3.eth.net.getId();
     const deployedNetwork = MyContract.networks[id];
     const contract = new web3.eth.Contract(
