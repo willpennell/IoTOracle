@@ -9,7 +9,7 @@ const callbackFID = Web3.utils.asciiToHex(cbfd)
 const iotid = 'rp41992'
 const iotidEncode = Web3.utils.asciiToHex(iotid)
 // dataType
-const dt = '{"type": bool, "topic": "PIRSensor", "tAfter": null, "tBefore": null}'
+const dt = '{"type": "bool", "topic": "PIRSensor", "tAfter": 1658686070, "tBefore": 1658858840}'
 const dataTypeEncode = Web3.utils.asciiToHex(dt)
 
 //const dataTypeEncode = Web3.utils.asciiToHex()

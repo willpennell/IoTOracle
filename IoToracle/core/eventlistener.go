@@ -4,10 +4,8 @@ import (
 	abi "IoToracle/abitogo"
 	c "IoToracle/config"
 	"IoToracle/utils"
-	"encoding/hex"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"golang.org/x/net/context"
 	"log"
@@ -138,18 +136,20 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventReleaseRequestDetails := <-channelReleaseRequestDetails:
-
+			id := eventReleaseRequestDetails.Arg0.Uint64()
 			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails)
 			// call fetch to IoT
 
 			fmt.Println("Dummy response...")
 			// call a tx to send response to Aggregator Oracle
-			fr := `{"result": true}`
-			frEncode := hex.EncodeToString([]byte(fr))
-			fetchedResult := common.Hex2Bytes(frEncode)
-			//userHash := crypto.Keccak256Hash(utils.Requests[eventReleaseRequestDetails.Arg0.Uint64()].DataType, fetchedResult)
 
-			utils.TxReceiveResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, fetchedResult)
+			//fr := `{"result": true}`
+			//frEncode := hex.EncodeToString([]byte(fr))
+			//fetchedResult := common.Hex2Bytes(frEncode)
+			//userHash := crypto.Keccak256Hash(utils.Requests[eventReleaseRequestDetails.Arg0.Uint64()].DataType, fetchedResult)
+			unpack := utils.ConvertToJson(eventReleaseRequestDetails, id)
+			fmt.Printf("%v\n%v\n", unpack.Type, unpack.Topic)
+			//utils.TxReceiveResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, fetchedResult)
 
 		}
 	}
