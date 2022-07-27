@@ -139,16 +139,10 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 			id := eventReleaseRequestDetails.Arg0.Uint64()
 			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails)
 			// call fetch to IoT
-
+			utils.FetchIoTData(eventReleaseRequestDetails, id)
 			fmt.Println("Dummy response...")
 			// call a tx to send response to Aggregator Oracle
 
-			//fr := `{"result": true}`
-			//frEncode := hex.EncodeToString([]byte(fr))
-			//fetchedResult := common.Hex2Bytes(frEncode)
-			//userHash := crypto.Keccak256Hash(utils.Requests[eventReleaseRequestDetails.Arg0.Uint64()].DataType, fetchedResult)
-			unpack := utils.ConvertToJson(eventReleaseRequestDetails, id)
-			fmt.Printf("%v\n%v\n", unpack.Type, unpack.Topic)
 			//utils.TxReceiveResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, fetchedResult)
 
 		}

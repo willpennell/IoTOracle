@@ -2,8 +2,7 @@ package utils
 
 import (
 	abi "IoToracle/abitogo"
-	"encoding/json"
-	"log"
+	"github.com/ethereum/go-ethereum/log"
 	"math/big"
 )
 
@@ -26,11 +25,31 @@ type FetchedBigIntResult struct {
 
 // comes in as bytes need to transform into
 
-func ConvertToJson(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) *DataType {
-	err := json.Unmarshal(eventReleaseRequestDetails.Arg2,
-		&Requests[id].UnPackedDataType)
-	if err != nil {
-		log.Fatal(err)
+// TODO function that builds a bool IoTRequest
+
+func IoTBoolResult(result bool) FetchedBoolResult {
+	return FetchedBoolResult{Result: result}
+}
+
+// TODO function that builds an big.Int IoTRequest
+
+// IoTBigIntResult function that returns the fetched
+func IoTBigIntResult(result big.Int) FetchedBigIntResult {
+	return FetchedBigIntResult{Result: result}
+}
+
+// TODO function that subscribes for a bool result
+
+// TODO function that subscribes for an int64 result
+
+func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) {
+	unpack := ConvertToJson(eventReleaseRequestDetails, id)
+	if unpack.Type == "bool" {
+		// call IoTfetch bool
+
+	} else if unpack.Type == "int" {
+		// call IoTFetch big.int
+	} else {
+		log.Error("error")
 	}
-	return &Requests[id].UnPackedDataType
 }
