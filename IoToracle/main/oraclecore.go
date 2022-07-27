@@ -2,6 +2,7 @@ package main
 
 import (
 	"IoToracle/core"
+	iot "IoToracle/iot"
 	p "IoToracle/utils"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"log"
@@ -22,12 +23,13 @@ func establishConnection() *ethclient.Client {
 
 func main() {
 	var wg sync.WaitGroup
-	wg.Add(2)
+	wg.Add(3)
 	client := establishConnection()
 	nodeInfo := p.InitOracle(client)
 	// run catch up
 
 	// goroutine for subscribing to events
+	go iot.StartClient(&wg)
 
 	go core.SubscribeToOracleRequestContractEvents(client, &wg, nodeInfo)
 	go core.SubscribeToAggregationContractEvents(client, &wg)

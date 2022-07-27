@@ -46,7 +46,6 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 	unpack := ConvertToJson(eventReleaseRequestDetails, id)
 	if unpack.Type == "bool" {
 		// call IoTfetch bool
-
 	} else if unpack.Type == "int" {
 		// call IoTFetch big.int
 	} else {
