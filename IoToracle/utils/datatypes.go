@@ -44,8 +44,10 @@ func IoTBigIntResult(result big.Int) FetchedBigIntResult {
 
 func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) {
 	unpack := ConvertToJson(eventReleaseRequestDetails, id)
+	Requests[id].UnPackedDataType = *unpack
 	if unpack.Type == "bool" {
 		// call IoTfetch bool
+		StartClient(unpack.Topic)
 	} else if unpack.Type == "int" {
 		// call IoTFetch big.int
 	} else {

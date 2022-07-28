@@ -58,7 +58,7 @@ func LeaveOracleNetwork(client *ethclient.Client, info *OracleNodeInfo) bool {
 	return false
 }
 
-func loadEnv() {
+func LoadEnv() {
 	err := godotenv.Load("./.env")
 	if err != nil {
 		log.Fatal(err)
@@ -66,7 +66,7 @@ func loadEnv() {
 }
 
 func getNodeAddress() string {
-	loadEnv()
+	LoadEnv()
 	return os.Getenv("NODEADDRESS")
 }
 
@@ -82,12 +82,12 @@ func getJoinedOracleNetwork() bool {
 // ***Getters & Setters***
 
 func getPrivateKey() string {
-	loadEnv()
+	LoadEnv()
 	return os.Getenv("PRIVATEKEY")
 }
 
 func setNodeAddress(nodeAdress string) {
-	loadEnv()
+	LoadEnv()
 	err := os.Setenv("NODEADDRESS", nodeAdress)
 	if err != nil {
 		log.Fatal(err)
@@ -102,7 +102,7 @@ func setHasOracleJoinedNetwork(in bool) {
 }
 
 func setPrivateKey(pk string) {
-	loadEnv()
+	LoadEnv()
 	err := os.Setenv("PRIVATEKEY", pk)
 	if err != nil {
 		log.Fatal(err)
@@ -148,4 +148,24 @@ func Load(v interface{}) error {
 
 func Unmarshal(r io.Reader, v interface{}) error {
 	return json.NewDecoder(r).Decode(v)
+}
+
+func GetBroker() string {
+	LoadEnv()
+	return os.Getenv("MQTTBROKER")
+}
+
+func GetClientID() string {
+	LoadEnv()
+	return os.Getenv("ORACLEMQTTCLIENTID")
+}
+
+func GetClientUsername() string {
+	LoadEnv()
+	return os.Getenv("ORACLEMQTTUSERNAME")
+}
+
+func GetClientPasswd() string {
+	LoadEnv()
+	return os.Getenv("ORACLEMQTTPASSWD")
 }

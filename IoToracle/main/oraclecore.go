@@ -2,7 +2,6 @@ package main
 
 import (
 	"IoToracle/core"
-	iot "IoToracle/iot"
 	p "IoToracle/utils"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"log"
@@ -29,7 +28,7 @@ func main() {
 	// run catch up
 
 	// goroutine for subscribing to events
-	go iot.StartClient(&wg)
+	//go iot.StartClient(&wg)
 
 	go core.SubscribeToOracleRequestContractEvents(client, &wg, nodeInfo)
 	go core.SubscribeToAggregationContractEvents(client, &wg)

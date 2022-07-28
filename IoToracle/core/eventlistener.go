@@ -140,6 +140,7 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails)
 			// call fetch to IoT
 			utils.FetchIoTData(eventReleaseRequestDetails, id)
+
 			fmt.Println("Dummy response...")
 			// call a tx to send response to Aggregator Oracle
 
