@@ -15,7 +15,7 @@ const dataTypeEncode = Web3.utils.asciiToHex(dt)
 //const dataTypeEncode = Web3.utils.asciiToHex()
 
 // requiredResult
-let rr = '{"result": true}'
+let rr = '{"Result":false}'
 const requiredResultEncode = Web3.utils.asciiToHex(rr)
 console.log(requiredResultEncode)
 

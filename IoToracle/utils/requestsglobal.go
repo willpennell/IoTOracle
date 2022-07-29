@@ -9,7 +9,8 @@ type Request struct {
 	DataType         []byte
 	IotId            []byte
 	UnPackedDataType DataType
-	Status           int8
+	IoTResult        []byte
+	Status           uint8 // 0 = not started, 1 = pending, 2 = complete
 }
 type RequestsSingleton map[uint64]*Request
 

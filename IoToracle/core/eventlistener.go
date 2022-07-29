@@ -6,6 +6,7 @@ import (
 	"IoToracle/utils"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"golang.org/x/net/context"
 	"log"
@@ -63,6 +64,7 @@ func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo uti
 
 			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1)
 			utils.Requests[id] = &request
+			utils.Requests[id].Status = 1
 
 			time.Sleep(time.Second)
 			tx, err := utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
@@ -137,11 +139,16 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 			log.Fatal(err)
 		case eventReleaseRequestDetails := <-channelReleaseRequestDetails:
 			id := eventReleaseRequestDetails.Arg0.Uint64()
+			utils.AddIoTIDToRequests(eventReleaseRequestDetails) // adds
+
 			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails)
 			// call fetch to IoT
 			utils.FetchIoTData(eventReleaseRequestDetails, id)
 
 			fmt.Println("Dummy response...")
+			hexedbytes := common.Bytes2Hex(utils.Requests[id].IoTResult)
+
+			utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedbytes))
 			// call a tx to send response to Aggregator Oracle
 
 			//utils.TxReceiveResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, fetchedResult)
@@ -221,7 +228,7 @@ func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.Wai
 	w.Add(2)
 	go EventResponseReceived(client, &w)
 	go EventAggregationComplete(client, &w)
-	//go EventLogHahses(client, &w)
+	go EventLogHahses(client, &w)
 	w.Wait()
 }
 
