@@ -1,3 +1,4 @@
+// Package utils helper functions
 package utils
 
 import (
@@ -7,6 +8,8 @@ import (
 	"github.com/fatih/color"
 	"net"
 )
+
+// printer helper functions to make output to terminal look neat
 
 func DASHEDLINE() {
 	fmt.Println("------------------------------------------------------------------")

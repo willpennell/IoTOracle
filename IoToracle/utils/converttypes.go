@@ -1,3 +1,4 @@
+// Package utils helper files and functions
 package utils
 
 import (
@@ -8,19 +9,18 @@ import (
 	"math/big"
 )
 
+// ConvertOpenForBidsData converts the input from events into a Request struct
 func ConvertOpenForBidsData(a interface{}, b interface{}) (Request, uint64) {
-	// covert RequestId
-	requestId, _ := a.(*big.Int)
-	requestIdConv := requestId.Uint64()
-
-	dataType, _ := b.([]byte)
-
+	requestId, _ := a.(*big.Int)        // covert RequestId
+	requestIdConv := requestId.Uint64() // converts from big.Int to uint64 for ID index in Requests map
+	dataType, _ := b.([]byte)           // gets dataType info from event as []byte
+	// adds converted types to struct
 	request := Request{
 		RequestId: requestIdConv,
 		DataType:  dataType,
 		IotId:     nil,
 	}
-	return request, requestIdConv
+	return request, requestIdConv //returns the request struct and ID
 }
 
 // AddIoTIDToRequests add incoming IoTID and assign to correct id in Request map
@@ -39,6 +39,7 @@ func ConvertToDataTypeStruct(eventReleaseRequestDetails *abi.OracleRequestContra
 	return &Requests[id].UnPackedDataType
 }
 
+// UnpackIoTBoolResult unmarshal json into FetchedBoolIoTResult struct
 func UnpackIoTBoolResult(packedResult []byte) FetchedBoolIoTResult {
 	var resultAndTimeStamp FetchedBoolIoTResult
 	err := json.Unmarshal(packedResult, &resultAndTimeStamp)
@@ -48,6 +49,7 @@ func UnpackIoTBoolResult(packedResult []byte) FetchedBoolIoTResult {
 	return resultAndTimeStamp
 }
 
+// UnpackIoTBigIntResult unmarshal json into FetchedBigIntIoTResult struct
 func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
 	var resultAndTimeStamp FetchedBigIntIoTResult
 	err := json.Unmarshal(packedResult, &resultAndTimeStamp)
@@ -57,6 +59,7 @@ func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
 	return resultAndTimeStamp
 }
 
+// packBoolToJson marshal into json from IoTBoolResult to []byte
 func packBoolToJson(IoTResult IoTBoolResult) []byte {
 	packed, err := json.Marshal(IoTResult)
 	if err != nil {
@@ -65,6 +68,7 @@ func packBoolToJson(IoTResult IoTBoolResult) []byte {
 	return packed
 }
 
+// packBigIntToJson marshal into json from IoTBigIntResult to []byte
 func packBigIntToJson(IoTResult IoTBigIntResult) []byte {
 	packed, err := json.Marshal(IoTResult)
 	if err != nil {
@@ -73,6 +77,7 @@ func packBigIntToJson(IoTResult IoTBigIntResult) []byte {
 	return packed
 }
 
+// TopicBuilder builds topic string from IoTID and Topic = IoTID/Topic for use with MQTT client
 func TopicBuilder(unpack *DataType, id uint64) string {
 	IoTtopic := fmt.Sprintf("%v/%v", string(Requests[id].IotId), unpack.Topic)
 	return IoTtopic

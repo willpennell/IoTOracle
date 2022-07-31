@@ -1,3 +1,4 @@
+// Package core eventlistener.go is the core functionality of the system
 package core
 
 import (
@@ -12,101 +13,95 @@ import (
 	"log"
 	"math/big"
 	"sync"
-	"time"
 )
 
 // ***TODOList*** (not yet needed)
 // TODO catch up with old request that node may have placed bid on
-// TODO subscribe OracleJoined
-// TODO Subscribe OracleLeft
 
 // ***OracleRequestContract***
 
 // SubscribeToOracleRequestContractEvents Listens to all event methods in OracleRequestContract
-func SubscribeToOracleRequestContractEvents(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
+func SubscribeToOracleRequestContractEvents(client *ethclient.Client,
+	wg *sync.WaitGroup,
+	nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
-	var w sync.WaitGroup
+	var w sync.WaitGroup // start new sync.WaitGroup for the events in orc contract
 	w.Add(5)
-	go EventOpenForBids(client, &w, nodeInfo)
-	go EventBidPlaced(client, &w)
-	go EventStatusChange(client, &w)
-	go EventReleaseRequestDetails(client, &w, nodeInfo)
-	go EventOraclePaid(client, &w)
-	w.Wait()
+	go EventOpenForBids(client, &w, nodeInfo)           // go routine for open for bids event
+	go EventBidPlaced(client, &w)                       // go routine for bids placed by oracle nodes
+	go EventStatusChange(client, &w)                    // go routine for a change in status for requests
+	go EventReleaseRequestDetails(client, &w, nodeInfo) // go routine for event that
+	// emits request details for nodes to fetch
+	go EventOraclePaid(client, &w) // go routine for paying oracles
+	w.Wait()                       // waits indefinitely as these events are persistent
 }
 
 // EventOpenForBids subscribe to OpenForBids
 func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
+	// creates a new orc contract instance that we can interact with
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a Deposited event
+	// Watch options, just context used for this
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
-
+	// chan for event
 	channelOpenForBids := make(chan *abi.OracleRequestContractOpenForBids)
-	// Start a goroutine which watches new events
-
+	// watch new event OpenForBids
 	sub, err := orcInstance.WatchOpenForBids(watchOpts, channelOpenForBids)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer sub.Unsubscribe()
-
-	for {
+	defer sub.Unsubscribe() // unsubscribes
+	for {                   // continuous loop
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
-		case eventOpenForBids := <-channelOpenForBids:
-			utils.OPENFORBIDSMESSAGE(eventOpenForBids)
-
+		case eventOpenForBids := <-channelOpenForBids: // creates event object
+			utils.OPENFORBIDSMESSAGE(eventOpenForBids) // prints message with data from event
+			// creates a request struct
 			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1)
-			utils.Requests[id] = &request
-			utils.Requests[id].Status = 1
-
-			time.Sleep(time.Second)
+			utils.Requests[id] = &request // this is added to the Requests map
+			utils.Requests[id].Status = 1 // change status to 1 to show this request is pending
+			//time.Sleep(time.Second)
+			// call tx function to send to orc contract and place bid
 			tx, err := utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
 			if err != nil {
 				log.Fatal(err)
 			}
-			utils.NEWBID()
-			utils.PRINTTXHASH(tx)
-			utils.ENDBID()
+			utils.NEWBID()        // prints message
+			utils.PRINTTXHASH(tx) // prints hash of tx
+			utils.ENDBID()        // prints message
 
 		}
 	}
-	// Receive events from the channel
-
 }
 
 // EventBidPlaced subscribe to PlaceBid
 func EventBidPlaced(client *ethclient.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
+	// creates a new orc contract instance that we can interact with
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a Deposited event
+	// Watch for a event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
-
+	// chan for event
 	channelBidPlaced := make(chan *abi.OracleRequestContractBidPlaced)
-	// Start a goroutine which watches new events
-
+	// watch new event BidPlaced
 	sub, err := orcInstance.WatchBidPlaced(watchOpts, channelBidPlaced)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
-
 	for {
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventBidPlaced := <-channelBidPlaced:
-			utils.BIDPLACEDMEASSGE(eventBidPlaced)
+			utils.BIDPLACEDMEASSGE(eventBidPlaced) // prints message
 		}
 	}
 	// Receive events from the channel
@@ -116,17 +111,16 @@ func EventBidPlaced(client *ethclient.Client, wg *sync.WaitGroup) {
 // EventReleaseRequestDetails subscribe to ReleaseRequestDetails
 func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
+	// creates a new orc contract instance that we can interact with
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a Deposited event
+	// Watch for an event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
-
+	// chan for event
 	channelReleaseRequestDetails := make(chan *abi.OracleRequestContractReleaseRequestDetails)
-	// Start a goroutine which watches new events
-
+	// watch new event ReleaseRequestDetails
 	sub, err := orcInstance.WatchReleaseRequestDetails(watchOpts, channelReleaseRequestDetails)
 	if err != nil {
 		log.Fatal(err)
@@ -138,85 +132,74 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventReleaseRequestDetails := <-channelReleaseRequestDetails:
-			id := eventReleaseRequestDetails.Arg0.Uint64()
-			utils.AddIoTIDToRequests(eventReleaseRequestDetails) // adds
-
-			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails)
+			id := eventReleaseRequestDetails.Arg0.Uint64()          // converts id to uint64
+			utils.AddIoTIDToRequests(eventReleaseRequestDetails)    // adds IoTID to Requests map
+			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails) // prints message
 			// call fetch to IoT
-			utils.FetchIoTData(eventReleaseRequestDetails, id)
-
-			fmt.Println("Dummy response...")
-			hexedbytes := common.Bytes2Hex(utils.Requests[id].IoTResult)
-
-			utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedbytes))
-			// call a tx to send response to Aggregator Oracle
-
-			//utils.TxReceiveResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, fetchedResult)
-
+			utils.FetchIoTData(eventReleaseRequestDetails, id) // function to call MQTT broker
+			// need to convert the result to hex
+			hexedBytes := common.Bytes2Hex(utils.Requests[id].IoTResult)
+			// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
+			utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedBytes))
 		}
 	}
-	// Receive events from the channel
 }
 
 // EventStatusChange Subscribe to StatusChange
 func EventStatusChange(client *ethclient.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
+	// creates a new orc contract instance that we can interact with
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a Deposited event
+	// Watch options for event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
-
+	// chan for event
 	channelStatusChange := make(chan *abi.OracleRequestContractStatusChange)
-	// Start a goroutine which watches new events
-
+	// watch new event Status Change
 	sub, err := orcInstance.WatchStatusChange(watchOpts, channelStatusChange)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
-
 	for {
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventStatusChange := <-channelStatusChange:
-			utils.STATUSCHANGEMESSAGE(eventStatusChange)
+			utils.STATUSCHANGEMESSAGE(eventStatusChange) // prints status change message
 		}
 	}
-	// Receive events from the channel
 }
 
+// EventOraclePaid listens for oracle paid messages
 func EventOraclePaid(client *ethclient.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
+	// creates a new orc contract instance that we can interact with
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a Deposited event
+	// Watch options
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
+	// chan for event
 
 	channelOraclePaid := make(chan *abi.OracleRequestContractOraclePaid)
-	// Start a goroutine which watches new events
-
+	// watch new event OraclePaid
 	sub, err := orcInstance.WatchOraclePaid(watchOpts, channelOraclePaid)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
-
 	for {
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventOraclePaid := <-channelOraclePaid:
-			utils.ORACLEPAID(eventOraclePaid)
+			utils.ORACLEPAID(eventOraclePaid) // prints message when OraclePaid
 		}
 	}
-	// Receive events from the channel
 }
 
 // ***AggregatorContract***
@@ -226,26 +209,25 @@ func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.Wai
 	defer wg.Done()
 	var w sync.WaitGroup
 	w.Add(2)
-	go EventResponseReceived(client, &w)
-	go EventAggregationComplete(client, &w)
-	go EventLogHahses(client, &w)
-	w.Wait()
+	go EventResponseReceived(client, &w)    // go routine for ResponseReceived event
+	go EventAggregationComplete(client, &w) // go routine for AggregationComplete event
+	go EventLogHashes(client, &w)           // go routine for LogHashes event
+	w.Wait()                                // waits indefinitely
 }
 
 // EventResponseReceived Subscribe to ResponseReceived
 func EventResponseReceived(client *ethclient.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
+	// creates a new Aggregator contract instance that we can interact with
 	aggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a Deposited event
+	// Watch options for a ResponseReceived event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
-
+	// chan for event
 	channelResponseReceived := make(chan *abi.AggregatorContractResponseReceived)
-	// Start a goroutine which watches new events
-
+	// watch new ResponseReceived event
 	sub, err := aggInstance.WatchResponseReceived(watchOpts, channelResponseReceived)
 	if err != nil {
 		log.Fatal(err)
@@ -257,7 +239,7 @@ func EventResponseReceived(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventResponseReceived := <-channelResponseReceived:
-			utils.RESPONSERECIEVED(eventResponseReceived)
+			utils.RESPONSERECIEVED(eventResponseReceived) // prints message
 		}
 	}
 	// Receive events from the channel
@@ -272,41 +254,37 @@ func EventAggregationComplete(client *ethclient.Client, wg *sync.WaitGroup) {
 	}
 	// Watch for a Deposited event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
-
+	// chan for event
 	channelAggregationCompleted := make(chan *abi.AggregatorContractAggregationCompleted)
-	// Start a goroutine which watches new events
-
+	// watch new event AggregationComplete
 	sub, err := aggInstance.WatchAggregationCompleted(watchOpts, channelAggregationCompleted)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
-
 	for {
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventAggregationCompleted := <-channelAggregationCompleted:
-			utils.AGGREGATIONCOMPLETE(eventAggregationCompleted)
+			utils.AGGREGATIONCOMPLETE(eventAggregationCompleted) // prints aggregation complete message
 
 		}
 	}
-	// Receive events from the channel
 }
 
-func EventLogHahses(client *ethclient.Client, wg *sync.WaitGroup) {
+// EventLogHashes func that listens for log hashes
+func EventLogHashes(client *ethclient.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 	aggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a Deposited event
+	// Watch options for event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
-	// Setup a channel for results
-
+	// chan for event
 	channelLogHashes := make(chan *abi.AggregatorContractLogHashes)
-	// Start a goroutine which watches new events
+	// watch new event LogHashes
 	sub, err := aggInstance.WatchLogHashes(watchOpts, channelLogHashes)
 	if err != nil {
 		log.Fatal(err)
@@ -316,9 +294,9 @@ func EventLogHahses(client *ethclient.Client, wg *sync.WaitGroup) {
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
-		case eventLogHahses := <-channelLogHashes:
-			fmt.Println("OG hash: ", eventLogHahses.Arg0)
-			fmt.Println("Result hash: ", eventLogHahses.Arg1)
+		case eventLogHashes := <-channelLogHashes:
+			fmt.Println("OG hash: ", eventLogHashes.Arg0)     // prints contract Hash
+			fmt.Println("Result hash: ", eventLogHashes.Arg1) // prints results hash
 
 		}
 	}

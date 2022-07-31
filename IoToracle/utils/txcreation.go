@@ -1,3 +1,4 @@
+// Package utils helper files and functions
 package utils
 
 import (
@@ -16,51 +17,56 @@ import (
 	"math/big"
 )
 
+// ChainID network id used to interact with blockchain
 var ChainID = big.NewInt(5777)
 
 // PrivateKey creates private key object to sign objects
 func PrivateKey(info OracleNodeInfo) *ecdsa.PrivateKey {
-	hexKey := info.PrivateKey
-	privateKeyBin, err := hexutil.Decode(hexKey)
+	hexKey := info.PrivateKey                    // gets this from OracleNodeInfo struct
+	privateKeyBin, err := hexutil.Decode(hexKey) // hex decoder function into []byte
 	if err != nil {
 		log.Fatal(err)
 	}
-	privateKey, err := crypto.ToECDSA(privateKeyBin)
+	privateKey, err := crypto.ToECDSA(privateKeyBin) // convert to ECDSA object for tx signatures
 	if err != nil {
 		log.Fatal(nil)
 	}
-	return privateKey
+	return privateKey // returns private key object
 }
 
 // Nonce creates a nonce for tx
 func Nonce(client *ethclient.Client, info OracleNodeInfo) uint64 {
+	// nonce of address for tx
 	nonce, err := client.PendingNonceAt(context.Background(), info.NodeAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return nonce
+	return nonce // returns nonce uint64 value
 }
 
 // GasForFuncCall creates gas price for tx
 func GasForFuncCall(client *ethclient.Client) *big.Int {
+	// gets suggested gas price to send with tx
 	gasPrice, err := client.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Fatal(err)
 	}
-	return gasPrice
+	return gasPrice // returns big.Int value
 }
 
 // Auth creates auth binding for transactions
 func Auth(client *ethclient.Client, info OracleNodeInfo) *bind.TransactOpts {
+	// creates transaction binding with private key and chainID
+	// auth is returned, and we can add values to its attributes
 	auth, err := bind.NewKeyedTransactorWithChainID(PrivateKey(info), ChainID)
 	if err != nil {
 		log.Fatal(err)
 	}
-	auth.Nonce = big.NewInt(int64(Nonce(client, info)))
-	auth.Value = big.NewInt(0)
-	auth.GasLimit = uint64(3000000)
-	auth.GasPrice = GasForFuncCall(client)
-	return auth
+	auth.Nonce = big.NewInt(int64(Nonce(client, info))) // add nonce value to auth
+	auth.Value = big.NewInt(0)                          // add value to send when calling certain functions that are payable **some are**
+	auth.GasLimit = uint64(3000000)                     // gas limit
+	auth.GasPrice = GasForFuncCall(client)              // gas price for transaction
+	return auth                                         // returns bind.TransactOpts object
 }
 
 // ****OracleRequestContract****
@@ -76,45 +82,41 @@ func OracleRequestContractInstance(client *ethclient.Client) *abi.OracleRequestC
 
 // TxJoinAsOracle creates tx to join oracle network
 func TxJoinAsOracle(client *ethclient.Client, info OracleNodeInfo) *types.Transaction {
-	auth := Auth(client, info)
-	stake := math.BigPow(10, 18) // 1 ether stake, when leaving the network it is returned.
-	auth.Value = stake
-	orcJoinAsOracle := OracleRequestContractInstance(client)
-	tx, err := orcJoinAsOracle.JoinAsOracle(auth)
+	auth := Auth(client, info)                               // auth object for transaction based on client and OracleNodeInfo
+	stake := math.BigPow(10, 18)                             // 1 ether stake, when leaving the network it is returned.
+	auth.Value = stake                                       // add to Value opt
+	orcJoinAsOracle := OracleRequestContractInstance(client) // orc contract instance
+	tx, err := orcJoinAsOracle.JoinAsOracle(auth)            // tx function call to JoinAsOracle, returns a tx
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx)
-	return tx
+	//PRINTTXHASH(tx) // print tx message
+	return tx // return tx types.Transaction
 }
 
 // TxLeaveOracleNetwork run this at start of test to make sure the different parts of the contract are working
 func TxLeaveOracleNetwork(client *ethclient.Client, info OracleNodeInfo) *types.Transaction {
-	orcLeaveOracle := OracleRequestContractInstance(client)
-	tx, err := orcLeaveOracle.LeaveOracleNetwork(Auth(client, info))
+	orcLeaveOracle := OracleRequestContractInstance(client)          // orc contract instance
+	tx, err := orcLeaveOracle.LeaveOracleNetwork(Auth(client, info)) // call LeaveOracleNetwork function
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx)
-	return tx
+	//PRINTTXHASH(tx) // print tx
+	return tx // return tx types.Transaction
 }
 
 // TxPlaceBid creates tx to  place bid on request
 func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) (*types.Transaction, error) {
-	orcPLaceBid := OracleRequestContractInstance(client)
-	tx, err := orcPLaceBid.PlaceBid(Auth(client, info), requestID)
+	orcPLaceBid := OracleRequestContractInstance(client)           // orc contract instance
+	tx, err := orcPLaceBid.PlaceBid(Auth(client, info), requestID) // call PlaceBid function
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx)
-	return tx, nil
+	//PRINTTXHASH(tx) // print tx
+	return tx, nil // return tx types.Transaction and error value
 }
 
-// ***ToDoList***
-// TODO generate tx createRequest
-// TODO generate tx deliverResponse
-// TODO generate tx for getters
-
+// TxPhash used to call pHash function **not used**
 func TxPhash(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) {
 	orcPLaceBid := OracleRequestContractInstance(client)
 	call := bind.CallOpts{Context: context.Background()}
@@ -126,28 +128,29 @@ func TxPhash(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) 
 
 }
 
-// Do not need at the moment
-
 // ****AggregatorContract****
 
 // AggregatorContractInstance creates instance of the aggregator contract
 func AggregatorContractInstance(client *ethclient.Client) *abi.AggregatorContract {
+	// Aggregator contract instance
 	AggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return AggInstance
+	return AggInstance // returns Aggregator contract
 }
 
 // TxReceiveResponse generate tx to send result fetched to receiveResponse
-func TxReceiveResponse(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int, fetchedResult []byte) *types.Transaction {
-	aggReceiveResponse := AggregatorContractInstance(client)
-	tx, err := aggReceiveResponse.ReceiveResponse(Auth(client, info), requestID, fetchedResult)
+func TxReceiveResponse(client *ethclient.Client, info OracleNodeInfo,
+	requestID *big.Int,
+	fetchedResult []byte) *types.Transaction {
+	aggReceiveResponse := AggregatorContractInstance(client)                                    // Aggregator contract instance
+	tx, err := aggReceiveResponse.ReceiveResponse(Auth(client, info), requestID, fetchedResult) // call ReceiveResponse function in Aggregator contract
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx)
-	return tx
+	//PRINTTXHASH(tx) // print tx message
+	return tx // return tx types.Transaction
 }
 
 // ***ToDoList***
