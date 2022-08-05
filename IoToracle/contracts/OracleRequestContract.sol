@@ -2,16 +2,21 @@
 pragma solidity ^0.8.0;
 
 import "./AggregatorContract.sol";
+import "./ReputationContract.sol";
 
 contract OracleRequestContract {
     //address that deploys contract
     address public owner;
     // address of aggregator contract
     address public aggregatorAddr;
+    // address of reputation contract
+    address public reputationAddr;
     // Array to populate with requests that come in
     Request[100] public requests;
     // all mappings of oracles that have joined network
     mapping (address => bool) public oracles;
+    // mapping of blacklisted oracles (who's ratings exceed 10)
+    mapping (address => bool) public blacklistedOracles;
     // stakeBalance of each node, should be equal to 1 eth
     mapping (address => uint) public stakeBalance;
     // request and and pending counters, pending decreased when status changed to COMPLETE
@@ -66,7 +71,10 @@ contract OracleRequestContract {
     payable
     oracleNotJoined()
     valueEqual1Eth()
+    isNotBlacklisted(address(msg.sender))
+    //oracleCannotRejoin()
     returns(bool){
+        ReputationContract(reputationAddr).addOracle(msg.sender);
         oracles[address(msg.sender)] = true; // set to true as is now in network
         stakeBalance[msg.sender] = msg.value; // added value to stakeBalance as a record
         emit OracleJoined(msg.sender, "Welcome new node!"); // emit event so listeners can be notified
@@ -78,7 +86,11 @@ contract OracleRequestContract {
     public
     oracleHasJoined()
     stakeCheck()
+    isNotBlacklisted(msg.sender)
     returns(bool) {
+        if (ReputationContract(reputationAddr).getOracleRating(msg.sender) > 1 ){
+            blacklistedOracles[msg.sender] = true;
+        }
         delete oracles[msg.sender]; // deletes address from mapping
         payable(msg.sender).transfer(stakeBalance[msg.sender]); // transfers their stake back to them
         stakeBalance[msg.sender] = 0; // set stakeBalance back to 0 for the oracle node
@@ -145,6 +157,7 @@ contract OracleRequestContract {
     oracleHasJoined() // requires that the oracle is in the network
     cancelFlagZero(_requestID) // requires requests cancel flag is zero
     orcCountLessThanNum(_requestID) // requires that the oracle counter is still les than the number of oracles needed
+    isNotBlacklisted()
     returns(bool)
     {
         requests[_requestID].oraclesForRequest[msg.sender] = true; // add true for oracle in request so we know they can vote
@@ -207,6 +220,18 @@ contract OracleRequestContract {
         AggregatorContract(aggregatorAddr).cancelRequest(_requestID);
         return true;
     }
+    // @notice blacklist oracle that misbehaves 10
+    function blacklistOracle(address _addr)
+    external
+    onlyReputation()
+    returns(bool)
+    {
+        blacklistedOracles[_addr] = true;
+        return blacklistedOracles[_addr];
+    }
+
+
+
     // *** Setters ***
     function setAggregatorContract(
         address _aggAddr)
@@ -215,6 +240,15 @@ contract OracleRequestContract {
     returns(bool)
     {
         aggregatorAddr = _aggAddr;
+        return true;
+    }
+
+    function setReputationContract(address _repAddr)
+    public
+    onlyOwner()
+    returns(bool)
+    {
+        reputationAddr = _repAddr;
         return true;
     }
 
@@ -257,6 +291,13 @@ contract OracleRequestContract {
     {
         return requests[_requestID].dataType;
     }
+    // @notice returns bool whether or not _addr is blacklisted
+    function getBlacklistedOracle(address _addr)
+    external
+    returns(bool)
+    {
+        return blacklistedOracles[_addr];
+    }
     // ***Modifiers***
     // @notice only owner of contract
     modifier onlyOwner()
@@ -268,6 +309,12 @@ contract OracleRequestContract {
     modifier onlyAggregator()
     {
         require(msg.sender == aggregatorAddr);
+        _;
+    }
+    // @notice only owner of reputation contract
+    modifier onlyReputation()
+    {
+        require(msg.sender == reputationAddr);
         _;
     }
     // @notice modifier to confirm calling address is an oracle node address already acknowledged
@@ -332,4 +379,13 @@ contract OracleRequestContract {
         _;
     }
 
+    modifier isNotBlacklisted() {
+        require(!blacklistedOracles[msg.sender] == true);
+        _;
+    }
+
+    modifier oracleCannotRejoin(address) {
+        require(!oraclesThatCannotRejoin[msg.sender] == true);
+        _;
+    }
 }
