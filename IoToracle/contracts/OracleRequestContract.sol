@@ -71,7 +71,7 @@ contract OracleRequestContract {
     payable
     oracleNotJoined()
     valueEqual1Eth()
-    isNotBlacklisted(address(msg.sender))
+    isNotBlacklisted()
     //oracleCannotRejoin()
     returns(bool){
         ReputationContract(reputationAddr).addOracle(msg.sender);
@@ -86,7 +86,7 @@ contract OracleRequestContract {
     public
     oracleHasJoined()
     stakeCheck()
-    isNotBlacklisted(msg.sender)
+    isNotBlacklisted()
     returns(bool) {
         if (ReputationContract(reputationAddr).getOracleRating(msg.sender) > 1 ){
             blacklistedOracles[msg.sender] = true;
@@ -294,6 +294,7 @@ contract OracleRequestContract {
     // @notice returns bool whether or not _addr is blacklisted
     function getBlacklistedOracle(address _addr)
     external
+    view
     returns(bool)
     {
         return blacklistedOracles[_addr];
@@ -384,8 +385,4 @@ contract OracleRequestContract {
         _;
     }
 
-    modifier oracleCannotRejoin(address) {
-        require(!oraclesThatCannotRejoin[msg.sender] == true);
-        _;
-    }
 }
