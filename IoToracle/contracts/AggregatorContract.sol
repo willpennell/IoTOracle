@@ -13,12 +13,13 @@ contract AggregatorContract {
         mapping (address => bool) oracleHasSubmittedCommit; // authorised oracles, marked true when committed
         mapping(address => bool) oracleHasSubmittedReveal; // authorised oracles, marked true when revealed
         mapping (address => bytes32) oracleCommits; // add their result to a map with their address as index
-        mapping (address => bytes[]) oracleReveals;
+        mapping (address => bool) oracleVoteReveals;
+        mapping (address => int256) oracleAverageReveals;
         mapping (uint256 => address) oracleAddresses; // uint to address to match counter and iterate through
         uint256 oracleCounter; // keep an index of the oracles
-        address[] correctOracles; // dynamic array to keep track of correct oracle address to be paid
-        address[] incorrectOracles;
-        uint256 aggregationType;
+        address[] correctRevealOracles; // dynamic array to keep track of correct oracle address to be paid
+        address[] incorrectRevealOracles;
+
         uint32 t; // a true counter;
         uint32 f; // a false counter: we need this under (n-1)/3
         uint cancelFlag; // cancelFlag == 0, == 1 if canceled
@@ -39,7 +40,7 @@ contract AggregatorContract {
         orc = OracleRequestContract(_addr); // initialise the Oracle Request Contract contract
     }
     // @notice commitResponse
-    function commitResponse(uint256 _requestID, bytes32 memory _commitHash )
+    function commitResponse(uint256 _requestID, bytes32 _commitHash )
     public
     onlyAuthorisedOraclesYetToCommit(_requestID)
     cancelFlagCheck(_requestID)
@@ -48,9 +49,6 @@ contract AggregatorContract {
     {
         if (answers[_requestID].requestID == 0) {
             answers[_requestID].requestID = _requestID; // assign correct id
-        }
-        if (answers[_requestID].aggregationType == 0) {
-            answers[_requestID].aggregationType = _aggregationType;
         }
         if (answers[_requestID].oracleCounter < orc.getNumberOfOracles(_requestID)) {
             answers[_requestID].oracleCommits[msg.sender] = _commitHash; // oracle nodes add commit to map
@@ -66,38 +64,118 @@ contract AggregatorContract {
         return true;
     }
 
-    function revealResponse(uint256 _requestID, bytes[] _result, bytes[] _secret)
+    function revealVoteResponse(uint256 _requestID, bool _result, bytes[] memory _secret)
+    public
     onlyAuthorisedOraclesYetToReveal(_requestID)
     cancelFlagCheck(_requestID)
     commitCompleteFlagCheck(_requestID) // checks all commits are in and flag is equal to 1
     revealsFlagCheck(_requestID) // checks that reveal flag is 0 otherwise function will not run
+    onlyVoteAggregationType(_requestID)
     returns(bool){
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
-        bytes32 revealHash = keccak256(abi.encodePacked(_secret, _result));
+        bytes32 revealHash = keccak256(abi.encode(_secret, _result));
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
-            answers[_requestID].oracleReveals[msg.sender] = _result;
+            answers[_requestID].oracleVoteReveals[msg.sender] = _result;
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true;
+            answers[_requestID].correctRevealOracles.push(msg.sender);
             // return answers[_requestID].oracleHasSubmittedReveal[msg.sender];
         } else {
-            answers[_requestID].incorrectOracles.push(msg.sender);
+            answers[_requestID].incorrectRevealOracles.push(msg.sender);
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true;
             //return false;
         }
         answers[_requestID].oracleCounter++;
         if (answers[_requestID].oracleCounter == (orc.getNumberOfOracles(_requestID) - 1)){
-            if (orc.getAggregationType(_requestID) == 1) {
-                // voting
-            } else if (orc.getAggregationType(_requestID) == 2) {
-                // averaging
-            }
-            return false;
+            voteAggregation(_requestID);
+        }
+        return true;
+    }
+
+    function revealAverageResponse(uint256 _requestID, int256 _result, bytes[] memory _secret)
+    public
+    onlyAuthorisedOraclesYetToReveal(_requestID)
+    cancelFlagCheck(_requestID)
+    commitCompleteFlagCheck(_requestID) // checks all commits are in and flag is equal to 1
+    revealsFlagCheck(_requestID) // checks that reveal flag is 0 otherwise function will not run
+    onlyAverageAggregationType(_requestID)
+    returns(bool){
+        // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
+        bytes32 revealHash = keccak256(abi.encode(_secret, _result));
+        if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
+            answers[_requestID].oracleAverageReveals[msg.sender] = _result;
+            answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true;
+            answers[_requestID].correctRevealOracles.push(msg.sender);
+            // return answers[_requestID].oracleHasSubmittedReveal[msg.sender];
+        } else {
+            answers[_requestID].incorrectRevealOracles.push(msg.sender);
+            answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true;
+            //return false;
+        }
+        answers[_requestID].oracleCounter++;
+        if (answers[_requestID].oracleCounter == (orc.getNumberOfOracles(_requestID) - 1)){
+            averageAggregation(_requestID);
         }
         return true;
     }
     // voting aggregation
+    function voteAggregation(uint256 _requestID) internal returns(bool) {
+        address[] memory trueOracleResults;
+        address[] memory falseOracleResults;
+        bool _result;
+        address orcAddress;
+        for (uint i = 0; i < answers[_requestID].correctRevealOracles.length; i++) {
+            orcAddress = answers[_requestID].correctRevealOracles[i];
+            if (answers[_requestID].oracleVoteReveals[orcAddress] == true ) {
+                trueOracleResults[answers[_requestID].t] = orcAddress;
+                answers[_requestID].t++;
+            } else {
+                falseOracleResults[answers[_requestID].f] = orcAddress;
+                answers[_requestID].f++;
+            }
+        }
 
+        if (answers[_requestID].t > answers[_requestID].f) {
+            // call
+            require(!(answers[_requestID].f > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
+            _result = true;
+            orc.deliverVoteResponse(_requestID, _result, trueOracleResults,
+                falseOracleResults,
+                answers[_requestID].incorrectRevealOracles);
+            return _result;
+        } else if (answers[_requestID].f > answers[_requestID].t) {
+            require(!(answers[_requestID].t > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
+            _result = false;
+            orc.deliverVoteResponse(_requestID, _result,
+                falseOracleResults,
+                trueOracleResults,
+                answers[_requestID].incorrectRevealOracles);
+            return _result;
+        } else {
+            orc.cancelRequestDueToDeadlock(_requestID, answers[_requestID].incorrectRevealOracles);
+            answers[_requestID].cancelFlag = 1;
+        }
+        return false;
+    }
     // averaging aggregation
-
+    function averageAggregation(uint256 _requestID)
+    internal
+    returns(bool)
+    {
+        address orcAddress;
+        int256 total = 0;
+        int256 average;
+        for (uint i=0; i<answers[_requestID].correctRevealOracles.length; i++){
+            orcAddress = answers[_requestID].correctRevealOracles[i];
+            total += answers[_requestID].oracleAverageReveals[orcAddress];
+        }
+        average = total / int(answers[_requestID].correctRevealOracles.length);
+        orc.deliverAverageResponse(
+                _requestID,
+                average,
+                answers[_requestID].correctRevealOracles,
+                    answers[_requestID].incorrectRevealOracles);
+        return true;
+    }
 
 
 
@@ -146,7 +224,7 @@ contract AggregatorContract {
         _;
     }
     modifier commitCompleteFlagCheck(uint256 _requestID) {
-        require(answers[_requestOD].commitsFlag == 1);
+        require(answers[_requestID].commitsFlag == 1);
         _;
     }
     modifier revealsFlagCheck(uint256 _requestID){
@@ -158,7 +236,14 @@ contract AggregatorContract {
         require(msg.sender == address(orc));
         _;
     }
-
+    modifier onlyVoteAggregationType(uint256 _requestID) {
+        require(orc.getAggregationType(_requestID) == 1);
+        _;
+    }
+    modifier onlyAverageAggregationType(uint256 _requestID) {
+        require(orc.getAggregationType(_requestID) == 2);
+        _;
+    }
 }
 
 

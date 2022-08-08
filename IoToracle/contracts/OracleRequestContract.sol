@@ -47,7 +47,7 @@ contract OracleRequestContract {
 
     bool[100] public completedRequests;// true for each requestID once status changes to complete.
 
-    event OpenForBids(uint256, bytes); // tells oracle nodes there is a request that needs bidding on
+    event OpenForBids(uint256, bytes, uint256); // tells oracle nodes there is a request that needs bidding on
     event BidPlaced(address); // tells nodes that a bid has been placed by another node
     event ReleaseRequestDetails(uint256, bytes, bytes); // the details the node needs to gather
     event StatusChange(Status, string); // tells nodes in network of status change of requests
@@ -114,7 +114,6 @@ contract OracleRequestContract {
         bytes memory _callbackFID,
         bytes memory _IoTID,
         bytes memory _dataType,
-        bytes memory _requiredResult,
         uint256 _aggregationType,
         uint32 _numberOfOracles)
     external
@@ -138,17 +137,13 @@ contract OracleRequestContract {
         requests[requestID].status = Status.PENDING;
         requests[requestID].cancelFlag = 0;
         requests[requestID].fee = msg.value; // keeps track of the fee for the request
-        requests[_requestID].aggregationType = _aggregationType;
+        requests[requestID].aggregationType = _aggregationType;
         emit StatusChange(requests[requestID].status, "PENDING"); // tells nodes in network of status change of requests
         // create a hash of the _dataType and _requiredResult:
-        // we will use the actual result to test upon delivery.
-        bytes32 phash = keccak256(abi.encodePacked(_dataType, _requiredResult));
-        // add required result to hash, only time it is used, we assume that the user-SC knows what answer they are looking for
-        requests[requestID].pHash = phash;
         // increment requestId ready for next create request function.
         requestCounter++;
         pendingCounter++;
-        emit OpenForBids(requestID, requests[requestID].dataType);
+        emit OpenForBids(requestID, requests[requestID].dataType, requests[requestID].aggregationType);
         return requestID;
     }
 
@@ -185,10 +180,12 @@ contract OracleRequestContract {
     // @param _requestID, id of request
     // @param _finalResult, final aggregated result
     // @param _correctOracles, array of addresses of oracles to be paid for their work
-    function deliverResponse(
+    function deliverVoteResponse(
         uint256 _requestID,
-        bytes memory _finalResult,
-        address[] memory _correctOracles)
+        bool _finalResult,
+        address[] memory _correctOracles,
+        address[] memory _incorrectOracles,
+        address[] memory _incorrectRevealOracles) // do not penalise
     public
     cancelFlagZero(_requestID) // requires that the cancelFlag is = 0
     onlyAggregator() // only the aggregator contract can call this function
@@ -196,7 +193,7 @@ contract OracleRequestContract {
     {
         // return single aggregation result
         _finalResult;
-        uint fee = requests[_requestID].fee / (requests[_requestID].numberOfOracles);
+        uint fee = requests[_requestID].fee / _correctOracles.length;
         // pay fees
         for (uint i=0; i<_correctOracles.length; i++) {
             // pay each share to each oracle
@@ -204,6 +201,53 @@ contract OracleRequestContract {
             payable(_correctOracles[i]).transfer(fee); // pays oracle their fee
             requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
             // and all oracles have been paid
+        }
+        for (uint i=0; i<_incorrectOracles.length; i++){
+            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
+            stakeBalance[_incorrectOracles[i]] -= penalty;
+            ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
+        }
+        // small penalty for incorrect hashes
+        for (uint i=0; i<_incorrectRevealOracles.length; i++) {
+            uint penalty = fee;
+            stakeBalance[_incorrectRevealOracles[i]] += penalty;
+        }
+        requests[_requestID].status = Status.COMPLETE; // request is complete
+        completedRequests[_requestID] = true; // add request id to completedRequests
+        emit StatusChange(requests[_requestID].status, "COMPLETE"); // tell listeners that the status has changed
+        pendingCounter--; // no longer pending so countered can be decremented
+        return true; // return true to so it has finished
+    }
+
+    // @notice called by aggregator contract to deliver final response
+    // @param _requestID, id of request
+    // @param _finalResult, final aggregated result
+    // @param _correctOracles, array of addresses of oracles to be paid for their work
+    function deliverAverageResponse(
+        uint256 _requestID,
+        int256 _finalResult,
+        address[] memory _correctOracles,
+        address[] memory _incorrectOracles)
+        // address[] memory _incorrectOracles,
+        // address[] memory _incorrectRevealOracles) // do not penalise
+    public
+    cancelFlagZero(_requestID) // requires that the cancelFlag is = 0
+    onlyAggregator() // only the aggregator contract can call this function
+    returns(bool)
+    {
+        // return single aggregation result
+        _finalResult;
+        uint fee = requests[_requestID].fee / _correctOracles.length;
+        // pay fees
+        for (uint i=0; i<_correctOracles.length; i++) {
+            // pay each share to each oracle
+            emit OraclePaid(_correctOracles[i], fee, "Oracle has been Paid!"); // tells listeners oracle node has been paid
+            payable(_correctOracles[i]).transfer(fee); // pays oracle their fee
+            requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
+            // and all oracles have been paid
+        }
+        for (uint i=0; i<_incorrectOracles.length; i++) {
+            stakeBalance[_incorrectOracles[i]] -= fee;
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete
         completedRequests[_requestID] = true; // add request id to completedRequests
@@ -225,6 +269,25 @@ contract OracleRequestContract {
         AggregatorContract(aggregatorAddr).cancelRequest(_requestID);
         return true;
     }
+    function cancelRequestDueToDeadlock(
+        uint256 _requestID,
+        address[] memory _incorrectOracleReveals)
+    external
+    onlyAggregator()
+    cancelFlagZero(_requestID)
+    returns(bool)
+    {
+        requests[_requestID].cancelFlag = 1;
+        requests[_requestID].status = Status.CANCELLED;
+        // return full fee as the user is not at fault here
+        // should be slashed from incorrect nodes for causing deadlock
+        uint penalty = requests[_requestID].fee / _incorrectOracleReveals.length;
+        for (uint i=0;i<_incorrectOracleReveals.length; i++) {
+            stakeBalance[_incorrectOracleReveals[i]] -= penalty;
+        }
+        payable(requests[_requestID].requester).transfer(requests[_requestID].fee);
+        return true;
+    }
     // @notice blacklist oracle that misbehaves 10
     function blacklistOracle(address _addr)
     external
@@ -234,6 +297,7 @@ contract OracleRequestContract {
         blacklistedOracles[_addr] = true;
         return blacklistedOracles[_addr];
     }
+
 
 
 
@@ -278,15 +342,7 @@ contract OracleRequestContract {
     {
         return requests[_requestID].numberOfOracles;
     }
-    function getPHash(
-        uint256 _requestID)
-    external
-    view
-    onlyAggregator()
-    returns(bytes32)
-    {
-        return requests[_requestID].pHash;
-    }
+
     function getDataType(
         uint256 _requestID)
     external
