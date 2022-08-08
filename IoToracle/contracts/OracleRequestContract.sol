@@ -24,6 +24,7 @@ contract OracleRequestContract {
     uint pendingCounter = 1;
     // Status logs for each request
     enum Status{PENDING, COMPLETE, CANCELLED}
+
     // a single Request structure
     struct Request {
         uint256 requestID; //Id for each request
@@ -32,11 +33,12 @@ contract OracleRequestContract {
         bytes callbackFID; // a function in the callback address that can be called
         bytes IoTID; // the ID of the IoT the user-SC wishes to gather data from
         bytes dataType; // data type, JSON that is decoded by the oracle node that will collect the data
-        bytes32 pHash; // a hash of the data type and the actual result required.
+        // bytes32 pHash; // a hash of the data type and the actual result required.
         //bytes requiredResult; // left this out for security reason, we only apply it to the hash
         uint32 numberOfOracles; // number of oracles needed to fetch the data
         mapping (address => bool) oraclesForRequest; // must be true in order for oracle node to participate
         mapping (uint32 => address) oracleAddressAccess; // mapping so we can iterate through addresses
+        uint256 aggregationType;
         uint32 oracleCounter; // index and counter for the number of oracles
         Status status; // status of the request
         uint8 cancelFlag; // cancel flag, if == 1 then do not continue with request
@@ -113,11 +115,13 @@ contract OracleRequestContract {
         bytes memory _IoTID,
         bytes memory _dataType,
         bytes memory _requiredResult,
+        uint256 _aggregationType,
         uint32 _numberOfOracles)
     external
     payable
     valueGTMinFeeCheck() // requires the value sent is >= MIN_FEE
     oddNumOracles(_numberOfOracles) // requires an odd number of oracles
+    aggregationTypeCheck(_aggregationType)
     returns(uint256)
     {
         uint256 requestID = requestCounter; // assign id to request
@@ -134,6 +138,7 @@ contract OracleRequestContract {
         requests[requestID].status = Status.PENDING;
         requests[requestID].cancelFlag = 0;
         requests[requestID].fee = msg.value; // keeps track of the fee for the request
+        requests[_requestID].aggregationType = _aggregationType;
         emit StatusChange(requests[requestID].status, "PENDING"); // tells nodes in network of status change of requests
         // create a hash of the _dataType and _requiredResult:
         // we will use the actual result to test upon delivery.
@@ -299,6 +304,15 @@ contract OracleRequestContract {
     {
         return blacklistedOracles[_addr];
     }
+    // @notice
+    function getAggregationType(uint256 _requestID)
+    external
+    view
+    onlyAggregator()
+    returns(uint256)
+    {
+        return requests[_requestID].aggregationType;
+    }
     // ***Modifiers***
     // @notice only owner of contract
     modifier onlyOwner()
@@ -382,6 +396,10 @@ contract OracleRequestContract {
 
     modifier isNotBlacklisted() {
         require(!blacklistedOracles[msg.sender] == true);
+        _;
+    }
+    modifier aggregationTypeCheck(uint256 _aggregationType) {
+        require(1 == _aggregationType || _aggregationType == 2 );
         _;
     }
 
