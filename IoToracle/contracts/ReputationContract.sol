@@ -31,25 +31,24 @@ contract ReputationContract {
         oracleRatings[_addr] = MIN_RATING;
         return true;
     }
-
+    // @notice increments penalty rating as oracle address keeps being dishonest
     function incrementRating(address _addr)
     external
-    onlyORC()
-    onlyNonBlacklistedOracles(_addr)
+    onlyORC() // only oracle request contract can call this
+    onlyNonBlacklistedOracles(_addr) // only non-blacklisted oracles are to be used
     returns(uint)
     {
-        oracleRatings[_addr] ++;
-        if (oracleRatings[_addr] > MIN_RATING) {
+        oracleRatings[_addr] ++; // increments the value in map at address
+        // check if the oracle rating is greater than the max rating
+        if (oracleRatings[_addr] > MAX_RATING) {
             // orc blacklist function
             orc.blacklistOracle(_addr);
             emit OracleBlacklisted(_addr, "oracle node has been blacklisted from network.");
         }
         return oracleRatings[_addr];
     }
-    // @notice
-
-
     // ***getters***
+    // @notice gets oracle rating
     function getOracleRating(address _addr)
     public
     view
@@ -57,7 +56,7 @@ contract ReputationContract {
     {
         return oracleRatings[_addr];
     }
-
+    // @notice gets oracle penalty fee
     function getPenaltyFee(address _addr)
     public
     view
@@ -65,10 +64,7 @@ contract ReputationContract {
     {
         return PENALTY_FEE**oracleRatings[_addr];
     }
-
     // ***modifiers***
-
-
     // @notice only OracleRequestContract can call the function with modifier
     modifier onlyORC()
     {

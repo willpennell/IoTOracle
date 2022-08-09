@@ -7,7 +7,6 @@ import (
 	"IoToracle/utils"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"golang.org/x/net/context"
 	"log"
@@ -61,7 +60,7 @@ func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo uti
 		case eventOpenForBids := <-channelOpenForBids: // creates event object
 			utils.OPENFORBIDSMESSAGE(eventOpenForBids) // prints message with data from event
 			// creates a request struct
-			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1)
+			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1, eventOpenForBids.Arg2)
 			utils.Requests[id] = &request // this is added to the Requests map
 			utils.Requests[id].Status = 1 // change status to 1 to show this request is pending
 			//time.Sleep(time.Second)
@@ -86,7 +85,7 @@ func EventBidPlaced(client *ethclient.Client, wg *sync.WaitGroup) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch for a event
+	// Watch for an event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
 	// chan for event
 	channelBidPlaced := make(chan *abi.OracleRequestContractBidPlaced)
@@ -138,9 +137,11 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 			// call fetch to IoT
 			utils.FetchIoTData(eventReleaseRequestDetails, id) // function to call MQTT broker
 			// need to convert the result to hex
-			hexedBytes := common.Bytes2Hex(utils.Requests[id].IoTResult)
+
 			// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
-			utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedBytes))
+			// TODO change to commitResponse
+			utils.TxCommitResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, utils.Requests[id].CommitHash)
+			// utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedBytes))
 		}
 	}
 }
@@ -205,44 +206,95 @@ func EventOraclePaid(client *ethclient.Client, wg *sync.WaitGroup) {
 // ***AggregatorContract***
 
 // SubscribeToAggregationContractEvents listens to all events in AggregationContract
-func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.WaitGroup) {
+func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	var w sync.WaitGroup
-	w.Add(2)
-	go EventResponseReceived(client, &w)    // go routine for ResponseReceived event
+	w.Add(3)
+
 	go EventAggregationComplete(client, &w) // go routine for AggregationComplete event
 	go EventLogHashes(client, &w)           // go routine for LogHashes event
-	w.Wait()                                // waits indefinitely
+	go EventCommitsPlaced(client, &w, nodeInfo)
+	w.Wait() // waits indefinitely
 }
 
-// EventResponseReceived Subscribe to ResponseReceived
-func EventResponseReceived(client *ethclient.Client, wg *sync.WaitGroup) {
+// EventCommitsPlaced TODO commits received
+func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
-	// creates a new Aggregator contract instance that we can interact with
 	aggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Watch options for a ResponseReceived event
+	// Watch for a Deposited event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
 	// chan for event
-	channelResponseReceived := make(chan *abi.AggregatorContractResponseReceived)
-	// watch new ResponseReceived event
-	sub, err := aggInstance.WatchResponseReceived(watchOpts, channelResponseReceived)
+	channelCommitsPlaced := make(chan *abi.AggregatorContractCommitsPlaced)
+	// watch new event AggregationComplete
+	sub, err := aggInstance.WatchCommitsPlaced(watchOpts, channelCommitsPlaced)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer sub.Unsubscribe()
-
 	for {
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
-		case eventResponseReceived := <-channelResponseReceived:
-			utils.RESPONSERECIEVED(eventResponseReceived) // prints message
+		case eventCommitsPlaced := <-channelCommitsPlaced:
+			utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
+			// TODO call reveal tx
+			id := eventCommitsPlaced.Arg0.Uint64()
+			ioTbool := utils.UnpackBool(utils.Requests[id].IoTResult)
+			fmt.Println("here: ", ioTbool)
+			if utils.Requests[id].AggregationType == 1 {
+
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, ioTbool, utils.Requests[id].Secret)
+			} else if utils.Requests[id].AggregationType == 2 {
+				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
+			}
+
+			// prints aggregation complete message
+
 		}
 	}
-	// Receive events from the channel
+}
+
+// TODO reveals received
+func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
+	defer wg.Done()
+	aggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Watch for a Deposited event
+	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
+	// chan for event
+	channelCommitsPlaced := make(chan *abi.AggregatorContractCommitsPlaced)
+	// watch new event AggregationComplete
+	sub, err := aggInstance.WatchCommitsPlaced(watchOpts, channelCommitsPlaced)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sub.Unsubscribe()
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case eventCommitsPlaced := <-channelCommitsPlaced:
+			utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
+			// TODO call reveal tx
+			id := eventCommitsPlaced.Arg0.Uint64()
+			ioTbool := utils.UnpackBool(utils.Requests[id].IoTResult)
+			fmt.Println("here: ", ioTbool)
+			if utils.Requests[id].AggregationType == 1 {
+
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, ioTbool, utils.Requests[id].Secret)
+			} else if utils.Requests[id].AggregationType == 2 {
+				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
+			}
+
+			// prints aggregation complete message
+
+		}
+	}
 }
 
 // EventAggregationComplete Subscribe to AggregationComplete
@@ -295,8 +347,8 @@ func EventLogHashes(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventLogHashes := <-channelLogHashes:
-			fmt.Println("OG hash: ", eventLogHashes.Arg0)     // prints contract Hash
-			fmt.Println("Result hash: ", eventLogHashes.Arg1) // prints results hash
+			fmt.Println("Commit Hash: ", eventLogHashes.Arg0)   // prints contract Hash
+			fmt.Println("Solidity Hash: ", eventLogHashes.Arg1) // prints results hash
 
 		}
 	}

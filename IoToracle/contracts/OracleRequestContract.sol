@@ -56,8 +56,8 @@ contract OracleRequestContract {
     event OraclePaid(address, uint, string); // tells the network when an oracle has been paid for its services
     // ***payments***
     uint GAS_PRICE = 2 * 10**10; // cost of gas
-    uint FEE = GAS_PRICE * 2; // fee to cover other function calls and pay each oracle
-    uint MIN_FEE = FEE + (GAS_PRICE * 3); // minimum needed to cover all costs
+    uint FEE = GAS_PRICE * 3; // fee to cover other function calls and pay each oracle
+    uint MIN_FEE = FEE + (GAS_PRICE * 5); // minimum needed to cover all costs
 
     // @notice constructor when first deployed
     constructor() {
@@ -91,7 +91,7 @@ contract OracleRequestContract {
     isNotBlacklisted()
     returns(bool) {
         if (ReputationContract(reputationAddr).getOracleRating(msg.sender) > 1 ){
-            blacklistedOracles[msg.sender] = true;
+            blacklistedOracles[msg.sender] = true; // allows oracle nodes with penalties to leave, but cannot rejoin
         }
         delete oracles[msg.sender]; // deletes address from mapping
         payable(msg.sender).transfer(stakeBalance[msg.sender]); // transfers their stake back to them
@@ -106,7 +106,7 @@ contract OracleRequestContract {
     // @param _callbackFID a particular function in a smart contract that is needed to be called based on request
     // @param _IoTID the identifier of the IoT device oracle node will be subscribing to
     // @param _dataType, true false answer, an event, continuous data over time?
-    // @param _requiredResult what is needed from IoT device
+    // @param _aggregationType 1 = voting, 2 = averaging
     // @param _numberOfOracles number of oracle nodes that fetch IoT data
     // @return the requestID so the user can keep track of request
     function createRequest(
@@ -120,7 +120,7 @@ contract OracleRequestContract {
     payable
     valueGTMinFeeCheck() // requires the value sent is >= MIN_FEE
     oddNumOracles(_numberOfOracles) // requires an odd number of oracles
-    aggregationTypeCheck(_aggregationType)
+    aggregationTypeCheck(_aggregationType) // 1 = voting, 2 = averaging
     returns(uint256)
     {
         uint256 requestID = requestCounter; // assign id to request
@@ -131,7 +131,6 @@ contract OracleRequestContract {
         requests[requestID].callbackFID = _callbackFID;
         requests[requestID].IoTID = _IoTID;
         requests[requestID].dataType = _dataType;
-        //requests[requestId].requiredResult = _requiredResult; // do not need to store result put in a hash?
         requests[requestID].numberOfOracles = _numberOfOracles;
         requests[requestID].oracleCounter = 0;
         requests[requestID].status = Status.PENDING;
@@ -139,7 +138,6 @@ contract OracleRequestContract {
         requests[requestID].fee = msg.value; // keeps track of the fee for the request
         requests[requestID].aggregationType = _aggregationType;
         emit StatusChange(requests[requestID].status, "PENDING"); // tells nodes in network of status change of requests
-        // create a hash of the _dataType and _requiredResult:
         // increment requestId ready for next create request function.
         requestCounter++;
         pendingCounter++;
@@ -157,7 +155,7 @@ contract OracleRequestContract {
     oracleHasJoined() // requires that the oracle is in the network
     cancelFlagZero(_requestID) // requires requests cancel flag is zero
     orcCountLessThanNum(_requestID) // requires that the oracle counter is still les than the number of oracles needed
-    isNotBlacklisted()
+    isNotBlacklisted() // requires the oracle has not exceed its penalty rating past 10
     returns(bool)
     {
         requests[_requestID].oraclesForRequest[msg.sender] = true; // add true for oracle in request so we know they can vote
@@ -202,15 +200,17 @@ contract OracleRequestContract {
             requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
             // and all oracles have been paid
         }
+        // add penalties and slash dishonest nodes stake
         for (uint i=0; i<_incorrectOracles.length; i++){
+            // gets penalty fee from reputation contract penalty**rating
             uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
             stakeBalance[_incorrectOracles[i]] -= penalty;
             ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
         }
-        // small penalty for incorrect hashes
+        // small penalty for incorrect hashes, as this could be an error
         for (uint i=0; i<_incorrectRevealOracles.length; i++) {
-            uint penalty = fee;
-            stakeBalance[_incorrectRevealOracles[i]] += penalty;
+            uint penalty = fee; // charge the fee of the request as a penalty
+            stakeBalance[_incorrectRevealOracles[i]] += penalty; // deducted from oracle stake
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete
         completedRequests[_requestID] = true; // add request id to completedRequests
@@ -246,8 +246,9 @@ contract OracleRequestContract {
             requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
             // and all oracles have been paid
         }
+        // small penalty for incorrect hashes, as this could be an error
         for (uint i=0; i<_incorrectOracles.length; i++) {
-            stakeBalance[_incorrectOracles[i]] -= fee;
+            stakeBalance[_incorrectOracles[i]] -= fee; // deducted fee from stake
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete
         completedRequests[_requestID] = true; // add request id to completedRequests
@@ -255,20 +256,26 @@ contract OracleRequestContract {
         pendingCounter--; // no longer pending so countered can be decremented
         return true; // return true to so it has finished
     }
-
+    // @notice function for requester to cancel request
+    // @param _requestID pass requestID to cancel the correct request
     function cancelRequest(
         uint256 _requestID)
     external
-    // need to make sure only the requester cancel the request
     onlyRequester(_requestID) // requires that only the requester can cancel
-    cancelFlagZero(_requestID)
+    cancelFlagZero(_requestID) // requires that request is not yet cancelled
     returns(bool)
     {
-        requests[_requestID].cancelFlag = 1;
-        requests[_requestID].status = Status.CANCELLED;
-        AggregatorContract(aggregatorAddr).cancelRequest(_requestID);
+        requests[_requestID].cancelFlag = 1; // changes flag to 1, if 1 it will not pass other functions
+        requests[_requestID].status = Status.CANCELLED; // status changed
+        emit StatusChange(requests[_requestID].status, "CANCELLED");
+        AggregatorContract(aggregatorAddr).cancelRequest(_requestID); // call cancelled request in AggregatorContract
         return true;
     }
+    // @notice cancelled request by deadlock in the voting, if there are incorrect nodes,
+    //         correct amount might be even and could cause deadlock in voting,
+    //         in this case we refund the requester and cancel request
+    // @param _requestID
+    // @param _incorrectOracleReveals, we slash the faulty nodes here, as they have caused issues penalties are given
     function cancelRequestDueToDeadlock(
         uint256 _requestID,
         address[] memory _incorrectOracleReveals)
@@ -281,11 +288,14 @@ contract OracleRequestContract {
         requests[_requestID].status = Status.CANCELLED;
         // return full fee as the user is not at fault here
         // should be slashed from incorrect nodes for causing deadlock
-        uint penalty = requests[_requestID].fee / _incorrectOracleReveals.length;
-        for (uint i=0;i<_incorrectOracleReveals.length; i++) {
+        for (uint i=0; i<_incorrectOracleReveals.length; i++){
+            // gets penalty fee from reputation contract penalty**rating
+            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracleReveals[i]);
             stakeBalance[_incorrectOracleReveals[i]] -= penalty;
+            ReputationContract(reputationAddr).incrementRating(_incorrectOracleReveals[i]);
         }
         payable(requests[_requestID].requester).transfer(requests[_requestID].fee);
+        emit StatusChange(requests[_requestID].status, "CANCELLED");
         return true;
     }
     // @notice blacklist oracle that misbehaves 10
@@ -294,8 +304,8 @@ contract OracleRequestContract {
     onlyReputation()
     returns(bool)
     {
-        blacklistedOracles[_addr] = true;
-        return blacklistedOracles[_addr];
+        blacklistedOracles[_addr] = true; // adds blacklisted oracle address to map
+        return blacklistedOracles[_addr]; // returns true
     }
 
 
@@ -410,7 +420,7 @@ contract OracleRequestContract {
     // @notice requires stakeBalance to equal exactly 1 ETH
     modifier stakeCheck()
     {
-        require(stakeBalance[msg.sender] == 1 ether);
+        require(stakeBalance[msg.sender] > 0);
         _;
     }
     // @notice requires the value sent to be >= MIN_FEE set

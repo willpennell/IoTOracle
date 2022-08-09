@@ -31,6 +31,7 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 
 // SetOpts creates and sets options for MQTT client
 func SetOpts() *mqtt.ClientOptions {
+
 	var port = 1883                                               // standard port for MQTT this could be in .env file
 	opts := mqtt.NewClientOptions()                               // opts object
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", GetBroker(), port)) // add broker to connect to, info from .env
@@ -46,6 +47,7 @@ func SetOpts() *mqtt.ClientOptions {
 
 // StartMQTTClient connects to MQTT client and subscribes to particular topic
 func StartMQTTClient(topic string) []byte {
+	fmt.Println(topic)
 	//defer w.Done()
 	subWait.Add(1)                 // add a counter to global sync.WaitGroup function
 	opts := SetOpts()              // create set options and return options object and assign to 'opts'

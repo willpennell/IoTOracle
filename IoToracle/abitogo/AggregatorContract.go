@@ -30,7 +30,7 @@ var (
 
 // AggregatorContractMetaData contains all meta data concerning the AggregatorContract contract.
 var AggregatorContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"ResponseReceived\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"t\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"f\",\"type\":\"uint32\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_actualResult\",\"type\":\"bytes\"}],\"name\":\"receiveResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"CommitsPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"RevealsPlaced\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint32\",\"name\":\"t\",\"type\":\"uint32\"},{\"internalType\":\"uint32\",\"name\":\"f\",\"type\":\"uint32\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commitsFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revealsFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_commitHash\",\"type\":\"bytes32\"}],\"name\":\"commitResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"int256\",\"name\":\"_result\",\"type\":\"int256\"},{\"internalType\":\"bytes[]\",\"name\":\"_secret\",\"type\":\"bytes[]\"}],\"name\":\"revealAverageResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"_result\",\"type\":\"bool\"},{\"internalType\":\"bytes[]\",\"name\":\"_secret\",\"type\":\"bytes[]\"}],\"name\":\"revealVoteResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // AggregatorContractABI is the input ABI used to generate the binding from.
@@ -181,7 +181,7 @@ func (_AggregatorContract *AggregatorContractTransactorRaw) Transact(opts *bind.
 
 // Answers is a free data retrieval call binding the contract method 0x17599cc5.
 //
-// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, bool lastOracle)
+// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, uint256 commitsFlag, uint256 revealsFlag, bool lastOracle)
 func (_AggregatorContract *AggregatorContractCaller) Answers(opts *bind.CallOpts, arg0 *big.Int) (struct {
 	RequestID     *big.Int
 	DataType      []byte
@@ -189,6 +189,8 @@ func (_AggregatorContract *AggregatorContractCaller) Answers(opts *bind.CallOpts
 	T             uint32
 	F             uint32
 	CancelFlag    *big.Int
+	CommitsFlag   *big.Int
+	RevealsFlag   *big.Int
 	LastOracle    bool
 }, error) {
 	var out []interface{}
@@ -201,6 +203,8 @@ func (_AggregatorContract *AggregatorContractCaller) Answers(opts *bind.CallOpts
 		T             uint32
 		F             uint32
 		CancelFlag    *big.Int
+		CommitsFlag   *big.Int
+		RevealsFlag   *big.Int
 		LastOracle    bool
 	})
 	if err != nil {
@@ -213,7 +217,9 @@ func (_AggregatorContract *AggregatorContractCaller) Answers(opts *bind.CallOpts
 	outstruct.T = *abi.ConvertType(out[3], new(uint32)).(*uint32)
 	outstruct.F = *abi.ConvertType(out[4], new(uint32)).(*uint32)
 	outstruct.CancelFlag = *abi.ConvertType(out[5], new(*big.Int)).(**big.Int)
-	outstruct.LastOracle = *abi.ConvertType(out[6], new(bool)).(*bool)
+	outstruct.CommitsFlag = *abi.ConvertType(out[6], new(*big.Int)).(**big.Int)
+	outstruct.RevealsFlag = *abi.ConvertType(out[7], new(*big.Int)).(**big.Int)
+	outstruct.LastOracle = *abi.ConvertType(out[8], new(bool)).(*bool)
 
 	return *outstruct, err
 
@@ -221,7 +227,7 @@ func (_AggregatorContract *AggregatorContractCaller) Answers(opts *bind.CallOpts
 
 // Answers is a free data retrieval call binding the contract method 0x17599cc5.
 //
-// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, bool lastOracle)
+// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, uint256 commitsFlag, uint256 revealsFlag, bool lastOracle)
 func (_AggregatorContract *AggregatorContractSession) Answers(arg0 *big.Int) (struct {
 	RequestID     *big.Int
 	DataType      []byte
@@ -229,6 +235,8 @@ func (_AggregatorContract *AggregatorContractSession) Answers(arg0 *big.Int) (st
 	T             uint32
 	F             uint32
 	CancelFlag    *big.Int
+	CommitsFlag   *big.Int
+	RevealsFlag   *big.Int
 	LastOracle    bool
 }, error) {
 	return _AggregatorContract.Contract.Answers(&_AggregatorContract.CallOpts, arg0)
@@ -236,7 +244,7 @@ func (_AggregatorContract *AggregatorContractSession) Answers(arg0 *big.Int) (st
 
 // Answers is a free data retrieval call binding the contract method 0x17599cc5.
 //
-// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, bool lastOracle)
+// Solidity: function answers(uint256 ) view returns(uint256 requestID, bytes dataType, uint256 oracleCounter, uint32 t, uint32 f, uint256 cancelFlag, uint256 commitsFlag, uint256 revealsFlag, bool lastOracle)
 func (_AggregatorContract *AggregatorContractCallerSession) Answers(arg0 *big.Int) (struct {
 	RequestID     *big.Int
 	DataType      []byte
@@ -244,6 +252,8 @@ func (_AggregatorContract *AggregatorContractCallerSession) Answers(arg0 *big.In
 	T             uint32
 	F             uint32
 	CancelFlag    *big.Int
+	CommitsFlag   *big.Int
+	RevealsFlag   *big.Int
 	LastOracle    bool
 }, error) {
 	return _AggregatorContract.Contract.Answers(&_AggregatorContract.CallOpts, arg0)
@@ -301,25 +311,67 @@ func (_AggregatorContract *AggregatorContractTransactorSession) CancelRequest(_r
 	return _AggregatorContract.Contract.CancelRequest(&_AggregatorContract.TransactOpts, _requestID)
 }
 
-// ReceiveResponse is a paid mutator transaction binding the contract method 0xf8f14f42.
+// CommitResponse is a paid mutator transaction binding the contract method 0x074e324d.
 //
-// Solidity: function receiveResponse(uint256 _requestID, bytes _actualResult) returns(bool)
-func (_AggregatorContract *AggregatorContractTransactor) ReceiveResponse(opts *bind.TransactOpts, _requestID *big.Int, _actualResult []byte) (*types.Transaction, error) {
-	return _AggregatorContract.contract.Transact(opts, "receiveResponse", _requestID, _actualResult)
+// Solidity: function commitResponse(uint256 _requestID, bytes32 _commitHash) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactor) CommitResponse(opts *bind.TransactOpts, _requestID *big.Int, _commitHash [32]byte) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "commitResponse", _requestID, _commitHash)
 }
 
-// ReceiveResponse is a paid mutator transaction binding the contract method 0xf8f14f42.
+// CommitResponse is a paid mutator transaction binding the contract method 0x074e324d.
 //
-// Solidity: function receiveResponse(uint256 _requestID, bytes _actualResult) returns(bool)
-func (_AggregatorContract *AggregatorContractSession) ReceiveResponse(_requestID *big.Int, _actualResult []byte) (*types.Transaction, error) {
-	return _AggregatorContract.Contract.ReceiveResponse(&_AggregatorContract.TransactOpts, _requestID, _actualResult)
+// Solidity: function commitResponse(uint256 _requestID, bytes32 _commitHash) returns(bool)
+func (_AggregatorContract *AggregatorContractSession) CommitResponse(_requestID *big.Int, _commitHash [32]byte) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.CommitResponse(&_AggregatorContract.TransactOpts, _requestID, _commitHash)
 }
 
-// ReceiveResponse is a paid mutator transaction binding the contract method 0xf8f14f42.
+// CommitResponse is a paid mutator transaction binding the contract method 0x074e324d.
 //
-// Solidity: function receiveResponse(uint256 _requestID, bytes _actualResult) returns(bool)
-func (_AggregatorContract *AggregatorContractTransactorSession) ReceiveResponse(_requestID *big.Int, _actualResult []byte) (*types.Transaction, error) {
-	return _AggregatorContract.Contract.ReceiveResponse(&_AggregatorContract.TransactOpts, _requestID, _actualResult)
+// Solidity: function commitResponse(uint256 _requestID, bytes32 _commitHash) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactorSession) CommitResponse(_requestID *big.Int, _commitHash [32]byte) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.CommitResponse(&_AggregatorContract.TransactOpts, _requestID, _commitHash)
+}
+
+// RevealAverageResponse is a paid mutator transaction binding the contract method 0x8259a8c1.
+//
+// Solidity: function revealAverageResponse(uint256 _requestID, int256 _result, bytes[] _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactor) RevealAverageResponse(opts *bind.TransactOpts, _requestID *big.Int, _result *big.Int, _secret [][]byte) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "revealAverageResponse", _requestID, _result, _secret)
+}
+
+// RevealAverageResponse is a paid mutator transaction binding the contract method 0x8259a8c1.
+//
+// Solidity: function revealAverageResponse(uint256 _requestID, int256 _result, bytes[] _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractSession) RevealAverageResponse(_requestID *big.Int, _result *big.Int, _secret [][]byte) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.RevealAverageResponse(&_AggregatorContract.TransactOpts, _requestID, _result, _secret)
+}
+
+// RevealAverageResponse is a paid mutator transaction binding the contract method 0x8259a8c1.
+//
+// Solidity: function revealAverageResponse(uint256 _requestID, int256 _result, bytes[] _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactorSession) RevealAverageResponse(_requestID *big.Int, _result *big.Int, _secret [][]byte) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.RevealAverageResponse(&_AggregatorContract.TransactOpts, _requestID, _result, _secret)
+}
+
+// RevealVoteResponse is a paid mutator transaction binding the contract method 0x42472ac7.
+//
+// Solidity: function revealVoteResponse(uint256 _requestID, bool _result, bytes[] _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactor) RevealVoteResponse(opts *bind.TransactOpts, _requestID *big.Int, _result bool, _secret [][]byte) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "revealVoteResponse", _requestID, _result, _secret)
+}
+
+// RevealVoteResponse is a paid mutator transaction binding the contract method 0x42472ac7.
+//
+// Solidity: function revealVoteResponse(uint256 _requestID, bool _result, bytes[] _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractSession) RevealVoteResponse(_requestID *big.Int, _result bool, _secret [][]byte) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.RevealVoteResponse(&_AggregatorContract.TransactOpts, _requestID, _result, _secret)
+}
+
+// RevealVoteResponse is a paid mutator transaction binding the contract method 0x42472ac7.
+//
+// Solidity: function revealVoteResponse(uint256 _requestID, bool _result, bytes[] _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactorSession) RevealVoteResponse(_requestID *big.Int, _result bool, _secret [][]byte) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.RevealVoteResponse(&_AggregatorContract.TransactOpts, _requestID, _result, _secret)
 }
 
 // AggregatorContractAggregationCompletedIterator is returned from FilterAggregationCompleted and is used to iterate over the raw logs and unpacked data for AggregationCompleted events raised by the AggregatorContract contract.
@@ -451,6 +503,141 @@ func (_AggregatorContract *AggregatorContractFilterer) WatchAggregationCompleted
 func (_AggregatorContract *AggregatorContractFilterer) ParseAggregationCompleted(log types.Log) (*AggregatorContractAggregationCompleted, error) {
 	event := new(AggregatorContractAggregationCompleted)
 	if err := _AggregatorContract.contract.UnpackLog(event, "AggregationCompleted", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// AggregatorContractCommitsPlacedIterator is returned from FilterCommitsPlaced and is used to iterate over the raw logs and unpacked data for CommitsPlaced events raised by the AggregatorContract contract.
+type AggregatorContractCommitsPlacedIterator struct {
+	Event *AggregatorContractCommitsPlaced // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *AggregatorContractCommitsPlacedIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(AggregatorContractCommitsPlaced)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(AggregatorContractCommitsPlaced)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *AggregatorContractCommitsPlacedIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *AggregatorContractCommitsPlacedIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// AggregatorContractCommitsPlaced represents a CommitsPlaced event raised by the AggregatorContract contract.
+type AggregatorContractCommitsPlaced struct {
+	Arg0 *big.Int
+	Arg1 string
+	Raw  types.Log // Blockchain specific contextual infos
+}
+
+// FilterCommitsPlaced is a free log retrieval operation binding the contract event 0x94654b3250060d23222c9a81fdafe2f23accfb1dc46fb56b8e4aa75c0776e0fd.
+//
+// Solidity: event CommitsPlaced(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) FilterCommitsPlaced(opts *bind.FilterOpts) (*AggregatorContractCommitsPlacedIterator, error) {
+
+	logs, sub, err := _AggregatorContract.contract.FilterLogs(opts, "CommitsPlaced")
+	if err != nil {
+		return nil, err
+	}
+	return &AggregatorContractCommitsPlacedIterator{contract: _AggregatorContract.contract, event: "CommitsPlaced", logs: logs, sub: sub}, nil
+}
+
+// WatchCommitsPlaced is a free log subscription operation binding the contract event 0x94654b3250060d23222c9a81fdafe2f23accfb1dc46fb56b8e4aa75c0776e0fd.
+//
+// Solidity: event CommitsPlaced(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) WatchCommitsPlaced(opts *bind.WatchOpts, sink chan<- *AggregatorContractCommitsPlaced) (event.Subscription, error) {
+
+	logs, sub, err := _AggregatorContract.contract.WatchLogs(opts, "CommitsPlaced")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(AggregatorContractCommitsPlaced)
+				if err := _AggregatorContract.contract.UnpackLog(event, "CommitsPlaced", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseCommitsPlaced is a log parse operation binding the contract event 0x94654b3250060d23222c9a81fdafe2f23accfb1dc46fb56b8e4aa75c0776e0fd.
+//
+// Solidity: event CommitsPlaced(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) ParseCommitsPlaced(log types.Log) (*AggregatorContractCommitsPlaced, error) {
+	event := new(AggregatorContractCommitsPlaced)
+	if err := _AggregatorContract.contract.UnpackLog(event, "CommitsPlaced", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log
@@ -592,9 +779,9 @@ func (_AggregatorContract *AggregatorContractFilterer) ParseLogHashes(log types.
 	return event, nil
 }
 
-// AggregatorContractResponseReceivedIterator is returned from FilterResponseReceived and is used to iterate over the raw logs and unpacked data for ResponseReceived events raised by the AggregatorContract contract.
-type AggregatorContractResponseReceivedIterator struct {
-	Event *AggregatorContractResponseReceived // Event containing the contract specifics and raw log
+// AggregatorContractRevealsPlacedIterator is returned from FilterRevealsPlaced and is used to iterate over the raw logs and unpacked data for RevealsPlaced events raised by the AggregatorContract contract.
+type AggregatorContractRevealsPlacedIterator struct {
+	Event *AggregatorContractRevealsPlaced // Event containing the contract specifics and raw log
 
 	contract *bind.BoundContract // Generic contract to use for unpacking event data
 	event    string              // Event name to use for unpacking event data
@@ -608,7 +795,7 @@ type AggregatorContractResponseReceivedIterator struct {
 // Next advances the iterator to the subsequent event, returning whether there
 // are any more events found. In case of a retrieval or parsing error, false is
 // returned and Error() can be queried for the exact failure.
-func (it *AggregatorContractResponseReceivedIterator) Next() bool {
+func (it *AggregatorContractRevealsPlacedIterator) Next() bool {
 	// If the iterator failed, stop iterating
 	if it.fail != nil {
 		return false
@@ -617,7 +804,7 @@ func (it *AggregatorContractResponseReceivedIterator) Next() bool {
 	if it.done {
 		select {
 		case log := <-it.logs:
-			it.Event = new(AggregatorContractResponseReceived)
+			it.Event = new(AggregatorContractRevealsPlaced)
 			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 				it.fail = err
 				return false
@@ -632,7 +819,7 @@ func (it *AggregatorContractResponseReceivedIterator) Next() bool {
 	// Iterator still in progress, wait for either a data or an error event
 	select {
 	case log := <-it.logs:
-		it.Event = new(AggregatorContractResponseReceived)
+		it.Event = new(AggregatorContractRevealsPlaced)
 		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
 			it.fail = err
 			return false
@@ -648,42 +835,42 @@ func (it *AggregatorContractResponseReceivedIterator) Next() bool {
 }
 
 // Error returns any retrieval or parsing error occurred during filtering.
-func (it *AggregatorContractResponseReceivedIterator) Error() error {
+func (it *AggregatorContractRevealsPlacedIterator) Error() error {
 	return it.fail
 }
 
 // Close terminates the iteration process, releasing any pending underlying
 // resources.
-func (it *AggregatorContractResponseReceivedIterator) Close() error {
+func (it *AggregatorContractRevealsPlacedIterator) Close() error {
 	it.sub.Unsubscribe()
 	return nil
 }
 
-// AggregatorContractResponseReceived represents a ResponseReceived event raised by the AggregatorContract contract.
-type AggregatorContractResponseReceived struct {
-	Arg0 common.Address
+// AggregatorContractRevealsPlaced represents a RevealsPlaced event raised by the AggregatorContract contract.
+type AggregatorContractRevealsPlaced struct {
+	Arg0 *big.Int
 	Arg1 string
 	Raw  types.Log // Blockchain specific contextual infos
 }
 
-// FilterResponseReceived is a free log retrieval operation binding the contract event 0xe4cba15a82b5f91e40e6fcd30c425c90aa715d1d6d73eb1fedb1baf58c28d6dd.
+// FilterRevealsPlaced is a free log retrieval operation binding the contract event 0xcd9014e59ca398764ef85e5719d2151f53668c6d08f5ea98e064a65a6cccf06e.
 //
-// Solidity: event ResponseReceived(address arg0, string arg1)
-func (_AggregatorContract *AggregatorContractFilterer) FilterResponseReceived(opts *bind.FilterOpts) (*AggregatorContractResponseReceivedIterator, error) {
+// Solidity: event RevealsPlaced(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) FilterRevealsPlaced(opts *bind.FilterOpts) (*AggregatorContractRevealsPlacedIterator, error) {
 
-	logs, sub, err := _AggregatorContract.contract.FilterLogs(opts, "ResponseReceived")
+	logs, sub, err := _AggregatorContract.contract.FilterLogs(opts, "RevealsPlaced")
 	if err != nil {
 		return nil, err
 	}
-	return &AggregatorContractResponseReceivedIterator{contract: _AggregatorContract.contract, event: "ResponseReceived", logs: logs, sub: sub}, nil
+	return &AggregatorContractRevealsPlacedIterator{contract: _AggregatorContract.contract, event: "RevealsPlaced", logs: logs, sub: sub}, nil
 }
 
-// WatchResponseReceived is a free log subscription operation binding the contract event 0xe4cba15a82b5f91e40e6fcd30c425c90aa715d1d6d73eb1fedb1baf58c28d6dd.
+// WatchRevealsPlaced is a free log subscription operation binding the contract event 0xcd9014e59ca398764ef85e5719d2151f53668c6d08f5ea98e064a65a6cccf06e.
 //
-// Solidity: event ResponseReceived(address arg0, string arg1)
-func (_AggregatorContract *AggregatorContractFilterer) WatchResponseReceived(opts *bind.WatchOpts, sink chan<- *AggregatorContractResponseReceived) (event.Subscription, error) {
+// Solidity: event RevealsPlaced(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) WatchRevealsPlaced(opts *bind.WatchOpts, sink chan<- *AggregatorContractRevealsPlaced) (event.Subscription, error) {
 
-	logs, sub, err := _AggregatorContract.contract.WatchLogs(opts, "ResponseReceived")
+	logs, sub, err := _AggregatorContract.contract.WatchLogs(opts, "RevealsPlaced")
 	if err != nil {
 		return nil, err
 	}
@@ -693,8 +880,8 @@ func (_AggregatorContract *AggregatorContractFilterer) WatchResponseReceived(opt
 			select {
 			case log := <-logs:
 				// New log arrived, parse the event and forward to the user
-				event := new(AggregatorContractResponseReceived)
-				if err := _AggregatorContract.contract.UnpackLog(event, "ResponseReceived", log); err != nil {
+				event := new(AggregatorContractRevealsPlaced)
+				if err := _AggregatorContract.contract.UnpackLog(event, "RevealsPlaced", log); err != nil {
 					return err
 				}
 				event.Raw = log
@@ -715,12 +902,12 @@ func (_AggregatorContract *AggregatorContractFilterer) WatchResponseReceived(opt
 	}), nil
 }
 
-// ParseResponseReceived is a log parse operation binding the contract event 0xe4cba15a82b5f91e40e6fcd30c425c90aa715d1d6d73eb1fedb1baf58c28d6dd.
+// ParseRevealsPlaced is a log parse operation binding the contract event 0xcd9014e59ca398764ef85e5719d2151f53668c6d08f5ea98e064a65a6cccf06e.
 //
-// Solidity: event ResponseReceived(address arg0, string arg1)
-func (_AggregatorContract *AggregatorContractFilterer) ParseResponseReceived(log types.Log) (*AggregatorContractResponseReceived, error) {
-	event := new(AggregatorContractResponseReceived)
-	if err := _AggregatorContract.contract.UnpackLog(event, "ResponseReceived", log); err != nil {
+// Solidity: event RevealsPlaced(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) ParseRevealsPlaced(log types.Log) (*AggregatorContractRevealsPlaced, error) {
+	event := new(AggregatorContractRevealsPlaced)
+	if err := _AggregatorContract.contract.UnpackLog(event, "RevealsPlaced", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log

@@ -10,61 +10,51 @@ import (
 
 // DataType struct of datatype that comes in from orc contract request
 type DataType struct {
-	Type    string // type of request needed, bool or int
-	Topic   string // Topic used for identifying the MQTT topic combined with IoTId
-	TAfter  uint64 // timestamp after, used to check that fetched result is after this
-	TBefore uint64 // timestamp before, used to check that fetched result is before this
+	Topic   string `json:"topic"`   // Topic used for identifying the MQTT topic combined with IoTId
+	TAfter  uint64 `json:"tAfter"`  // timestamp after, used to check that fetched result is after this
+	TBefore uint64 `json:"tBefore"` // timestamp before, used to check that fetched result is before this
 }
 
 // FetchedBoolIoTResult struct of fetched result that comes in json style from MQTT broker {"Request":true,"Timestamp":189822}
 type FetchedBoolIoTResult struct {
-	Result    bool   // result true or false
-	Timestamp uint64 // timestamp of recorded result
+	Result    bool   `json:"result"`    // result true or false
+	Timestamp uint64 `json:"timestamp"` // timestamp of recorded result
 }
 
 // FetchedBigIntIoTResult struct of fetched result that comes in json from MQTT broker {"Result":26,"Timestamp":189822}
 type FetchedBigIntIoTResult struct {
-	Result    big.Int // result int could be temperature, elapsed time, counter etc
-	Timestamp uint64  // timestamp of recorded result
-}
-
-// IoTBoolResult the result for the blockchain only needs the result and not the timestamp so package for json marshal
-type IoTBoolResult struct {
-	Result bool
-}
-
-// IoTBigIntResult the result for the blockchain only needs the result and not the timestamp so package for json marshal
-type IoTBigIntResult struct {
-	Result big.Int
+	Result    big.Int `json:"result"`    // result int could be temperature, elapsed time, counter etc
+	Timestamp uint64  `json:"timestamp"` // timestamp of recorded result
 }
 
 // FetchIoTData unpacks DataType and then subscribes MQTT broker
 func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) {
 	unpack := ConvertToDataTypeStruct(eventReleaseRequestDetails, id) // convert DataType []byte into DataType struct
 	Requests[id].UnPackedDataType = *unpack                           // add unpacked DataType struct to Requests map
-	if unpack.Type == "bool" {
+	fmt.Println("made it here")
+	fmt.Println("should be 1: ", Requests[id].AggregationType)
+	if Requests[id].AggregationType == 1 {
 		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
 		result := UnpackIoTBoolResult(packedResult)               // unpacked the result into IoTBoolResult
+		Requests[id].IoTResult = packBoolToJson(result)
 		// check timestamp is in window given in DataType
 		if checkBoolTimeStamp(result, id) {
-			packed := IoTBoolResult{Result: result.Result}           // IoTBoolResult struct created to be packed for marshal
-			packedJson := packBoolToJson(packed)                     // packed into []byte ready to be sent back
-			fmt.Println("final packed result: ", string(packedJson)) // print to terminal
-			Requests[id].IoTResult = packedJson                      // add packed data to Requests[id] map
+			Requests[id].Secret = RandStringBytes(64)
+			fmt.Println(string(Requests[id].Secret))
+			// TODO create hash of result and random string
+			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, Requests[id].IoTResult)
+			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
 		} else {
 			log.Error("Error... timestamp not in time window required.")
 		}
 
-	} else if unpack.Type == "int" {
+	} else if Requests[id].AggregationType == 2 {
 		// call IoTFetch big.int
 		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
 		result := UnpackIoTBigIntResult(packedResult)             // unpacked the result into IoTBigIntResult
 		// check timestamp is in window given in DataType
 		if checkBigIntTimeStamp(result, id) {
-			packed := IoTBigIntResult{Result: result.Result}         // IoTBoolResult struct created to be packed for marshal
-			packedJson := packBigIntToJson(packed)                   // packed into []byte ready to be sent back
-			fmt.Println("final packed result: ", string(packedJson)) // print to terminal
-			Requests[id].IoTResult = packedJson                      // add packed data to Requests[id] map
+
 		} else {
 			log.Error("Error... timestamp not in time window required.")
 		}

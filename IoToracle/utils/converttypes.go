@@ -10,15 +10,18 @@ import (
 )
 
 // ConvertOpenForBidsData converts the input from events into a Request struct
-func ConvertOpenForBidsData(a interface{}, b interface{}) (Request, uint64) {
+func ConvertOpenForBidsData(a interface{}, b interface{}, c interface{}) (Request, uint64) {
 	requestId, _ := a.(*big.Int)        // covert RequestId
 	requestIdConv := requestId.Uint64() // converts from big.Int to uint64 for ID index in Requests map
 	dataType, _ := b.([]byte)           // gets dataType info from event as []byte
+	aggType, _ := c.(*big.Int)
+	aggTypeConv := aggType.Int64()
 	// adds converted types to struct
 	request := Request{
-		RequestId: requestIdConv,
-		DataType:  dataType,
-		IotId:     nil,
+		RequestId:       requestIdConv,
+		DataType:        dataType,
+		IotId:           nil,
+		AggregationType: aggTypeConv,
 	}
 	return request, requestIdConv //returns the request struct and ID
 }
@@ -49,6 +52,15 @@ func UnpackIoTBoolResult(packedResult []byte) FetchedBoolIoTResult {
 	return resultAndTimeStamp
 }
 
+func UnpackBool(packedResult []byte) bool {
+	var ioTBool bool
+	err := json.Unmarshal(packedResult, &ioTBool)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return ioTBool
+}
+
 // UnpackIoTBigIntResult unmarshal json into FetchedBigIntIoTResult struct
 func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
 	var resultAndTimeStamp FetchedBigIntIoTResult
@@ -60,8 +72,8 @@ func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
 }
 
 // packBoolToJson marshal into json from IoTBoolResult to []byte
-func packBoolToJson(IoTResult IoTBoolResult) []byte {
-	packed, err := json.Marshal(IoTResult)
+func packBoolToJson(IoTResult FetchedBoolIoTResult) []byte {
+	packed, err := json.Marshal(IoTResult.Result)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -69,7 +81,7 @@ func packBoolToJson(IoTResult IoTBoolResult) []byte {
 }
 
 // packBigIntToJson marshal into json from IoTBigIntResult to []byte
-func packBigIntToJson(IoTResult IoTBigIntResult) []byte {
+func packBigIntToJson(IoTResult FetchedBigIntIoTResult) []byte {
 	packed, err := json.Marshal(IoTResult)
 	if err != nil {
 		log.Fatal(err)

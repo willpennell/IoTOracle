@@ -29,6 +29,6 @@ func main() {
 
 	// go routines
 	go core.SubscribeToOracleRequestContractEvents(client, &wg, nodeInfo) // subscribes to events from Orc contract
-	go core.SubscribeToAggregationContractEvents(client, &wg)             // subscribes to events from Aggregator contract
+	go core.SubscribeToAggregationContractEvents(client, &wg, nodeInfo)   // subscribes to events from Aggregator contract
 	wg.Wait()                                                             // waits until the routines are complete, runs indefinitely
 }

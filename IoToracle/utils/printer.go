@@ -93,11 +93,10 @@ func RELEASEREQUESTDETAILS(eventReleaseRequestDetails *abi.OracleRequestContract
 	REQUESTLINE()
 }
 
-func RESPONSERECIEVED(eventResponseReceived *abi.AggregatorContractResponseReceived) {
-	REQUESTLINE()
-	fmt.Println("Response Received:")
-	fmt.Println("Response From Address: ", eventResponseReceived.Arg0)
-	fmt.Println("Response Message: ", eventResponseReceived.Arg1)
+func COMMITSPLACEDMESSAGE(eventCommitsPlaced *abi.AggregatorContractCommitsPlaced) {
+	color.Green("--------------------COMMITS PLACED-----------------")
+	fmt.Println("RequestID: ", eventCommitsPlaced.Arg0)
+	fmt.Println(eventCommitsPlaced.Arg1)
 	REQUESTLINE()
 }
 

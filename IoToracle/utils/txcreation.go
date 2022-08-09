@@ -5,7 +5,6 @@ import (
 	abi "IoToracle/abitogo"
 	c "IoToracle/config"
 	"crypto/ecdsa"
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -116,18 +115,6 @@ func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.In
 	return tx, nil // return tx types.Transaction and error value
 }
 
-// TxPhash used to call pHash function **not used**
-func TxPhash(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) {
-	orcPLaceBid := OracleRequestContractInstance(client)
-	call := bind.CallOpts{Context: context.Background()}
-	pHash, err := orcPLaceBid.GetPHash(&call, requestID)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Solidity HASH: ", pHash)
-
-}
-
 // ****AggregatorContract****
 
 // AggregatorContractInstance creates instance of the aggregator contract
@@ -140,17 +127,40 @@ func AggregatorContractInstance(client *ethclient.Client) *abi.AggregatorContrac
 	return AggInstance // returns Aggregator contract
 }
 
-// TxReceiveResponse generate tx to send result fetched to receiveResponse
-func TxReceiveResponse(client *ethclient.Client, info OracleNodeInfo,
+// TxCommitResponse generate tx to send result fetched to commit
+func TxCommitResponse(client *ethclient.Client, info OracleNodeInfo,
 	requestID *big.Int,
-	fetchedResult []byte) *types.Transaction {
-	aggReceiveResponse := AggregatorContractInstance(client)                                    // Aggregator contract instance
-	tx, err := aggReceiveResponse.ReceiveResponse(Auth(client, info), requestID, fetchedResult) // call ReceiveResponse function in Aggregator contract
+	commitHash [32]byte) *types.Transaction {
+	aggCommitResponse := AggregatorContractInstance(client)                                // Aggregator contract instance
+	tx, err := aggCommitResponse.CommitResponse(Auth(client, info), requestID, commitHash) // call commitResponse function in Aggregator contract
 	if err != nil {
 		log.Fatal(err)
 	}
 	//PRINTTXHASH(tx) // print tx message
 	return tx // return tx types.Transaction
+}
+
+func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
+	requestID *big.Int, ioTresult bool, secret []byte) *types.Transaction {
+	aggRevealVoteResponse := AggregatorContractInstance(client)
+	tx, err := aggRevealVoteResponse.RevealVoteResponse(Auth(client, info), requestID, ioTresult, [][]byte{secret})
+	if err != nil {
+		log.Fatal(err)
+	}
+	// PRINTTXHASH(tx)
+	return tx
+}
+
+func TxRevealAverageResponse(client *ethclient.Client, info OracleNodeInfo,
+	requestID *big.Int, ioTresult *big.Int, secret []byte) *types.Transaction {
+	aggRevealAverageResponse := AggregatorContractInstance(client)
+	tx, err := aggRevealAverageResponse.RevealAverageResponse(Auth(client, info),
+		requestID, ioTresult, [][]byte{secret})
+	if err != nil {
+		log.Fatal(err)
+	}
+	// PRINTTXHASH(tx)
+	return tx
 }
 
 // ***ToDoList***
