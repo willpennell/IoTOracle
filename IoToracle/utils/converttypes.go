@@ -74,6 +74,7 @@ func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
 // packBoolToJson marshal into json from IoTBoolResult to []byte
 func packBoolToJson(IoTResult FetchedBoolIoTResult) []byte {
 	packed, err := json.Marshal(IoTResult.Result)
+	fmt.Println(packed)
 	if err != nil {
 		log.Fatal(err)
 	}

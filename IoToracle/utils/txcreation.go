@@ -137,13 +137,14 @@ func TxCommitResponse(client *ethclient.Client, info OracleNodeInfo,
 		log.Fatal(err)
 	}
 	//PRINTTXHASH(tx) // print tx message
+
 	return tx // return tx types.Transaction
 }
 
 func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
-	requestID *big.Int, ioTresult bool, secret []byte) *types.Transaction {
+	requestID *big.Int, ioTresult []byte, secret []byte) *types.Transaction {
 	aggRevealVoteResponse := AggregatorContractInstance(client)
-	tx, err := aggRevealVoteResponse.RevealVoteResponse(Auth(client, info), requestID, ioTresult, [][]byte{secret})
+	tx, err := aggRevealVoteResponse.RevealVoteResponse(Auth(client, info), requestID, ioTresult, secret)
 	if err != nil {
 		log.Fatal(err)
 	}

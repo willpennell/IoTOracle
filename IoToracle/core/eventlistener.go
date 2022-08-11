@@ -135,7 +135,7 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 			utils.AddIoTIDToRequests(eventReleaseRequestDetails)    // adds IoTID to Requests map
 			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails) // prints message
 			// call fetch to IoT
-			utils.FetchIoTData(eventReleaseRequestDetails, id) // function to call MQTT broker
+			utils.FetchIoTData(client, eventReleaseRequestDetails, id) // function to call MQTT broker
 			// need to convert the result to hex
 
 			// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
@@ -209,11 +209,12 @@ func EventOraclePaid(client *ethclient.Client, wg *sync.WaitGroup) {
 func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	var w sync.WaitGroup
-	w.Add(3)
+	w.Add(4)
 
 	go EventAggregationComplete(client, &w) // go routine for AggregationComplete event
 	go EventLogHashes(client, &w)           // go routine for LogHashes event
 	go EventCommitsPlaced(client, &w, nodeInfo)
+
 	w.Wait() // waits indefinitely
 }
 
@@ -242,11 +243,12 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
 			// TODO call reveal tx
 			id := eventCommitsPlaced.Arg0.Uint64()
-			ioTbool := utils.UnpackBool(utils.Requests[id].IoTResult)
-			fmt.Println("here: ", ioTbool)
+			//unpackedIotResult := utils.UnpackBool(utils.Requests[id].IoTResult)
+
 			if utils.Requests[id].AggregationType == 1 {
 
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, ioTbool, utils.Requests[id].Secret)
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, utils.Requests[id].IoTResult,
+					utils.Requests[id].Secret)
 			} else if utils.Requests[id].AggregationType == 2 {
 				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
 			}
@@ -258,7 +260,7 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 }
 
 // TODO reveals received
-func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
+/*func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	aggInstance, err := abi.NewAggregatorContract(c.AGGREGATIONCONTRACTADDRESS, client)
 	if err != nil {
@@ -282,11 +284,10 @@ func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
 			// TODO call reveal tx
 			id := eventCommitsPlaced.Arg0.Uint64()
-			ioTbool := utils.UnpackBool(utils.Requests[id].IoTResult)
-			fmt.Println("here: ", ioTbool)
+
 			if utils.Requests[id].AggregationType == 1 {
 
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, ioTbool, utils.Requests[id].Secret)
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, utils.Requests[id].IoTResult, utils.Requests[id].Secret)
 			} else if utils.Requests[id].AggregationType == 2 {
 				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
 			}
@@ -295,7 +296,7 @@ func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 
 		}
 	}
-}
+}*/
 
 // EventAggregationComplete Subscribe to AggregationComplete
 func EventAggregationComplete(client *ethclient.Client, wg *sync.WaitGroup) {
@@ -347,7 +348,8 @@ func EventLogHashes(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventLogHashes := <-channelLogHashes:
-			fmt.Println("Commit Hash: ", eventLogHashes.Arg0)   // prints contract Hash
+			fmt.Println("Here")
+			fmt.Println("!!Commit Hash: ", eventLogHashes.Arg0) // prints contract Hash
 			fmt.Println("Solidity Hash: ", eventLogHashes.Arg1) // prints results hash
 
 		}

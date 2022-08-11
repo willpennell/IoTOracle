@@ -31,9 +31,9 @@ func InitOracle(client *ethclient.Client) OracleNodeInfo {
 		JoinedOracleNetwork: getJoinedOracleNetwork(),
 		PrivateKey:          getPrivateKey(),
 	}
-	LeaveOracleNetwork(client, &nodeInfo) // restarts each time for clean session, leaves network
-	JoinOracleNetwork(client, &nodeInfo)  //  then rejoins
-	return nodeInfo                       // returns OracleNodeInfo object
+	//LeaveOracleNetwork(client, &nodeInfo) // restarts each time for clean session, leaves network
+	JoinOracleNetwork(client, &nodeInfo) //  then rejoins
+	return nodeInfo                      // returns OracleNodeInfo object
 }
 
 // JoinOracleNetwork function to call join oracle function in smart contract

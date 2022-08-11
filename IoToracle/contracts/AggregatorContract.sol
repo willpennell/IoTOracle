@@ -4,6 +4,9 @@ pragma solidity ^0.8.0;
 import "./OracleRequestContract.sol";
 
 contract AggregatorContract {
+    struct BoolResult {
+        bool result;
+    }
     address public owner; // owner of contract
     OracleRequestContract orc; // instance of ORC contract
     Answer[100] public answers; // array of 100 Answer structs to keep track of answers
@@ -69,7 +72,7 @@ contract AggregatorContract {
     // @param _requestID
     // @param _result, the answer that was fetch by IoT
     // @param _secret, the string that was hashed with the IoT result in the commit
-    function revealVoteResponse(uint256 _requestID, bool _result, bytes[] memory _secret)
+    function revealVoteResponse(uint256 _requestID, bytes memory _result, bytes memory _secret)
     public
     onlyAuthorisedOraclesYetToReveal(_requestID) // only oracles yet to reveal
     cancelFlagCheck(_requestID) // make sure cancel flag = 0
@@ -78,10 +81,11 @@ contract AggregatorContract {
     onlyVoteAggregationType(_requestID) // makes sure only vote responses are received
     returns(bool){
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
-        bytes32 revealHash = keccak256(abi.encodePacked(abi.encode(_secret), abi.encode(_result))); // hash of _result and _secret
+        // BoolResult memory boolResult = abi.decode(_result, (BoolResult));
+        bytes32 revealHash = keccak256(abi.encode(_secret, _result)); // hash of _result and _secret
         emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash);
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
-            answers[_requestID].oracleVoteReveals[msg.sender] = _result; // add oracles answer to reveals
+            //answers[_requestID].oracleVoteReveals[msg.sender] = _result; // add oracles answer to reveals
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only vote once
             answers[_requestID].correctRevealOracles.push(msg.sender); // adds to the correct reveals for aggregation
         } else {

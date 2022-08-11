@@ -4,6 +4,7 @@ package utils
 import (
 	abi "IoToracle/abitogo"
 	"fmt"
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
 	"math/big"
 )
@@ -28,7 +29,7 @@ type FetchedBigIntIoTResult struct {
 }
 
 // FetchIoTData unpacks DataType and then subscribes MQTT broker
-func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) {
+func FetchIoTData(client *ethclient.Client, eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) {
 	unpack := ConvertToDataTypeStruct(eventReleaseRequestDetails, id) // convert DataType []byte into DataType struct
 	Requests[id].UnPackedDataType = *unpack                           // add unpacked DataType struct to Requests map
 	fmt.Println("made it here")
@@ -41,6 +42,7 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 		if checkBoolTimeStamp(result, id) {
 			Requests[id].Secret = RandStringBytes(64)
 			fmt.Println(string(Requests[id].Secret))
+			fmt.Println(string(Requests[id].IoTResult))
 			// TODO create hash of result and random string
 			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, Requests[id].IoTResult)
 			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
