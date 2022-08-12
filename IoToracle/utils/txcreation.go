@@ -63,7 +63,7 @@ func Auth(client *ethclient.Client, info OracleNodeInfo) *bind.TransactOpts {
 	}
 	auth.Nonce = big.NewInt(int64(Nonce(client, info))) // add nonce value to auth
 	auth.Value = big.NewInt(0)                          // add value to send when calling certain functions that are payable **some are**
-	auth.GasLimit = uint64(3000000)                     // gas limit
+	auth.GasLimit = uint64(6721975)                     // gas limit
 	auth.GasPrice = GasForFuncCall(client)              // gas price for transaction
 	return auth                                         // returns bind.TransactOpts object
 }
@@ -141,9 +141,9 @@ func TxCommitResponse(client *ethclient.Client, info OracleNodeInfo,
 }
 
 func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
-	requestID *big.Int, ioTresult bool, secret []byte) *types.Transaction {
+	requestID *big.Int, ioTresult []byte, secret []byte) *types.Transaction {
 	aggRevealVoteResponse := AggregatorContractInstance(client)
-	tx, err := aggRevealVoteResponse.RevealVoteResponse(Auth(client, info), requestID, ioTresult, [][]byte{secret})
+	tx, err := aggRevealVoteResponse.RevealVoteResponse(Auth(client, info), requestID, ioTresult, secret)
 	if err != nil {
 		log.Fatal(err)
 	}

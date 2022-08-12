@@ -8,6 +8,7 @@ contract AggregatorContract {
     OracleRequestContract orc; // instance of ORC contract
     Answer[100] public answers; // array of 100 Answer structs to keep track of answers
     struct Answer {
+        //bytes test;
         uint256 requestID; // the request ID
         bytes dataType; // data type of request 'bool' 'temp' etc
         mapping (address => bool) oracleHasSubmittedCommit; // authorised oracles, marked true when committed
@@ -32,7 +33,7 @@ contract AggregatorContract {
     event LogHashes(bytes32, bytes32); // emits logs of hashes
     event CommitsPlaced(uint, string); // emits a commits placed event
     event RevealsPlaced(uint, string); // emits reveals placed event
-
+    event Logging(string);
 
 
     // @notice constructor called when deployed
@@ -69,7 +70,7 @@ contract AggregatorContract {
     // @param _requestID
     // @param _result, the answer that was fetch by IoT
     // @param _secret, the string that was hashed with the IoT result in the commit
-    function revealVoteResponse(uint256 _requestID, bool _result, bytes[] memory _secret)
+    function revealVoteResponse(uint256 _requestID, bytes memory _result, bytes memory _secret)
     public
     onlyAuthorisedOraclesYetToReveal(_requestID) // only oracles yet to reveal
     cancelFlagCheck(_requestID) // make sure cancel flag = 0
@@ -78,19 +79,24 @@ contract AggregatorContract {
     onlyVoteAggregationType(_requestID) // makes sure only vote responses are received
     returns(bool){
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
-        bytes32 revealHash = keccak256(abi.encodePacked(abi.encode(_secret), abi.encode(_result))); // hash of _result and _secret
+        bytes32 revealHash =  keccak256(abi.encodePacked(_result));// hash of _result and _secret
         emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash);
+        _secret;
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
-            answers[_requestID].oracleVoteReveals[msg.sender] = _result; // add oracles answer to reveals
+            //answers[_requestID].oracleVoteReveals[msg.sender] = _result; // add oracles answer to reveals
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only vote once
             answers[_requestID].correctRevealOracles.push(msg.sender); // adds to the correct reveals for aggregation
+            emit Logging("we are in the first if block");
+
         } else {
+            emit Logging("We are in the else block");
             answers[_requestID].incorrectRevealOracles.push(msg.sender); // an incorrect match of commit and reveal hashes
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only vote once
         }
 
         if (answers[_requestID].oracleCounter == (orc.getNumberOfOracles(_requestID) - 1)){
             emit RevealsPlaced(_requestID, "All reveals have been placed");
+            answers[_requestID].revealsFlag = 1;
             voteAggregation(_requestID); // once number of oracles has been reached call voteAggregation
         }
         answers[_requestID].oracleCounter++; // increment counter for next oracle
@@ -132,47 +138,47 @@ contract AggregatorContract {
     //         with the most votes as correct. and the others are penalised in ORC contract. Majority vote
     // @param _requestID
     function voteAggregation(uint256 _requestID) internal returns(bool) {
-        address[] memory trueOracleResults; // oracles that answer true
-        address[] memory falseOracleResults; // oracles that answer false
-        bool _result; // the final result to send to ORC contract
-        address orcAddress; // placeholder oracle address var
-        // loop through the oracles that provided a correct reveal
-        for (uint i = 0; i < answers[_requestID].correctRevealOracles.length; i++) {
-            orcAddress = answers[_requestID].correctRevealOracles[i]; // assign address
-            // if the reveal result is true add to true array and increment true counter
-            if (answers[_requestID].oracleVoteReveals[orcAddress] == true ) {
-                trueOracleResults[answers[_requestID].t] = orcAddress; // add oracle address to true array
-                answers[_requestID].t++; // increment true counter
-            } else { // if false add address to false array
-                falseOracleResults[answers[_requestID].f] = orcAddress;
-                answers[_requestID].f++; // increment false counter
-            }
-        }
-        // which ever is greater pass to call deliverVoteResponse in true(correct) then false(incorrect) order
-        if (answers[_requestID].t > answers[_requestID].f) {
-            // call
-            require(!(answers[_requestID].f > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
-            _result = true; // final result
-            // pass in requestID the result, trueOracleResults as the correct field and falseOracleResults as the incorrect
-            orc.deliverVoteResponse(_requestID, _result, trueOracleResults,
-                falseOracleResults,
-                answers[_requestID].incorrectRevealOracles);
-            return _result;
-        } else if (answers[_requestID].f > answers[_requestID].t) {
-            // which ever is greater pass to call deliverVoteResponse in false(correct) then true(incorrect) order
-            require(!(answers[_requestID].t > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
-            _result = false;
-            // pass in requestID the result, falseOracleResults as the correct field and trueOracleResults as the incorrect
-            orc.deliverVoteResponse(_requestID, _result,
-                falseOracleResults,
-                trueOracleResults,
-                answers[_requestID].incorrectRevealOracles);
-            return _result;
-        } else {
-            // when the t and f counters are the same, deadlock as appeared so we need to cancel and refund
-            orc.cancelRequestDueToDeadlock(_requestID, answers[_requestID].incorrectRevealOracles);
-            answers[_requestID].cancelFlag = 1;
-        }
+//        address[] memory trueOracleResults; // oracles that answer true
+//        address[] memory falseOracleResults; // oracles that answer false
+//        //bytes memory _result; // the final result to send to ORC contract
+//        address orcAddress; // placeholder oracle address var
+//        // loop through the oracles that provided a correct reveal
+//        for (uint i = 0; i < answers[_requestID].correctRevealOracles.length; i++) {
+//            orcAddress = answers[_requestID].correctRevealOracles[i]; // assign address
+//            // if the reveal result is true add to true array and increment true counter
+//            if (answers[_requestID].oracleVoteReveals[orcAddress] == true ) {
+//                trueOracleResults[answers[_requestID].t] = orcAddress; // add oracle address to true array
+//                answers[_requestID].t++; // increment true counter
+//            } else { // if false add address to false array
+//                falseOracleResults[answers[_requestID].f] = orcAddress;
+//                answers[_requestID].f++; // increment false counter
+//            }
+//        }
+//        // which ever is greater pass to call deliverVoteResponse in true(correct) then false(incorrect) order
+//        if (answers[_requestID].t > answers[_requestID].f) {
+//            // call
+//            require(!(answers[_requestID].f > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
+//            _result = 'hello'; // final result
+//            // pass in requestID the result, trueOracleResults as the correct field and falseOracleResults as the incorrect
+//            orc.deliverVoteResponse(_requestID, _result, trueOracleResults,
+//                falseOracleResults,
+//                answers[_requestID].incorrectRevealOracles);
+//            return true;
+//        } else if (answers[_requestID].f > answers[_requestID].t) {
+//            // which ever is greater pass to call deliverVoteResponse in false(correct) then true(incorrect) order
+//            require(!(answers[_requestID].t > (answers[_requestID].oracleCounter - 1) / 3), 'too many incorrect nodes');
+//            _result = 'goodbye';
+//            // pass in requestID the result, falseOracleResults as the correct field and trueOracleResults as the incorrect
+//            orc.deliverVoteResponse(_requestID, _result,
+//                falseOracleResults,
+//                trueOracleResults,
+//                answers[_requestID].incorrectRevealOracles);
+//            return true;
+//        } else {
+//            // when the t and f counters are the same, deadlock as appeared so we need to cancel and refund
+//            orc.cancelRequestDueToDeadlock(_requestID, answers[_requestID].incorrectRevealOracles);
+//            answers[_requestID].cancelFlag = 1;
+//        }
         emit AggregationCompleted(_requestID, "Vote Aggregation Complete");
         return false;
     }

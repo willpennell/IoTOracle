@@ -245,8 +245,8 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			ioTbool := utils.UnpackBool(utils.Requests[id].IoTResult)
 			fmt.Println("here: ", ioTbool)
 			if utils.Requests[id].AggregationType == 1 {
-
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, ioTbool, utils.Requests[id].Secret)
+				fmt.Println(string(utils.Requests[id].IoTResult))
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, utils.Requests[id].IoTResult, utils.Requests[id].Secret)
 			} else if utils.Requests[id].AggregationType == 2 {
 				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
 			}
@@ -286,7 +286,7 @@ func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			fmt.Println("here: ", ioTbool)
 			if utils.Requests[id].AggregationType == 1 {
 
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, ioTbool, utils.Requests[id].Secret)
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, utils.Requests[id].IoTResult, utils.Requests[id].Secret)
 			} else if utils.Requests[id].AggregationType == 2 {
 				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
 			}

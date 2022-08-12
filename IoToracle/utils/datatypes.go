@@ -42,6 +42,7 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 			Requests[id].Secret = RandStringBytes(64)
 			fmt.Println(string(Requests[id].Secret))
 			// TODO create hash of result and random string
+			fmt.Println("should be true: ", string(Requests[id].IoTResult))
 			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, Requests[id].IoTResult)
 			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
 		} else {
