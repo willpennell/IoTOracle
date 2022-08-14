@@ -5,6 +5,7 @@ import (
 	abi "IoToracle/abitogo"
 	"fmt"
 	"github.com/ethereum/go-ethereum/log"
+	solsha3 "github.com/miguelmota/go-solidity-sha3"
 	"math/big"
 )
 
@@ -41,9 +42,11 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 		if checkBoolTimeStamp(result, id) {
 			Requests[id].Secret = RandStringBytes(64)
 			fmt.Println(string(Requests[id].Secret))
+			tes := solsha3.Bool(UnpackBool(Requests[id].IoTResult))
+			fmt.Println(tes)
 			// TODO create hash of result and random string
 			fmt.Println("should be true: ", string(Requests[id].IoTResult))
-			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, Requests[id].IoTResult)
+			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
 			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
 		} else {
 			log.Error("Error... timestamp not in time window required.")

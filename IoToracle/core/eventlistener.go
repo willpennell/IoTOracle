@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/ethclient"
+	solsha3 "github.com/miguelmota/go-solidity-sha3"
 	"golang.org/x/net/context"
 	"log"
 	"math/big"
@@ -244,9 +245,10 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			id := eventCommitsPlaced.Arg0.Uint64()
 			ioTbool := utils.UnpackBool(utils.Requests[id].IoTResult)
 			fmt.Println("here: ", ioTbool)
+			tes := solsha3.Bool(utils.UnpackBool(utils.Requests[id].IoTResult))
 			if utils.Requests[id].AggregationType == 1 {
 				fmt.Println(string(utils.Requests[id].IoTResult))
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, utils.Requests[id].IoTResult, utils.Requests[id].Secret)
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, tes, utils.Requests[id].Secret)
 			} else if utils.Requests[id].AggregationType == 2 {
 				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
 			}

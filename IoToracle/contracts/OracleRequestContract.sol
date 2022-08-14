@@ -55,6 +55,7 @@ contract OracleRequestContract {
     event OracleLeft(address, string); // tells the network that another oracle has left
     event OraclePaid(address, uint, string); // tells the network when an oracle has been paid for its services
     event Logging(string);
+    event FinalResultLog(bool, string);
     // ***payments***
     uint GAS_PRICE = 2 * 10**10; // cost of gas
     uint FEE = GAS_PRICE * 3; // fee to cover other function calls and pay each oracle
@@ -181,7 +182,7 @@ contract OracleRequestContract {
     // @param _correctOracles, array of addresses of oracles to be paid for their work
     function deliverVoteResponse(
         uint256 _requestID,
-        bytes memory _finalResult,
+        bool _finalResult,
         address[] memory _correctOracles,
         address[] memory _incorrectOracles,
         address[] memory _incorrectRevealOracles) // do not penalise
@@ -191,30 +192,31 @@ contract OracleRequestContract {
     returns(bool)
     {
         // return single aggregation result
+        emit FinalResultLog(_finalResult, " the final result");
         _finalResult;
-        //uint fee = requests[_requestID].fee / _correctOracles.length;
+        uint fee = requests[_requestID].fee / _correctOracles.length;
         // pay fees
         for (uint i=0; i<_correctOracles.length; i++) {
             // pay each share to each oracle
             emit Logging("gets to inside correctOracles");
-            emit OraclePaid(_correctOracles[i], 0, "Oracle has been Paid!"); // tells listeners oracle node has been paid
-            //payable(_correctOracles[i]).transfer(fee); // pays oracle their fee
-            //requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
+            emit OraclePaid(_correctOracles[i], fee, "Oracle has been Paid!"); // tells listeners oracle node has been paid
+            payable(_correctOracles[i]).transfer(fee); // pays oracle their fee
+            requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
             // and all oracles have been paid
         }
         // add penalties and slash dishonest nodes stake
         for (uint i=0; i<_incorrectOracles.length; i++){
             emit Logging("gets to loop incorrectOracles");
             // gets penalty fee from reputation contract penalty**rating
-//            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
-//            stakeBalance[_incorrectOracles[i]] -= penalty;
-//            ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
+            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
+            stakeBalance[_incorrectOracles[i]] -= penalty;
+            ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
         }
         // small penalty for incorrect hashes, as this could be an error
         for (uint i=0; i<_incorrectRevealOracles.length; i++) {
             emit Logging("we get inside penalty incorrect hashes");
-            //uint penalty = fee; // charge the fee of the request as a penalty
-            //stakeBalance[_incorrectRevealOracles[i]] += penalty; // deducted from oracle stake
+            uint penalty = fee; // charge the fee of the request as a penalty
+            stakeBalance[_incorrectRevealOracles[i]] += penalty; // deducted from oracle stake
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete
         completedRequests[_requestID] = true; // add request id to completedRequests

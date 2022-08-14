@@ -138,6 +138,7 @@ func TxCommitResponse(client *ethclient.Client, info OracleNodeInfo,
 	}
 	//PRINTTXHASH(tx) // print tx message
 	return tx // return tx types.Transaction
+
 }
 
 func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
