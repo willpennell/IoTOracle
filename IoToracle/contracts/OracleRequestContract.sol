@@ -56,6 +56,7 @@ contract OracleRequestContract {
     event OraclePaid(address, uint, string); // tells the network when an oracle has been paid for its services
     event Logging(string);
     event FinalResultLog(bool, string);
+    event FinalInt(int256, string);
     // ***payments***
     uint GAS_PRICE = 2 * 10**10; // cost of gas
     uint FEE = GAS_PRICE * 3; // fee to cover other function calls and pay each oracle
@@ -242,6 +243,7 @@ contract OracleRequestContract {
     returns(bool)
     {
         // return single aggregation result
+        emit FinalInt(_finalResult, "the final result");
         _finalResult;
         uint fee = requests[_requestID].fee / _correctOracles.length;
         // pay fees

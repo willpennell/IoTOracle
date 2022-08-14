@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/log"
 	solsha3 "github.com/miguelmota/go-solidity-sha3"
-	"math/big"
 )
 
 // DataType struct of datatype that comes in from orc contract request
@@ -24,8 +23,8 @@ type FetchedBoolIoTResult struct {
 
 // FetchedBigIntIoTResult struct of fetched result that comes in json from MQTT broker {"Result":26,"Timestamp":189822}
 type FetchedBigIntIoTResult struct {
-	Result    big.Int `json:"result"`    // result int could be temperature, elapsed time, counter etc
-	Timestamp uint64  `json:"timestamp"` // timestamp of recorded result
+	Result    int    `json:"result"`    // result int could be temperature, elapsed time, counter etc
+	Timestamp uint64 `json:"timestamp"` // timestamp of recorded result
 }
 
 // FetchIoTData unpacks DataType and then subscribes MQTT broker
@@ -44,8 +43,6 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 			fmt.Println(string(Requests[id].Secret))
 			tes := solsha3.Bool(UnpackBool(Requests[id].IoTResult))
 			fmt.Println(tes)
-			// TODO create hash of result and random string
-			fmt.Println("should be true: ", string(Requests[id].IoTResult))
 			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
 			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
 		} else {
@@ -55,10 +52,18 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 	} else if Requests[id].AggregationType == 2 {
 		// call IoTFetch big.int
 		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
-		result := UnpackIoTBigIntResult(packedResult)             // unpacked the result into IoTBigIntResult
-		// check timestamp is in window given in DataType
-		if checkBigIntTimeStamp(result, id) {
 
+		result := UnpackIoTBigIntResult(packedResult) // unpacked the result into IoTBigIntResult
+		Requests[id].IoTResult = packBigIntToJson(result)
+		// check timestamp is in window given in DataType
+		fmt.Println("IoT Result Should be int: ", string(Requests[id].IoTResult))
+		if checkBigIntTimeStamp(result, id) {
+			Requests[id].Secret = RandStringBytes(64)
+			fmt.Println(string(Requests[id].Secret))
+			tes := solsha3.Int256(UnpackIoTBigIntResult(Requests[id].IoTResult))
+			fmt.Println(tes)
+			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
+			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
 		} else {
 			log.Error("Error... timestamp not in time window required.")
 		}

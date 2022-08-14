@@ -153,10 +153,10 @@ func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
 }
 
 func TxRevealAverageResponse(client *ethclient.Client, info OracleNodeInfo,
-	requestID *big.Int, ioTresult *big.Int, secret []byte) *types.Transaction {
+	requestID *big.Int, ioTresult []byte, secret []byte) *types.Transaction {
 	aggRevealAverageResponse := AggregatorContractInstance(client)
 	tx, err := aggRevealAverageResponse.RevealAverageResponse(Auth(client, info),
-		requestID, ioTresult, [][]byte{secret})
+		requestID, ioTresult, secret)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -88,7 +88,7 @@ contract AggregatorContract {
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
         bytes32 revealHash =  keccak256(abi.encodePacked(_secret, _result));// hash of _result and _secret
         emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash);
-        bool decodedResult = decode(_result);
+        bool decodedResult = decodeBool(_result);
         emit LogBool(decodedResult);
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
 
@@ -116,8 +116,8 @@ contract AggregatorContract {
     // @param _secret, the string that was hashed with the IoT result in the commit
     function revealAverageResponse(
         uint256 _requestID,
-        int256 _result,
-        bytes[] memory _secret)
+        bytes memory _result,
+        bytes memory _secret)
     public
     onlyAuthorisedOraclesYetToReveal(_requestID) // only oracles yet to reveal
     cancelFlagCheck(_requestID) // make sure cancel flag = 0
@@ -126,9 +126,10 @@ contract AggregatorContract {
     onlyAverageAggregationType(_requestID) // makes sure only average responses are received
     returns(bool){
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
-        bytes32 revealHash = keccak256(abi.encode(_secret, _result)); // hash of _result and _secret
+        int256 decodeResult = decodeInt(_result);
+        bytes32 revealHash = keccak256(abi.encodePacked(_secret, _result)); // hash of _result and _secret
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
-            answers[_requestID].oracleAverageReveals[msg.sender] = _result; // adds the int result to map
+            answers[_requestID].oracleAverageReveals[msg.sender] = decodeResult; // adds the int result to map
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // can only submit once
             answers[_requestID].correctRevealOracles.push(msg.sender); // adds correct oracles for aggregation
         } else {
@@ -279,12 +280,19 @@ contract AggregatorContract {
         require(orc.getAggregationType(_requestID) == 2);
         _;
     }
-    function decode(bytes memory data) public pure returns (bool b){
+    function decodeBool(bytes memory data) public pure returns (bool b){
         assembly {
         // Load the length of data (first 32 bytes)
             let len := mload(data)
         // Load the data after 32 bytes, so add 0x20
             b := mload(add(data, 0x20))
+        }
+    }
+    function decodeInt(bytes memory data) public pure returns (int256 i) {
+        assembly {
+            let len := mload(data)
+
+            i := mload(add(data, 0x20))
         }
     }
 }

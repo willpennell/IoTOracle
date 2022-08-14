@@ -30,7 +30,7 @@ var (
 
 // AggregatorContractMetaData contains all meta data concerning the AggregatorContract contract.
 var AggregatorContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"CommitsPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"Logging\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"RevealsPlaced\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"t\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"f\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commitsFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revealsFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_commitHash\",\"type\":\"bytes32\"}],\"name\":\"commitResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decode\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"b\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"int256\",\"name\":\"_result\",\"type\":\"int256\"},{\"internalType\":\"bytes[]\",\"name\":\"_secret\",\"type\":\"bytes[]\"}],\"name\":\"revealAverageResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealVoteResponse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"CommitsPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"Logging\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"RevealsPlaced\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"t\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"f\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commitsFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revealsFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_commitHash\",\"type\":\"bytes32\"}],\"name\":\"commitResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeBool\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"b\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeInt\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"i\",\"type\":\"int256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealAverageResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealVoteResponse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // AggregatorContractABI is the input ABI used to generate the binding from.
@@ -259,12 +259,12 @@ func (_AggregatorContract *AggregatorContractCallerSession) Answers(arg0 *big.In
 	return _AggregatorContract.Contract.Answers(&_AggregatorContract.CallOpts, arg0)
 }
 
-// Decode is a free data retrieval call binding the contract method 0xe5c5e9a3.
+// DecodeBool is a free data retrieval call binding the contract method 0xc62173d0.
 //
-// Solidity: function decode(bytes data) pure returns(bool b)
-func (_AggregatorContract *AggregatorContractCaller) Decode(opts *bind.CallOpts, data []byte) (bool, error) {
+// Solidity: function decodeBool(bytes data) pure returns(bool b)
+func (_AggregatorContract *AggregatorContractCaller) DecodeBool(opts *bind.CallOpts, data []byte) (bool, error) {
 	var out []interface{}
-	err := _AggregatorContract.contract.Call(opts, &out, "decode", data)
+	err := _AggregatorContract.contract.Call(opts, &out, "decodeBool", data)
 
 	if err != nil {
 		return *new(bool), err
@@ -276,18 +276,49 @@ func (_AggregatorContract *AggregatorContractCaller) Decode(opts *bind.CallOpts,
 
 }
 
-// Decode is a free data retrieval call binding the contract method 0xe5c5e9a3.
+// DecodeBool is a free data retrieval call binding the contract method 0xc62173d0.
 //
-// Solidity: function decode(bytes data) pure returns(bool b)
-func (_AggregatorContract *AggregatorContractSession) Decode(data []byte) (bool, error) {
-	return _AggregatorContract.Contract.Decode(&_AggregatorContract.CallOpts, data)
+// Solidity: function decodeBool(bytes data) pure returns(bool b)
+func (_AggregatorContract *AggregatorContractSession) DecodeBool(data []byte) (bool, error) {
+	return _AggregatorContract.Contract.DecodeBool(&_AggregatorContract.CallOpts, data)
 }
 
-// Decode is a free data retrieval call binding the contract method 0xe5c5e9a3.
+// DecodeBool is a free data retrieval call binding the contract method 0xc62173d0.
 //
-// Solidity: function decode(bytes data) pure returns(bool b)
-func (_AggregatorContract *AggregatorContractCallerSession) Decode(data []byte) (bool, error) {
-	return _AggregatorContract.Contract.Decode(&_AggregatorContract.CallOpts, data)
+// Solidity: function decodeBool(bytes data) pure returns(bool b)
+func (_AggregatorContract *AggregatorContractCallerSession) DecodeBool(data []byte) (bool, error) {
+	return _AggregatorContract.Contract.DecodeBool(&_AggregatorContract.CallOpts, data)
+}
+
+// DecodeInt is a free data retrieval call binding the contract method 0x582b5656.
+//
+// Solidity: function decodeInt(bytes data) pure returns(int256 i)
+func (_AggregatorContract *AggregatorContractCaller) DecodeInt(opts *bind.CallOpts, data []byte) (*big.Int, error) {
+	var out []interface{}
+	err := _AggregatorContract.contract.Call(opts, &out, "decodeInt", data)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// DecodeInt is a free data retrieval call binding the contract method 0x582b5656.
+//
+// Solidity: function decodeInt(bytes data) pure returns(int256 i)
+func (_AggregatorContract *AggregatorContractSession) DecodeInt(data []byte) (*big.Int, error) {
+	return _AggregatorContract.Contract.DecodeInt(&_AggregatorContract.CallOpts, data)
+}
+
+// DecodeInt is a free data retrieval call binding the contract method 0x582b5656.
+//
+// Solidity: function decodeInt(bytes data) pure returns(int256 i)
+func (_AggregatorContract *AggregatorContractCallerSession) DecodeInt(data []byte) (*big.Int, error) {
+	return _AggregatorContract.Contract.DecodeInt(&_AggregatorContract.CallOpts, data)
 }
 
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
@@ -363,24 +394,24 @@ func (_AggregatorContract *AggregatorContractTransactorSession) CommitResponse(_
 	return _AggregatorContract.Contract.CommitResponse(&_AggregatorContract.TransactOpts, _requestID, _commitHash)
 }
 
-// RevealAverageResponse is a paid mutator transaction binding the contract method 0x8259a8c1.
+// RevealAverageResponse is a paid mutator transaction binding the contract method 0xb44d5495.
 //
-// Solidity: function revealAverageResponse(uint256 _requestID, int256 _result, bytes[] _secret) returns(bool)
-func (_AggregatorContract *AggregatorContractTransactor) RevealAverageResponse(opts *bind.TransactOpts, _requestID *big.Int, _result *big.Int, _secret [][]byte) (*types.Transaction, error) {
+// Solidity: function revealAverageResponse(uint256 _requestID, bytes _result, bytes _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactor) RevealAverageResponse(opts *bind.TransactOpts, _requestID *big.Int, _result []byte, _secret []byte) (*types.Transaction, error) {
 	return _AggregatorContract.contract.Transact(opts, "revealAverageResponse", _requestID, _result, _secret)
 }
 
-// RevealAverageResponse is a paid mutator transaction binding the contract method 0x8259a8c1.
+// RevealAverageResponse is a paid mutator transaction binding the contract method 0xb44d5495.
 //
-// Solidity: function revealAverageResponse(uint256 _requestID, int256 _result, bytes[] _secret) returns(bool)
-func (_AggregatorContract *AggregatorContractSession) RevealAverageResponse(_requestID *big.Int, _result *big.Int, _secret [][]byte) (*types.Transaction, error) {
+// Solidity: function revealAverageResponse(uint256 _requestID, bytes _result, bytes _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractSession) RevealAverageResponse(_requestID *big.Int, _result []byte, _secret []byte) (*types.Transaction, error) {
 	return _AggregatorContract.Contract.RevealAverageResponse(&_AggregatorContract.TransactOpts, _requestID, _result, _secret)
 }
 
-// RevealAverageResponse is a paid mutator transaction binding the contract method 0x8259a8c1.
+// RevealAverageResponse is a paid mutator transaction binding the contract method 0xb44d5495.
 //
-// Solidity: function revealAverageResponse(uint256 _requestID, int256 _result, bytes[] _secret) returns(bool)
-func (_AggregatorContract *AggregatorContractTransactorSession) RevealAverageResponse(_requestID *big.Int, _result *big.Int, _secret [][]byte) (*types.Transaction, error) {
+// Solidity: function revealAverageResponse(uint256 _requestID, bytes _result, bytes _secret) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactorSession) RevealAverageResponse(_requestID *big.Int, _result []byte, _secret []byte) (*types.Transaction, error) {
 	return _AggregatorContract.Contract.RevealAverageResponse(&_AggregatorContract.TransactOpts, _requestID, _result, _secret)
 }
 

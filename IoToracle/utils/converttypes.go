@@ -66,6 +66,7 @@ func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
 	var resultAndTimeStamp FetchedBigIntIoTResult
 	err := json.Unmarshal(packedResult, &resultAndTimeStamp)
 	if err != nil {
+		fmt.Println("Issues here...")
 		log.Fatal(err)
 	}
 	return resultAndTimeStamp
