@@ -65,7 +65,8 @@ func StartMQTTClient(topic string) []byte {
 // sub function that subscribes to MQTT broker at requested topic
 func sub(client mqtt.Client, topic string) {
 	token := client.Subscribe(topic, 0, messagePubHandler) // publish handler callback used here
-	token.Wait()                                           // waits for a response from publish handler
-	fmt.Printf("Subscribed to topic: %s\n", topic)         // subscribed to topic
-	subWait.Wait()                                         // waits for the counter to be decremented in publishHandler callback function
+	fmt.Println("we are here")
+	token.Wait()                                   // waits for a response from publish handler
+	fmt.Printf("Subscribed to topic: %s\n", topic) // subscribed to topic
+	subWait.Wait()                                 // waits for the counter to be decremented in publishHandler callback function
 }

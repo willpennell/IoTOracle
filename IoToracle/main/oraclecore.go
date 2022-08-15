@@ -26,7 +26,7 @@ func main() {
 	wg.Add(2)                        // add a count to the waitGroup
 	client := establishConnection()  // client blockchain object
 	nodeInfo := p.InitOracle(client) // calls init functions for when first running the program
-
+	p.LoadRequestJson()
 	// go routines
 	go core.SubscribeToOracleRequestContractEvents(client, &wg, nodeInfo) // subscribes to events from Orc contract
 	go core.SubscribeToAggregationContractEvents(client, &wg, nodeInfo)   // subscribes to events from Aggregator contract

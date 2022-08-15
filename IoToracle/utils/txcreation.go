@@ -158,6 +158,7 @@ func TxRevealAverageResponse(client *ethclient.Client, info OracleNodeInfo,
 	tx, err := aggRevealAverageResponse.RevealAverageResponse(Auth(client, info),
 		requestID, ioTresult, secret)
 	if err != nil {
+
 		log.Fatal(err)
 	}
 	PRINTTXHASH(tx)

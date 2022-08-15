@@ -2,6 +2,8 @@
 package utils
 
 import (
+	"fmt"
+	"log"
 	"sync"
 )
 
@@ -40,3 +42,19 @@ func MakeRequests() RequestsSingleton {
 var Requests = MakeRequests() // singleton Requests struct
 
 // TODO log to output file
+
+func LoadRequestJson() {
+	err := Load(&Requests, "./data/requests.json")
+	fmt.Println(&Requests)
+	if err != nil {
+		log.Fatal("EOF error? ", err)
+	}
+
+}
+
+func SaveRequestJson() {
+	err := Save(Requests, "./data/requests.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
+}

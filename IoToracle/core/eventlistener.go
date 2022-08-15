@@ -312,7 +312,8 @@ func EventAggregationComplete(client *ethclient.Client, wg *sync.WaitGroup) {
 			log.Fatal(err)
 		case eventAggregationCompleted := <-channelAggregationCompleted:
 			utils.AGGREGATIONCOMPLETE(eventAggregationCompleted) // prints aggregation complete message
-
+			utils.Requests[eventAggregationCompleted.Arg0.Uint64()].Status = 2
+			utils.SaveRequestJson()
 		}
 	}
 }

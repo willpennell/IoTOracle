@@ -29,6 +29,7 @@ func ConvertOpenForBidsData(a interface{}, b interface{}, c interface{}) (Reques
 // AddIoTIDToRequests add incoming IoTID and assign to correct id in Request map
 func AddIoTIDToRequests(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails) []byte {
 	Requests[eventReleaseRequestDetails.Arg0.Uint64()].IotId = eventReleaseRequestDetails.Arg1
+	SaveRequestJson()
 	return Requests[eventReleaseRequestDetails.Arg0.Uint64()].IotId
 }
 

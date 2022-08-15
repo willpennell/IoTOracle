@@ -79,7 +79,7 @@ func getNodeAddress() string {
 // getJoinedOracleNetwork helper func to get flag value from .tmp file
 func getJoinedOracleNetwork() bool {
 	var parseBool *bool
-	err := Load(&parseBool) // parsed from .tmp file
+	err := Load(&parseBool, "./JoinedAsOracle.tmp") // parsed from .tmp file
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -103,7 +103,7 @@ func setNodeAddress(nodeAdress string) {
 
 // setHasOracleJoinedNetwork saves the flag value to .tmp file
 func setHasOracleJoinedNetwork(in bool) {
-	err := Save(in)
+	err := Save(in, "./JoinedAsOracle.tmp")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -121,10 +121,10 @@ func setPrivateKey(pk string) {
 // ***load and save bool value for oracle joined network ***
 
 // Save function to save flag to .tmp file
-func Save(v interface{}) error {
+func Save(v interface{}, path string) error {
 	lock.Lock()
 	defer lock.Unlock()
-	f, err := os.Create("./JoinedAsOracle.tmp")
+	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
@@ -147,15 +147,23 @@ func Marshal(v interface{}) (io.Reader, error) {
 }
 
 // Load loads flag value from .tmp
-func Load(v interface{}) error {
+func Load(v interface{}, path string) error {
 	lock.Lock()
 	defer lock.Unlock()
-	f, err := os.Open("./JoinedAsOracle.tmp")
+	f, err := os.Open(path)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	return Unmarshal(f, v)
+	stats, err := f.Stat()
+	if err != nil {
+		log.Fatal(nil)
+	}
+	if stats.Size() == 0 {
+		return nil
+	} else {
+		return Unmarshal(f, v)
+	}
 }
 
 // Unmarshal new json decoder for .tmp flag

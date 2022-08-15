@@ -36,43 +36,9 @@ type FetchedBigIntIoTResult struct {
 func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) {
 	unpack := ConvertToDataTypeStruct(eventReleaseRequestDetails, id) // convert DataType []byte into DataType struct
 	Requests[id].UnPackedDataType = *unpack                           // add unpacked DataType struct to Requests map
-	if Requests[id].AggregationType == 1 {
-		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
-		result := UnpackIoTBoolResult(packedResult)               // unpacked the result into IoTBoolResult
-		Requests[id].IoTResult = packBoolToJson(result)
-		// check timestamp is in window given in DataType
-		if checkBoolTimeStamp(result, id) {
-			Requests[id].Secret = RandStringBytes(64)
-			fmt.Println(string(Requests[id].Secret))
-			tes := solsha3.Bool(UnpackBool(Requests[id].IoTResult))
-			fmt.Println(tes)
-			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
-			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
-		} else {
-			log.Error("Error... timestamp not in time window required.")
-		}
+	SaveRequestJson()
+	SimpleFetchIoT(&Requests[id].UnPackedDataType, id)
 
-	} else if Requests[id].AggregationType == 2 {
-		// call IoTFetch big.int
-		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
-		jsonString := string(packedResult)
-		result := UnpackIoTBigIntResult([]byte(jsonString)) // unpacked the result into IoTBigIntResult
-		//fmt.Println(yo)
-		Requests[id].IoTResult = packBigIntToJson(result)
-		// check timestamp is in window given in DataType
-		if checkBigIntTimeStamp(result, id) {
-			Requests[id].Secret = RandStringBytes(64)
-			fmt.Println(string(Requests[id].Secret))
-			tes := solsha3.Int256(UnpackInt(Requests[id].IoTResult))
-			fmt.Println(tes)
-			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
-			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
-		} else {
-			log.Error("Error... timestamp not in time window required.")
-		}
-	} else {
-		log.Error("error")
-	}
 }
 
 // checkBoolTimeStamp checks that timestamp is between given window
@@ -91,4 +57,50 @@ func checkBigIntTimeStamp(result FetchedBigIntIoTResult, id uint64) bool {
 		return true
 	}
 	return false
+}
+
+func SimpleFetchIoT(unpack *DataType, id uint64) {
+	if Requests[id].AggregationType == 1 {
+		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
+		result := UnpackIoTBoolResult(packedResult)               // unpacked the result into IoTBoolResult
+		Requests[id].IoTResult = packBoolToJson(result)
+		SaveRequestJson()
+		// check timestamp is in window given in DataType
+		if checkBoolTimeStamp(result, id) {
+			Requests[id].Secret = RandStringBytes(64)
+			SaveRequestJson()
+			fmt.Println(string(Requests[id].Secret))
+			tes := solsha3.Bool(UnpackBool(Requests[id].IoTResult))
+			fmt.Println(tes)
+			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
+			SaveRequestJson()
+			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
+		} else {
+			log.Error("Error... timestamp not in time window required.")
+		}
+
+	} else if Requests[id].AggregationType == 2 {
+		// call IoTFetch big.int
+		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
+		jsonString := string(packedResult)
+		result := UnpackIoTBigIntResult([]byte(jsonString)) // unpacked the result into IoTBigIntResult
+		//fmt.Println(yo)
+		Requests[id].IoTResult = packBigIntToJson(result)
+		SaveRequestJson()
+		// check timestamp is in window given in DataType
+		if checkBigIntTimeStamp(result, id) {
+			Requests[id].Secret = RandStringBytes(64)
+			SaveRequestJson()
+			fmt.Println(string(Requests[id].Secret))
+			tes := solsha3.Int256(UnpackInt(Requests[id].IoTResult))
+			fmt.Println(tes)
+			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
+			SaveRequestJson()
+			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
+		} else {
+			log.Error("Error... timestamp not in time window required.")
+		}
+	} else {
+		log.Error("error")
+	}
 }
