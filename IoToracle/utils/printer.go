@@ -100,6 +100,13 @@ func COMMITSPLACEDMESSAGE(eventCommitsPlaced *abi.AggregatorContractCommitsPlace
 	REQUESTLINE()
 }
 
+func REVEALSPLACEDMESSAGE(eventRevealsPlaced *abi.AggregatorContractRevealsPlaced) {
+	color.Green("--------------------REVEALS PLACED-----------------")
+	fmt.Println("RequestID: ", eventRevealsPlaced.Arg0)
+	fmt.Println(eventRevealsPlaced.Arg1)
+	REQUESTLINE()
+}
+
 func AGGREGATIONCOMPLETE(eventAggregationCompleted *abi.AggregatorContractAggregationCompleted) {
 	color.Green("--------------------AGGREGATION--------------------")
 	fmt.Println("Aggregation Complete:")

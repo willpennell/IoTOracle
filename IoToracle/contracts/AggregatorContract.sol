@@ -37,6 +37,7 @@ contract AggregatorContract {
     event RevealsPlaced(uint, string); // emits reveals placed event
     event Logging(string);
     event LogBool(bool);
+    event LogInt(int256);
 
 
     // @notice constructor called when deployed
@@ -128,6 +129,8 @@ contract AggregatorContract {
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
         int256 decodeResult = decodeInt(_result);
         bytes32 revealHash = keccak256(abi.encodePacked(_secret, _result)); // hash of _result and _secret
+        emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash);
+        emit LogInt(decodeResult);
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
             answers[_requestID].oracleAverageReveals[msg.sender] = decodeResult; // adds the int result to map
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // can only submit once
@@ -136,11 +139,11 @@ contract AggregatorContract {
             answers[_requestID].incorrectRevealOracles.push(msg.sender); // an incorrect match of commit and reveal hashes
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only respond once
         }
-        answers[_requestID].oracleCounter++; // increment oracle counter
         if (answers[_requestID].oracleCounter == (orc.getNumberOfOracles(_requestID) - 1)){
             emit RevealsPlaced(_requestID, "All reveals have been placed");
             averageAggregation(_requestID); // once number of oracles has been reached call averageAggregation
         }
+        answers[_requestID].oracleCounter++; // increment oracle counter
         return true;
     }
     // @notice vote aggregation, splits the correct reveals into true and false lists, then chooses the bool

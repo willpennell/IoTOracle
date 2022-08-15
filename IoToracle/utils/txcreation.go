@@ -160,7 +160,7 @@ func TxRevealAverageResponse(client *ethclient.Client, info OracleNodeInfo,
 	if err != nil {
 		log.Fatal(err)
 	}
-	// PRINTTXHASH(tx)
+	PRINTTXHASH(tx)
 	return tx
 }
 

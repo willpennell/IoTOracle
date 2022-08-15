@@ -21,6 +21,11 @@ type FetchedBoolIoTResult struct {
 	Timestamp uint64 `json:"timestamp"` // timestamp of recorded result
 }
 
+type Proxy struct {
+	Result    float64 `json:"result"`
+	Timestamp float64 `json:"timestamp"`
+}
+
 // FetchedBigIntIoTResult struct of fetched result that comes in json from MQTT broker {"Result":26,"Timestamp":189822}
 type FetchedBigIntIoTResult struct {
 	Result    int    `json:"result"`    // result int could be temperature, elapsed time, counter etc
@@ -31,8 +36,6 @@ type FetchedBigIntIoTResult struct {
 func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRequestDetails, id uint64) {
 	unpack := ConvertToDataTypeStruct(eventReleaseRequestDetails, id) // convert DataType []byte into DataType struct
 	Requests[id].UnPackedDataType = *unpack                           // add unpacked DataType struct to Requests map
-	fmt.Println("made it here")
-	fmt.Println("should be 1: ", Requests[id].AggregationType)
 	if Requests[id].AggregationType == 1 {
 		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
 		result := UnpackIoTBoolResult(packedResult)               // unpacked the result into IoTBoolResult
@@ -52,15 +55,15 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 	} else if Requests[id].AggregationType == 2 {
 		// call IoTFetch big.int
 		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
-
-		result := UnpackIoTBigIntResult(packedResult) // unpacked the result into IoTBigIntResult
+		jsonString := string(packedResult)
+		result := UnpackIoTBigIntResult([]byte(jsonString)) // unpacked the result into IoTBigIntResult
+		//fmt.Println(yo)
 		Requests[id].IoTResult = packBigIntToJson(result)
 		// check timestamp is in window given in DataType
-		fmt.Println("IoT Result Should be int: ", string(Requests[id].IoTResult))
 		if checkBigIntTimeStamp(result, id) {
 			Requests[id].Secret = RandStringBytes(64)
 			fmt.Println(string(Requests[id].Secret))
-			tes := solsha3.Int256(UnpackIoTBigIntResult(Requests[id].IoTResult))
+			tes := solsha3.Int256(UnpackInt(Requests[id].IoTResult))
 			fmt.Println(tes)
 			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
 			fmt.Println("Commit Hash: ", Requests[id].CommitHash)

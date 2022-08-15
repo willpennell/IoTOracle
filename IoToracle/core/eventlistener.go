@@ -210,11 +210,12 @@ func EventOraclePaid(client *ethclient.Client, wg *sync.WaitGroup) {
 func SubscribeToAggregationContractEvents(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	var w sync.WaitGroup
-	w.Add(3)
+	w.Add(4)
 
 	go EventAggregationComplete(client, &w) // go routine for AggregationComplete event
 	go EventLogHashes(client, &w)           // go routine for LogHashes event
 	go EventCommitsPlaced(client, &w, nodeInfo)
+	go EventRevealsPlaced(client, &w, nodeInfo)
 	w.Wait() // waits indefinitely
 }
 
@@ -249,9 +250,9 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 				fmt.Println(string(utils.Requests[id].IoTResult))
 				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, tes, utils.Requests[id].Secret)
 			} else if utils.Requests[id].AggregationType == 2 {
-				tes := solsha3.Int256(utils.UnpackIoTBigIntResult(utils.Requests[id].IoTResult))
+				tes := solsha3.Int256(utils.UnpackInt(utils.Requests[id].IoTResult))
 				utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, tes, utils.Requests[id].Secret)
-				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
+
 			}
 
 			// prints aggregation complete message
@@ -270,9 +271,9 @@ func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 	// Watch for a Deposited event
 	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
 	// chan for event
-	channelCommitsPlaced := make(chan *abi.AggregatorContractCommitsPlaced)
+	channelRevealsPlaced := make(chan *abi.AggregatorContractRevealsPlaced)
 	// watch new event AggregationComplete
-	sub, err := aggInstance.WatchCommitsPlaced(watchOpts, channelCommitsPlaced)
+	sub, err := aggInstance.WatchRevealsPlaced(watchOpts, channelRevealsPlaced)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -281,21 +282,9 @@ func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 		select {
 		case err := <-sub.Err():
 			log.Fatal(err)
-		case eventCommitsPlaced := <-channelCommitsPlaced:
-			utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
+		case eventRevealsPlaced := <-channelRevealsPlaced:
+			utils.REVEALSPLACEDMESSAGE(eventRevealsPlaced)
 			// TODO call reveal tx
-			id := eventCommitsPlaced.Arg0.Uint64()
-			ioTbool := utils.UnpackBool(utils.Requests[id].IoTResult)
-			fmt.Println("here: ", ioTbool)
-			if utils.Requests[id].AggregationType == 1 {
-
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, utils.Requests[id].IoTResult, utils.Requests[id].Secret)
-			} else if utils.Requests[id].AggregationType == 2 {
-				// utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, iotBigInt, )
-			}
-
-			// prints aggregation complete message
-
 		}
 	}
 }

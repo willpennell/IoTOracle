@@ -61,15 +61,40 @@ func UnpackBool(packedResult []byte) bool {
 	return ioTBool
 }
 
-// UnpackIoTBigIntResult unmarshal json into FetchedBigIntIoTResult struct
-func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
-	var resultAndTimeStamp FetchedBigIntIoTResult
-	err := json.Unmarshal(packedResult, &resultAndTimeStamp)
+func UnpackInt(packedResult []byte) int {
+	var ioTInt int
+	err := json.Unmarshal(packedResult, &ioTInt)
 	if err != nil {
-		fmt.Println("Issues here...")
 		log.Fatal(err)
 	}
-	return resultAndTimeStamp
+	return ioTInt
+}
+
+// UnpackIoTBigIntResult unmarshal json into FetchedBigIntIoTResult struct
+func UnpackIoTBigIntResult(packedResult []byte) FetchedBigIntIoTResult {
+	var jsonObject interface{}
+	var resultAndTimestamp FetchedBigIntIoTResult
+	err := json.Unmarshal(packedResult, &jsonObject)
+	if err != nil {
+		log.Fatal(err)
+	}
+	proxy := createProxy(interfaceToMap(jsonObject))       // creates a proxy to get the correct types from the json IoT int data
+	resultAndTimestamp.Result = int(proxy.Result)          // assigns the proxy values to the correct struct
+	resultAndTimestamp.Timestamp = uint64(proxy.Timestamp) // assigns the proxy values to the correct struct
+	return resultAndTimestamp
+}
+
+func interfaceToMap(v interface{}) map[string]interface{} {
+	return v.(map[string]interface{})
+}
+func createProxy(v map[string]interface{}) Proxy {
+	result := v["result"]
+	timestamp := v["timestamp"]
+	proxy := Proxy{
+		Result:    result.(float64),
+		Timestamp: timestamp.(float64),
+	}
+	return proxy
 }
 
 // packBoolToJson marshal into json from IoTBoolResult to []byte
@@ -83,7 +108,7 @@ func packBoolToJson(IoTResult FetchedBoolIoTResult) []byte {
 
 // packBigIntToJson marshal into json from IoTBigIntResult to []byte
 func packBigIntToJson(IoTResult FetchedBigIntIoTResult) []byte {
-	packed, err := json.Marshal(IoTResult)
+	packed, err := json.Marshal(IoTResult.Result)
 	if err != nil {
 		log.Fatal(err)
 	}
