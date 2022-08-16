@@ -254,6 +254,7 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 				utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, tes, utils.Requests[id].Secret)
 
 			}
+			utils.SaveRequestJson()
 
 			// prints aggregation complete message
 
@@ -313,6 +314,7 @@ func EventAggregationComplete(client *ethclient.Client, wg *sync.WaitGroup) {
 		case eventAggregationCompleted := <-channelAggregationCompleted:
 			utils.AGGREGATIONCOMPLETE(eventAggregationCompleted) // prints aggregation complete message
 			utils.Requests[eventAggregationCompleted.Arg0.Uint64()].Status = 2
+			fmt.Println("Voting status change: ", utils.Requests[eventAggregationCompleted.Arg0.Uint64()].Status)
 			utils.SaveRequestJson()
 		}
 	}

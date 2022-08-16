@@ -30,12 +30,12 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 }
 
 // SetOpts creates and sets options for MQTT client
-func SetOpts() *mqtt.ClientOptions {
+func SetOpts(clientID string) *mqtt.ClientOptions {
 
 	var port = 1883                                               // standard port for MQTT this could be in .env file
 	opts := mqtt.NewClientOptions()                               // opts object
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", GetBroker(), port)) // add broker to connect to, info from .env
-	opts.SetClientID(GetClientID())                               // set clientID, info from .env
+	opts.SetClientID(clientID)                                    // set clientID, info from .env
 	opts.SetUsername(GetClientUsername())                         // set client Username, info from .env
 	opts.SetPassword(GetClientPasswd())                           // set client passwd, info from .env
 	opts.SetDefaultPublishHandler(messagePubHandler)              // set publish handler. what happens when a message is recieved
@@ -46,11 +46,11 @@ func SetOpts() *mqtt.ClientOptions {
 }
 
 // StartMQTTClient connects to MQTT client and subscribes to particular topic
-func StartMQTTClient(topic string) []byte {
+func StartMQTTClient(topic string, clientID string) []byte {
 	fmt.Println(topic)
 	//defer w.Done()
 	subWait.Add(1)                 // add a counter to global sync.WaitGroup function
-	opts := SetOpts()              // create set options and return options object and assign to 'opts'
+	opts := SetOpts(clientID)      // create set options and return options object and assign to 'opts'
 	client := mqtt.NewClient(opts) // start new MQTT client with opts
 	// creates token when connected if token has error then throw panic
 	if token := client.Connect(); token.Wait() && token.Error() != nil {

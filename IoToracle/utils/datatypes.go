@@ -37,7 +37,7 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 	unpack := ConvertToDataTypeStruct(eventReleaseRequestDetails, id) // convert DataType []byte into DataType struct
 	Requests[id].UnPackedDataType = *unpack                           // add unpacked DataType struct to Requests map
 	SaveRequestJson()
-	SimpleFetchIoT(&Requests[id].UnPackedDataType, id)
+	SimpleFetchIoT(&Requests[id].UnPackedDataType, id, GetClientID())
 
 }
 
@@ -59,10 +59,10 @@ func checkBigIntTimeStamp(result FetchedBigIntIoTResult, id uint64) bool {
 	return false
 }
 
-func SimpleFetchIoT(unpack *DataType, id uint64) {
+func SimpleFetchIoT(unpack *DataType, id uint64, clientID string) {
 	if Requests[id].AggregationType == 1 {
-		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
-		result := UnpackIoTBoolResult(packedResult)               // unpacked the result into IoTBoolResult
+		packedResult := StartMQTTClient(TopicBuilder(unpack, id), clientID) // pass in full topic IoTID/Topic and start MQTT client
+		result := UnpackIoTBoolResult(packedResult)                         // unpacked the result into IoTBoolResult
 		Requests[id].IoTResult = packBoolToJson(result)
 		SaveRequestJson()
 		// check timestamp is in window given in DataType
@@ -81,7 +81,7 @@ func SimpleFetchIoT(unpack *DataType, id uint64) {
 
 	} else if Requests[id].AggregationType == 2 {
 		// call IoTFetch big.int
-		packedResult := StartMQTTClient(TopicBuilder(unpack, id)) // pass in full topic IoTID/Topic and start MQTT client
+		packedResult := StartMQTTClient(TopicBuilder(unpack, id), clientID) // pass in full topic IoTID/Topic and start MQTT client
 		jsonString := string(packedResult)
 		result := UnpackIoTBigIntResult([]byte(jsonString)) // unpacked the result into IoTBigIntResult
 		//fmt.Println(yo)

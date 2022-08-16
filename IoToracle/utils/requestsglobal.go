@@ -2,7 +2,6 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"sync"
 )
@@ -45,7 +44,6 @@ var Requests = MakeRequests() // singleton Requests struct
 
 func LoadRequestJson() {
 	err := Load(&Requests, "./data/requests.json")
-	fmt.Println(&Requests)
 	if err != nil {
 		log.Fatal("EOF error? ", err)
 	}

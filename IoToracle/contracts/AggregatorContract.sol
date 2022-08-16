@@ -154,15 +154,15 @@ contract AggregatorContract {
         address orcAddress; // placeholder oracle address var
         // loop through the oracles that provided a correct reveal
         for (uint i = 0; i < answers[_requestID].correctRevealOracles.length; i++) {
-            emit Logging("we enter the loop");
+
             orcAddress = answers[_requestID].correctRevealOracles[i]; // assign address
             // if the reveal result is true add to true array and increment true counter
             if (answers[_requestID].oracleVoteReveals[orcAddress] == true ) {
-                emit Logging("in the if statement");
+
                 answers[_requestID].trueOracleResults.push(orcAddress); // add oracle address to true array
                 answers[_requestID].t++; // increment true counter
             } else { // if false add address to false array
-                emit Logging("in the else statement");
+
                 answers[_requestID].falseOracleResults.push(orcAddress);
                 answers[_requestID].f++; // increment false counter
             }
@@ -176,7 +176,6 @@ contract AggregatorContract {
             orc.deliverVoteResponse(_requestID, _result, answers[_requestID].trueOracleResults,
                 answers[_requestID].falseOracleResults,
                 answers[_requestID].incorrectRevealOracles);
-            return true;
         } else if (answers[_requestID].f > answers[_requestID].t) {
             // which ever is greater pass to call deliverVoteResponse in false(correct) then true(incorrect) order
             require(!(answers[_requestID].t > (answers[_requestID].oracleCounter) / 3), 'too many incorrect nodes');
@@ -186,14 +185,13 @@ contract AggregatorContract {
                 answers[_requestID].falseOracleResults,
                 answers[_requestID].trueOracleResults,
                 answers[_requestID].incorrectRevealOracles);
-            return true;
         } else {
             // when the t and f counters are the same, deadlock as appeared so we need to cancel and refund
             orc.cancelRequestDueToDeadlock(_requestID, answers[_requestID].incorrectRevealOracles);
             answers[_requestID].cancelFlag = 1;
         }
         emit AggregationCompleted(_requestID, "Vote Aggregation Complete");
-        return false;
+        return true;
     }
     // @notice averaging aggregation this function takes an average of the correct reveal oracles
     function averageAggregation(
