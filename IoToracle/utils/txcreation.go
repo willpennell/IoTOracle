@@ -89,7 +89,7 @@ func TxJoinAsOracle(client *ethclient.Client, info OracleNodeInfo) *types.Transa
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx) // print tx message
+	TXLog(tx)
 	return tx // return tx types.Transaction
 }
 
@@ -100,7 +100,7 @@ func TxLeaveOracleNetwork(client *ethclient.Client, info OracleNodeInfo) *types.
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx) // print tx
+	TXLog(tx)
 	return tx // return tx types.Transaction
 }
 
@@ -111,7 +111,7 @@ func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.In
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx) // print tx
+	TXLog(tx)
 	return tx, nil // return tx types.Transaction and error value
 }
 
@@ -136,7 +136,7 @@ func TxCommitResponse(client *ethclient.Client, info OracleNodeInfo,
 	if err != nil {
 		log.Fatal(err)
 	}
-	//PRINTTXHASH(tx) // print tx message
+	TXLog(tx)
 	return tx // return tx types.Transaction
 
 }
@@ -148,7 +148,7 @@ func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
 	if err != nil {
 		log.Fatal(err)
 	}
-	// PRINTTXHASH(tx)
+	TXLog(tx)
 	return tx
 }
 
@@ -161,7 +161,7 @@ func TxRevealAverageResponse(client *ethclient.Client, info OracleNodeInfo,
 
 		log.Fatal(err)
 	}
-	PRINTTXHASH(tx)
+	TXLog(tx)
 	return tx
 }
 

@@ -64,16 +64,14 @@ func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo uti
 			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1, eventOpenForBids.Arg2)
 			utils.Requests[id] = &request // this is added to the Requests map
 			utils.Requests[id].Status = 1 // change status to 1 to show this request is pending
+			utils.SaveRequestJson()
 			//time.Sleep(time.Second)
 			// call tx function to send to orc contract and place bid
 			tx, err := utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
 			if err != nil {
 				log.Fatal(err)
 			}
-			utils.NEWBID()        // prints message
 			utils.PRINTTXHASH(tx) // prints hash of tx
-			utils.ENDBID()        // prints message
-
 		}
 	}
 }
@@ -132,16 +130,18 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventReleaseRequestDetails := <-channelReleaseRequestDetails:
-			id := eventReleaseRequestDetails.Arg0.Uint64()          // converts id to uint64
-			utils.AddIoTIDToRequests(eventReleaseRequestDetails)    // adds IoTID to Requests map
+			id := eventReleaseRequestDetails.Arg0.Uint64()       // converts id to uint64
+			utils.AddIoTIDToRequests(eventReleaseRequestDetails) // adds IoTID to Requests map
+			utils.SaveRequestJson()
 			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails) // prints message
 			// call fetch to IoT
 			utils.FetchIoTData(eventReleaseRequestDetails, id) // function to call MQTT broker
 			// need to convert the result to hex
-
+			utils.SaveRequestJson()
 			// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
 			// TODO change to commitResponse
 			utils.TxCommitResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, utils.Requests[id].CommitHash)
+
 			// utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedBytes))
 		}
 	}
@@ -246,12 +246,11 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			id := eventCommitsPlaced.Arg0.Uint64()
 
 			if utils.Requests[id].AggregationType == 1 {
-				tes := solsha3.Bool(utils.UnpackBool(utils.Requests[id].IoTResult))
-				fmt.Println(string(utils.Requests[id].IoTResult))
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, tes, utils.Requests[id].Secret)
+				shaBoolEncode := solsha3.Bool(utils.UnpackBool(utils.Requests[id].IoTResult))
+				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, shaBoolEncode, utils.Requests[id].Secret)
 			} else if utils.Requests[id].AggregationType == 2 {
-				tes := solsha3.Int256(utils.UnpackInt(utils.Requests[id].IoTResult))
-				utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, tes, utils.Requests[id].Secret)
+				shaIntEncode := solsha3.Int256(utils.UnpackInt(utils.Requests[id].IoTResult))
+				utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, shaIntEncode, utils.Requests[id].Secret)
 
 			}
 			utils.SaveRequestJson()
@@ -342,9 +341,7 @@ func EventLogHashes(client *ethclient.Client, wg *sync.WaitGroup) {
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventLogHashes := <-channelLogHashes:
-			fmt.Println("Commit Hash: ", eventLogHashes.Arg0)   // prints contract Hash
-			fmt.Println("Solidity Hash: ", eventLogHashes.Arg1) // prints results hash
-
+			utils.HASHLOGMESSAGE(eventLogHashes)
 		}
 	}
 }

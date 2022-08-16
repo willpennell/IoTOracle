@@ -4,8 +4,10 @@ package utils
 import (
 	abi "IoToracle/abitogo"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/fatih/color"
+	"log"
 	"net"
 )
 
@@ -31,12 +33,6 @@ func REQUESTLINE() {
 	color.Green("---------------------------------------------------")
 }
 
-func REQUESTMESSAGE(req Request) {
-	fmt.Println("Request ID: ", req.RequestId)
-	fmt.Println("Data Type: ", string(req.DataType))
-	fmt.Println("IoT ID: ", string(req.IotId))
-}
-
 func SERVERLISTENING(lis net.Listener) {
 	color.Red("server listening at %v\n", lis.Addr())
 }
@@ -49,8 +45,8 @@ func ORACLENODEHASLEFT() {
 	color.Red("NODE HAS LEFT NETWORK!\n")
 }
 
-func PRINTTXHASH(tx *types.Transaction) {
-	color.HiMagenta("Cost: %v\nHash: %v\n", tx.Cost(), tx.Hash())
+func PRINTTXHASH(tx *types.Transaction) string {
+	return fmt.Sprintf("Cost: %v\nHash: %v\n", tx.Cost(), tx.Hash())
 }
 
 func NEWBID() {
@@ -122,4 +118,45 @@ func ORACLEPAID(eventOraclePaid *abi.OracleRequestContractOraclePaid) {
 	color.HiYellow("Message: %v\n", eventOraclePaid.Arg2)
 	REQUESTLINE()
 
+}
+
+func MQTTBROKERSUB(topic string) {
+	color.Green("-----------------SUBSCRIBED TO MQTT TOPIC------------------")
+	it := color.New(color.FgHiBlue).Add(color.Italic)
+	_, err := it.Printf("Subscribed to topic: %s\n", topic)
+	if err != nil {
+		log.Println(err)
+	}
+	REQUESTLINE()
+
+}
+
+func MQTTMESSAGE(msg string) {
+	MQTTHEADER()
+	it := color.New(color.FgHiBlue).Add(color.Italic)
+	_, err := it.Printf("%s\n", msg)
+	if err != nil {
+		log.Println(err)
+	}
+	REQUESTLINE()
+
+}
+
+func MQTTHEADER() {
+	color.Green("-----------------MQTT MESSAGE------------------")
+}
+
+func HASHLOGMESSAGE(eventLogHashes *abi.AggregatorContractLogHashes) {
+	color.Green("-----------------HASH MESSAGE------------------")
+	it := color.New(color.FgHiRed).Add(color.Italic)
+
+	_, err := it.Printf("commit hash: 0x%s\n", common.Bytes2Hex(eventLogHashes.Arg0[:]))
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = it.Printf("smart contract hash: 0x%s\n", common.Bytes2Hex(eventLogHashes.Arg1[:]))
+	if err != nil {
+		log.Println(err)
+	}
+	REQUESTLINE()
 }

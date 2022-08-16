@@ -21,11 +21,11 @@ func OutstandingRequests(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo 
 	fmt.Println(len(utils.Requests))
 	clientID := "request_oracle_catch_up"
 	for _, element := range utils.Requests {
+		fmt.Println("Request ID: ", element.RequestId)
 		if element.Status == 1 {
 
 			// TODO fetch IoT Data
 			utils.SimpleFetchIoT(&element.UnPackedDataType, element.RequestId, clientID)
-			fmt.Println(element.CommitHash)
 			// TODO send back to smart contract
 			utils.TxCommitResponse(client, nodeInfo, big.NewInt(int64(element.RequestId)), element.CommitHash)
 			// TODO send response

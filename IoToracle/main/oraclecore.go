@@ -22,11 +22,13 @@ func establishConnection() *ethclient.Client {
 }
 
 func main() {
-	var wg sync.WaitGroup            // sync group for concurrent go routines to run
-	wg.Add(2)                        // add a count to the waitGroup
+	var wg sync.WaitGroup // sync group for concurrent go routines to run
+	wg.Add(2)             // add a count to the waitGroup
+	p.SetUpErrLog()
 	client := establishConnection()  // client blockchain object
 	nodeInfo := p.InitOracle(client) // calls init functions for when first running the program
 	p.LoadRequestJson()
+	go core.OutstandingRequests(client, &wg, nodeInfo)
 	// go routines
 	go core.SubscribeToOracleRequestContractEvents(client, &wg, nodeInfo) // subscribes to events from Orc contract
 	go core.SubscribeToAggregationContractEvents(client, &wg, nodeInfo)   // subscribes to events from Aggregator contract

@@ -3,7 +3,6 @@ package utils
 
 import (
 	abi "IoToracle/abitogo"
-	"fmt"
 	"github.com/ethereum/go-ethereum/log"
 	solsha3 "github.com/miguelmota/go-solidity-sha3"
 )
@@ -38,7 +37,7 @@ func FetchIoTData(eventReleaseRequestDetails *abi.OracleRequestContractReleaseRe
 	Requests[id].UnPackedDataType = *unpack                           // add unpacked DataType struct to Requests map
 	SaveRequestJson()
 	SimpleFetchIoT(&Requests[id].UnPackedDataType, id, GetClientID())
-
+	SaveRequestJson()
 }
 
 // checkBoolTimeStamp checks that timestamp is between given window
@@ -69,12 +68,10 @@ func SimpleFetchIoT(unpack *DataType, id uint64, clientID string) {
 		if checkBoolTimeStamp(result, id) {
 			Requests[id].Secret = RandStringBytes(64)
 			SaveRequestJson()
-			fmt.Println(string(Requests[id].Secret))
-			tes := solsha3.Bool(UnpackBool(Requests[id].IoTResult))
-			fmt.Println(tes)
-			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
+			shaBoolEncode := solsha3.Bool(UnpackBool(Requests[id].IoTResult))
+			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, shaBoolEncode)
 			SaveRequestJson()
-			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
+
 		} else {
 			log.Error("Error... timestamp not in time window required.")
 		}
@@ -91,12 +88,9 @@ func SimpleFetchIoT(unpack *DataType, id uint64, clientID string) {
 		if checkBigIntTimeStamp(result, id) {
 			Requests[id].Secret = RandStringBytes(64)
 			SaveRequestJson()
-			fmt.Println(string(Requests[id].Secret))
-			tes := solsha3.Int256(UnpackInt(Requests[id].IoTResult))
-			fmt.Println(tes)
-			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, tes)
+			shaIntEncode := solsha3.Int256(UnpackInt(Requests[id].IoTResult))
+			Requests[id].CommitHash = GenerateHash(id, Requests[id].Secret, shaIntEncode)
 			SaveRequestJson()
-			fmt.Println("Commit Hash: ", Requests[id].CommitHash)
 		} else {
 			log.Error("Error... timestamp not in time window required.")
 		}

@@ -14,19 +14,19 @@ var packedResult []byte
 // messagePubHandler used for handling incoming messages from publisher (iot) device
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 	// message from topic
-	fmt.Printf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic())
+	MQTTMESSAGE(fmt.Sprintf("Received message: %s from topic: %s\n", msg.Payload(), msg.Topic()))
 	packedResult = msg.Payload() // add the message (json) to packedResult
 	subWait.Done()               // will stop goroutine
 }
 
 // connectHandler used for connecting client
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	fmt.Println("Connected")
+	MQTTMESSAGE("connected..")
 }
 
 // connectLostHandler used for lost connection
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-	fmt.Printf("Connect lost: %v", err)
+	MQTTMESSAGE(fmt.Sprintf("Connect lost: %v", err))
 }
 
 // SetOpts creates and sets options for MQTT client
@@ -65,8 +65,8 @@ func StartMQTTClient(topic string, clientID string) []byte {
 // sub function that subscribes to MQTT broker at requested topic
 func sub(client mqtt.Client, topic string) {
 	token := client.Subscribe(topic, 0, messagePubHandler) // publish handler callback used here
-	fmt.Println("we are here")
-	token.Wait()                                   // waits for a response from publish handler
-	fmt.Printf("Subscribed to topic: %s\n", topic) // subscribed to topic
-	subWait.Wait()                                 // waits for the counter to be decremented in publishHandler callback function
+
+	token.Wait()         // waits for a response from publish handler
+	MQTTBROKERSUB(topic) // subscribed to topic
+	subWait.Wait()       // waits for the counter to be decremented in publishHandler callback function
 }

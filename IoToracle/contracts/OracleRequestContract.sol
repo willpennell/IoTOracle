@@ -195,29 +195,36 @@ contract OracleRequestContract {
         // return single aggregation result
         emit FinalResultLog(_finalResult, " the final result");
         _finalResult;
-        uint fee = requests[_requestID].fee / _correctOracles.length;
+
+        uint slashedRewards = 0; //pay honest nodes fees from the slashing
         // pay fees
-        for (uint i=0; i<_correctOracles.length; i++) {
-            // pay each share to each oracle
-            emit Logging("gets to inside correctOracles");
-            emit OraclePaid(_correctOracles[i], fee, "Oracle has been Paid!"); // tells listeners oracle node has been paid
-            payable(_correctOracles[i]).transfer(fee); // pays oracle their fee
-            requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
-            // and all oracles have been paid
-        }
+
         // add penalties and slash dishonest nodes stake
         for (uint i=0; i<_incorrectOracles.length; i++){
-            emit Logging("gets to loop incorrectOracles");
+
             // gets penalty fee from reputation contract penalty**rating
             uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
             stakeBalance[_incorrectOracles[i]] -= penalty;
+            slashedRewards += penalty;
             ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
         }
         // small penalty for incorrect hashes, as this could be an error
         for (uint i=0; i<_incorrectRevealOracles.length; i++) {
-            emit Logging("we get inside penalty incorrect hashes");
-            uint penalty = fee; // charge the fee of the request as a penalty
+
+            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]); // charge the fee of the request as a penalty
+            slashedRewards += penalty;
             stakeBalance[_incorrectRevealOracles[i]] += penalty; // deducted from oracle stake
+        }
+        uint fee = requests[_requestID].fee / _correctOracles.length;
+        uint slashShare = slashedRewards / _correctOracles.length;
+        for (uint i=0; i<_correctOracles.length; i++) {
+            // pay each share to each oracle
+            uint fullReward = fee + slashShare;
+
+            emit OraclePaid(_correctOracles[i], fullReward, "Oracle has been Paid!"); // tells listeners oracle node has been paid
+            payable(_correctOracles[i]).transfer(fullReward); // pays oracle their fee
+            requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
+            // and all oracles have been paid
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete
         completedRequests[_requestID] = true; // add request id to completedRequests
