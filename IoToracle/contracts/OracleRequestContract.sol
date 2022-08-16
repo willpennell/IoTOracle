@@ -24,7 +24,12 @@ contract OracleRequestContract {
     uint pendingCounter = 1;
     // Status logs for each request
     enum Status{PENDING, COMPLETE, CANCELLED}
-
+    struct Timings {
+        uint appealFlag;
+        uint timestamp;
+        uint elapsedTime;
+        address[] timedOutOracles;
+    }
     // a single Request structure
     struct Request {
         uint256 requestID; //Id for each request
@@ -43,11 +48,12 @@ contract OracleRequestContract {
         Status status; // status of the request
         uint8 cancelFlag; // cancel flag, if == 1 then do not continue with request
         uint fee; // fee sent to cover costs and extra for fetch the data
+
     }
 
     bool[100] public completedRequests;// true for each requestID once status changes to complete.
-
-    event OpenForBids(uint256, bytes, uint256); // tells oracle nodes there is a request that needs bidding on
+    Timings[100] public timings;
+    event OpenForBids(uint256, bytes, uint256, uint, uint); // tells oracle nodes there is a request that needs bidding on
     event BidPlaced(address); // tells nodes that a bid has been placed by another node
     event ReleaseRequestDetails(uint256, bytes, bytes); // the details the node needs to gather
     event StatusChange(Status, string); // tells nodes in network of status change of requests
@@ -57,6 +63,7 @@ contract OracleRequestContract {
     event Logging(string);
     event FinalResultLog(bool, string);
     event FinalInt(int256, string);
+    event UpdateTimestamp(uint256, uint256, uint256);
     // ***payments***
     uint GAS_PRICE = 2 * 10**10; // cost of gas
     uint FEE = GAS_PRICE * 3; // fee to cover other function calls and pay each oracle
@@ -118,7 +125,8 @@ contract OracleRequestContract {
         bytes memory _IoTID,
         bytes memory _dataType,
         uint256 _aggregationType,
-        uint32 _numberOfOracles)
+        uint32 _numberOfOracles,
+        uint _elapsedTime) // time required
     external
     payable
     valueGTMinFeeCheck() // requires the value sent is >= MIN_FEE
@@ -126,7 +134,10 @@ contract OracleRequestContract {
     aggregationTypeCheck(_aggregationType) // 1 = voting, 2 = averaging
     returns(uint256)
     {
+
         uint256 requestID = requestCounter; // assign id to request
+        timings[requestID].timestamp = block.timestamp;
+        timings[requestID].elapsedTime = _elapsedTime;
         // log details of the request to array to cross reference later
         requests[requestID].requestID = requestID;
         requests[requestID].requester = msg.sender;
@@ -144,8 +155,36 @@ contract OracleRequestContract {
         // increment requestId ready for next create request function.
         requestCounter++;
         pendingCounter++;
-        emit OpenForBids(requestID, requests[requestID].dataType, requests[requestID].aggregationType);
+        emit OpenForBids(requestID, requests[requestID].dataType, requests[requestID].aggregationType,
+            timings[requestID].timestamp, timings[requestID].elapsedTime);
         return requestID;
+    }
+    // @notice
+    function timeoutCommitsAppeal(uint256 _requestID)
+    timeHasElapsed(_requestID)
+    onlySubmittedCommitsOracles(_requestID)
+    external
+    {
+        // call get un-responded nodes
+        address[] memory unRespondedNodes = AggregatorContract(aggregatorAddr).getUnRespondedCommitOracles(_requestID);
+        for (uint i=0; i<unRespondedNodes.length; i++) {
+            timings[_requestID].timedOutOracles.push(unRespondedNodes[i]);
+        }
+        timings[_requestID].timestamp = block.timestamp; // reset timestamp
+        timings[_requestID].elapsedTime = 150; // allow for 2.5 min send a reveal message
+        emit UpdateTimestamp(_requestID, timings[_requestID].timestamp, timings[_requestID].elapsedTime);
+        AggregatorContract(aggregatorAddr).forceCommitsPlaced(_requestID);
+    }
+
+    function timeoutRevealsAppeal(uint _requestID)
+    onlySubmittedRevealsOracles(_requestID)
+    external
+    {
+        address[] memory unRespondedNodes = AggregatorContract(aggregatorAddr).getUnRespondedRevealOracles(_requestID);
+        for (uint i=0; i<unRespondedNodes.length; i++) {
+            timings[_requestID].timedOutOracles.push(unRespondedNodes[i]);
+        }
+        AggregatorContract(aggregatorAddr).forceRevealsPlaced(_requestID, requests[_requestID].aggregationType);
     }
 
     // @notice off-chain oracle node places bid to fetch data, once threshold is reached, emits event details.
@@ -483,5 +522,28 @@ contract OracleRequestContract {
         require(1 == _aggregationType || _aggregationType == 2 );
         _;
     }
+    modifier elapsedTimeGT10mins(uint _elapsedTime) {
+        require(_elapsedTime > 10 minutes ); // this allows genuine time for oracles to respond..
+        _;
+    }
+    modifier withinTime(uint256 _requestID) {
+        require(block.timestamp < (timings[_requestID].timestamp + timings[_requestID].elapsedTime) );
+        _;
+    }
+    modifier timeHasElapsed(uint _requestID) {
+        require((timings[_requestID].timestamp + timings[_requestID].elapsedTime) > block.timestamp );
+        _;
+    }
+    modifier onlySubmittedCommitsOracles(uint256 _requestID) {
+        require(AggregatorContract(aggregatorAddr).getCommitFlag(_requestID) == 0
+            && AggregatorContract(aggregatorAddr).getOracleHasSubmittedCommit(_requestID, msg.sender));
+        _;
+    }
 
+    modifier onlySubmittedRevealsOracles(uint256 _requestID) {
+        require(AggregatorContract(aggregatorAddr).getCommitFlag(_requestID) == 1
+        && AggregatorContract(aggregatorAddr).getOracleHasSubmittedReveal(_requestID, msg.sender)
+        && AggregatorContract(aggregatorAddr).getRevealFlag(_requestID) == 0);
+        _;
+    }
 }

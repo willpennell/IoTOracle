@@ -39,7 +39,8 @@ const init = async () => {
         iotidEncode,
         dataTypeEncode,
         2,
-        1
+        1,
+        600
     ).send({from: addr1, gas: 3000000, value: 10**12}).catch((error) => {
         console.log(error)
     });

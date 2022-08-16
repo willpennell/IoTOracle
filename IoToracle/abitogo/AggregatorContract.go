@@ -30,7 +30,7 @@ var (
 
 // AggregatorContractMetaData contains all meta data concerning the AggregatorContract contract.
 var AggregatorContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"CommitsPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"name\":\"LogInt\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"Logging\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"RevealsPlaced\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"t\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"f\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commitsFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revealsFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_commitHash\",\"type\":\"bytes32\"}],\"name\":\"commitResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeBool\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"b\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeInt\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"i\",\"type\":\"int256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealAverageResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealVoteResponse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"CommitsPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"name\":\"LogInt\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"Logging\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"RevealsPlaced\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"t\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"f\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commitsFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revealsFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_commitHash\",\"type\":\"bytes32\"}],\"name\":\"commitResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeBool\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"b\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeInt\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"i\",\"type\":\"int256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"forceCommitsPlaced\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_aggregationType\",\"type\":\"uint256\"}],\"name\":\"forceRevealsPlaced\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getCommitFlag\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_oracleAddr\",\"type\":\"address\"}],\"name\":\"getOracleHasSubmittedCommit\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_oracleAddr\",\"type\":\"address\"}],\"name\":\"getOracleHasSubmittedReveal\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getRevealFlag\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getUnRespondedCommitOracles\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getUnRespondedRevealOracles\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealAverageResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealVoteResponse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // AggregatorContractABI is the input ABI used to generate the binding from.
@@ -321,6 +321,130 @@ func (_AggregatorContract *AggregatorContractCallerSession) DecodeInt(data []byt
 	return _AggregatorContract.Contract.DecodeInt(&_AggregatorContract.CallOpts, data)
 }
 
+// GetCommitFlag is a free data retrieval call binding the contract method 0x9c0daa7c.
+//
+// Solidity: function getCommitFlag(uint256 _requestID) view returns(uint256)
+func (_AggregatorContract *AggregatorContractCaller) GetCommitFlag(opts *bind.CallOpts, _requestID *big.Int) (*big.Int, error) {
+	var out []interface{}
+	err := _AggregatorContract.contract.Call(opts, &out, "getCommitFlag", _requestID)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// GetCommitFlag is a free data retrieval call binding the contract method 0x9c0daa7c.
+//
+// Solidity: function getCommitFlag(uint256 _requestID) view returns(uint256)
+func (_AggregatorContract *AggregatorContractSession) GetCommitFlag(_requestID *big.Int) (*big.Int, error) {
+	return _AggregatorContract.Contract.GetCommitFlag(&_AggregatorContract.CallOpts, _requestID)
+}
+
+// GetCommitFlag is a free data retrieval call binding the contract method 0x9c0daa7c.
+//
+// Solidity: function getCommitFlag(uint256 _requestID) view returns(uint256)
+func (_AggregatorContract *AggregatorContractCallerSession) GetCommitFlag(_requestID *big.Int) (*big.Int, error) {
+	return _AggregatorContract.Contract.GetCommitFlag(&_AggregatorContract.CallOpts, _requestID)
+}
+
+// GetOracleHasSubmittedCommit is a free data retrieval call binding the contract method 0xf76b365e.
+//
+// Solidity: function getOracleHasSubmittedCommit(uint256 _requestID, address _oracleAddr) view returns(bool)
+func (_AggregatorContract *AggregatorContractCaller) GetOracleHasSubmittedCommit(opts *bind.CallOpts, _requestID *big.Int, _oracleAddr common.Address) (bool, error) {
+	var out []interface{}
+	err := _AggregatorContract.contract.Call(opts, &out, "getOracleHasSubmittedCommit", _requestID, _oracleAddr)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// GetOracleHasSubmittedCommit is a free data retrieval call binding the contract method 0xf76b365e.
+//
+// Solidity: function getOracleHasSubmittedCommit(uint256 _requestID, address _oracleAddr) view returns(bool)
+func (_AggregatorContract *AggregatorContractSession) GetOracleHasSubmittedCommit(_requestID *big.Int, _oracleAddr common.Address) (bool, error) {
+	return _AggregatorContract.Contract.GetOracleHasSubmittedCommit(&_AggregatorContract.CallOpts, _requestID, _oracleAddr)
+}
+
+// GetOracleHasSubmittedCommit is a free data retrieval call binding the contract method 0xf76b365e.
+//
+// Solidity: function getOracleHasSubmittedCommit(uint256 _requestID, address _oracleAddr) view returns(bool)
+func (_AggregatorContract *AggregatorContractCallerSession) GetOracleHasSubmittedCommit(_requestID *big.Int, _oracleAddr common.Address) (bool, error) {
+	return _AggregatorContract.Contract.GetOracleHasSubmittedCommit(&_AggregatorContract.CallOpts, _requestID, _oracleAddr)
+}
+
+// GetOracleHasSubmittedReveal is a free data retrieval call binding the contract method 0x2d214d2e.
+//
+// Solidity: function getOracleHasSubmittedReveal(uint256 _requestID, address _oracleAddr) view returns(bool)
+func (_AggregatorContract *AggregatorContractCaller) GetOracleHasSubmittedReveal(opts *bind.CallOpts, _requestID *big.Int, _oracleAddr common.Address) (bool, error) {
+	var out []interface{}
+	err := _AggregatorContract.contract.Call(opts, &out, "getOracleHasSubmittedReveal", _requestID, _oracleAddr)
+
+	if err != nil {
+		return *new(bool), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(bool)).(*bool)
+
+	return out0, err
+
+}
+
+// GetOracleHasSubmittedReveal is a free data retrieval call binding the contract method 0x2d214d2e.
+//
+// Solidity: function getOracleHasSubmittedReveal(uint256 _requestID, address _oracleAddr) view returns(bool)
+func (_AggregatorContract *AggregatorContractSession) GetOracleHasSubmittedReveal(_requestID *big.Int, _oracleAddr common.Address) (bool, error) {
+	return _AggregatorContract.Contract.GetOracleHasSubmittedReveal(&_AggregatorContract.CallOpts, _requestID, _oracleAddr)
+}
+
+// GetOracleHasSubmittedReveal is a free data retrieval call binding the contract method 0x2d214d2e.
+//
+// Solidity: function getOracleHasSubmittedReveal(uint256 _requestID, address _oracleAddr) view returns(bool)
+func (_AggregatorContract *AggregatorContractCallerSession) GetOracleHasSubmittedReveal(_requestID *big.Int, _oracleAddr common.Address) (bool, error) {
+	return _AggregatorContract.Contract.GetOracleHasSubmittedReveal(&_AggregatorContract.CallOpts, _requestID, _oracleAddr)
+}
+
+// GetRevealFlag is a free data retrieval call binding the contract method 0xba26ed59.
+//
+// Solidity: function getRevealFlag(uint256 _requestID) view returns(uint256)
+func (_AggregatorContract *AggregatorContractCaller) GetRevealFlag(opts *bind.CallOpts, _requestID *big.Int) (*big.Int, error) {
+	var out []interface{}
+	err := _AggregatorContract.contract.Call(opts, &out, "getRevealFlag", _requestID)
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// GetRevealFlag is a free data retrieval call binding the contract method 0xba26ed59.
+//
+// Solidity: function getRevealFlag(uint256 _requestID) view returns(uint256)
+func (_AggregatorContract *AggregatorContractSession) GetRevealFlag(_requestID *big.Int) (*big.Int, error) {
+	return _AggregatorContract.Contract.GetRevealFlag(&_AggregatorContract.CallOpts, _requestID)
+}
+
+// GetRevealFlag is a free data retrieval call binding the contract method 0xba26ed59.
+//
+// Solidity: function getRevealFlag(uint256 _requestID) view returns(uint256)
+func (_AggregatorContract *AggregatorContractCallerSession) GetRevealFlag(_requestID *big.Int) (*big.Int, error) {
+	return _AggregatorContract.Contract.GetRevealFlag(&_AggregatorContract.CallOpts, _requestID)
+}
+
 // Owner is a free data retrieval call binding the contract method 0x8da5cb5b.
 //
 // Solidity: function owner() view returns(address)
@@ -392,6 +516,90 @@ func (_AggregatorContract *AggregatorContractSession) CommitResponse(_requestID 
 // Solidity: function commitResponse(uint256 _requestID, bytes32 _commitHash) returns(bool)
 func (_AggregatorContract *AggregatorContractTransactorSession) CommitResponse(_requestID *big.Int, _commitHash [32]byte) (*types.Transaction, error) {
 	return _AggregatorContract.Contract.CommitResponse(&_AggregatorContract.TransactOpts, _requestID, _commitHash)
+}
+
+// ForceCommitsPlaced is a paid mutator transaction binding the contract method 0xc6d96072.
+//
+// Solidity: function forceCommitsPlaced(uint256 _requestID) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactor) ForceCommitsPlaced(opts *bind.TransactOpts, _requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "forceCommitsPlaced", _requestID)
+}
+
+// ForceCommitsPlaced is a paid mutator transaction binding the contract method 0xc6d96072.
+//
+// Solidity: function forceCommitsPlaced(uint256 _requestID) returns(bool)
+func (_AggregatorContract *AggregatorContractSession) ForceCommitsPlaced(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.ForceCommitsPlaced(&_AggregatorContract.TransactOpts, _requestID)
+}
+
+// ForceCommitsPlaced is a paid mutator transaction binding the contract method 0xc6d96072.
+//
+// Solidity: function forceCommitsPlaced(uint256 _requestID) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactorSession) ForceCommitsPlaced(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.ForceCommitsPlaced(&_AggregatorContract.TransactOpts, _requestID)
+}
+
+// ForceRevealsPlaced is a paid mutator transaction binding the contract method 0x4a627152.
+//
+// Solidity: function forceRevealsPlaced(uint256 _requestID, uint256 _aggregationType) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactor) ForceRevealsPlaced(opts *bind.TransactOpts, _requestID *big.Int, _aggregationType *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "forceRevealsPlaced", _requestID, _aggregationType)
+}
+
+// ForceRevealsPlaced is a paid mutator transaction binding the contract method 0x4a627152.
+//
+// Solidity: function forceRevealsPlaced(uint256 _requestID, uint256 _aggregationType) returns(bool)
+func (_AggregatorContract *AggregatorContractSession) ForceRevealsPlaced(_requestID *big.Int, _aggregationType *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.ForceRevealsPlaced(&_AggregatorContract.TransactOpts, _requestID, _aggregationType)
+}
+
+// ForceRevealsPlaced is a paid mutator transaction binding the contract method 0x4a627152.
+//
+// Solidity: function forceRevealsPlaced(uint256 _requestID, uint256 _aggregationType) returns(bool)
+func (_AggregatorContract *AggregatorContractTransactorSession) ForceRevealsPlaced(_requestID *big.Int, _aggregationType *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.ForceRevealsPlaced(&_AggregatorContract.TransactOpts, _requestID, _aggregationType)
+}
+
+// GetUnRespondedCommitOracles is a paid mutator transaction binding the contract method 0xf681ee11.
+//
+// Solidity: function getUnRespondedCommitOracles(uint256 _requestID) returns(address[])
+func (_AggregatorContract *AggregatorContractTransactor) GetUnRespondedCommitOracles(opts *bind.TransactOpts, _requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "getUnRespondedCommitOracles", _requestID)
+}
+
+// GetUnRespondedCommitOracles is a paid mutator transaction binding the contract method 0xf681ee11.
+//
+// Solidity: function getUnRespondedCommitOracles(uint256 _requestID) returns(address[])
+func (_AggregatorContract *AggregatorContractSession) GetUnRespondedCommitOracles(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.GetUnRespondedCommitOracles(&_AggregatorContract.TransactOpts, _requestID)
+}
+
+// GetUnRespondedCommitOracles is a paid mutator transaction binding the contract method 0xf681ee11.
+//
+// Solidity: function getUnRespondedCommitOracles(uint256 _requestID) returns(address[])
+func (_AggregatorContract *AggregatorContractTransactorSession) GetUnRespondedCommitOracles(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.GetUnRespondedCommitOracles(&_AggregatorContract.TransactOpts, _requestID)
+}
+
+// GetUnRespondedRevealOracles is a paid mutator transaction binding the contract method 0x19ff76c0.
+//
+// Solidity: function getUnRespondedRevealOracles(uint256 _requestID) returns(address[])
+func (_AggregatorContract *AggregatorContractTransactor) GetUnRespondedRevealOracles(opts *bind.TransactOpts, _requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.contract.Transact(opts, "getUnRespondedRevealOracles", _requestID)
+}
+
+// GetUnRespondedRevealOracles is a paid mutator transaction binding the contract method 0x19ff76c0.
+//
+// Solidity: function getUnRespondedRevealOracles(uint256 _requestID) returns(address[])
+func (_AggregatorContract *AggregatorContractSession) GetUnRespondedRevealOracles(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.GetUnRespondedRevealOracles(&_AggregatorContract.TransactOpts, _requestID)
+}
+
+// GetUnRespondedRevealOracles is a paid mutator transaction binding the contract method 0x19ff76c0.
+//
+// Solidity: function getUnRespondedRevealOracles(uint256 _requestID) returns(address[])
+func (_AggregatorContract *AggregatorContractTransactorSession) GetUnRespondedRevealOracles(_requestID *big.Int) (*types.Transaction, error) {
+	return _AggregatorContract.Contract.GetUnRespondedRevealOracles(&_AggregatorContract.TransactOpts, _requestID)
 }
 
 // RevealAverageResponse is a paid mutator transaction binding the contract method 0xb44d5495.

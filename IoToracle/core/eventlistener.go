@@ -26,14 +26,15 @@ func SubscribeToOracleRequestContractEvents(client *ethclient.Client,
 	nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	var w sync.WaitGroup // start new sync.WaitGroup for the events in orc contract
-	w.Add(5)
+	w.Add(6)
 	go EventOpenForBids(client, &w, nodeInfo)           // go routine for open for bids event
 	go EventBidPlaced(client, &w)                       // go routine for bids placed by oracle nodes
 	go EventStatusChange(client, &w)                    // go routine for a change in status for requests
 	go EventReleaseRequestDetails(client, &w, nodeInfo) // go routine for event that
 	// emits request details for nodes to fetch
 	go EventOraclePaid(client, &w) // go routine for paying oracles
-	w.Wait()                       // waits indefinitely as these events are persistent
+	go EventUpdateTimestamp(client, &w)
+	w.Wait() // waits indefinitely as these events are persistent
 }
 
 // EventOpenForBids subscribe to OpenForBids
@@ -60,11 +61,16 @@ func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo uti
 			log.Fatal(err)
 		case eventOpenForBids := <-channelOpenForBids: // creates event object
 			utils.OPENFORBIDSMESSAGE(eventOpenForBids) // prints message with data from event
+
 			// creates a request struct
-			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1, eventOpenForBids.Arg2)
+			request, id := utils.ConvertOpenForBidsData(eventOpenForBids.Arg0, eventOpenForBids.Arg1,
+				eventOpenForBids.Arg2, eventOpenForBids.Arg3, eventOpenForBids.Arg4)
+
 			utils.Requests[id] = &request // this is added to the Requests map
 			utils.Requests[id].Status = 1 // change status to 1 to show this request is pending
 			utils.SaveRequestJson()
+
+			go utils.StampTimer(id, utils.Requests[id].Timestamp, utils.Requests[id].ElapsedTime)
 			//time.Sleep(time.Second)
 			// call tx function to send to orc contract and place bid
 			tx, err := utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
@@ -141,10 +147,47 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 			// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
 			// TODO change to commitResponse
 			utils.TxCommitResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, utils.Requests[id].CommitHash)
-
+			utils.Requests[id].AppealFlag = 1
+			utils.SaveRequestJson()
 			// utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedBytes))
 		}
 	}
+}
+
+// EventUpdateTimestamp subscribe to UpdateTimestamp
+func EventUpdateTimestamp(client *ethclient.Client, wg *sync.WaitGroup) {
+	defer wg.Done()
+	// creates a new orc contract instance that we can interact with
+	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Watch for an event
+	watchOpts := &bind.WatchOpts{Context: context.Background(), Start: nil}
+	// chan for event
+	channelUpdateTimestamp := make(chan *abi.OracleRequestContractUpdateTimestamp)
+	// watch new event BidPlaced
+	sub, err := orcInstance.WatchUpdateTimestamp(watchOpts, channelUpdateTimestamp)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer sub.Unsubscribe()
+	for {
+		select {
+		case err := <-sub.Err():
+			log.Fatal(err)
+		case eventUpdateTimestamp := <-channelUpdateTimestamp:
+			id := eventUpdateTimestamp.Arg0.Uint64()
+			newTimestamp := eventUpdateTimestamp.Arg1.Int64()
+			newElapsedTime := eventUpdateTimestamp.Arg2.Int64()
+			utils.Requests[id].Timestamp = newTimestamp
+			utils.Requests[id].ElapsedTime = newElapsedTime
+			utils.SaveRequestJson()
+			go utils.StampTimer(id, utils.Requests[id].Timestamp, utils.Requests[id].ElapsedTime)
+		}
+	}
+	// Receive events from the channel
+
 }
 
 // EventStatusChange Subscribe to StatusChange
@@ -253,6 +296,7 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 				utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, shaIntEncode, utils.Requests[id].Secret)
 
 			}
+			utils.Requests[id].AppealFlag = 2
 			utils.SaveRequestJson()
 
 			// prints aggregation complete message
