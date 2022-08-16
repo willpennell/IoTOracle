@@ -4,7 +4,6 @@ import (
 	"IoToracle/utils"
 	"fmt"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"math/big"
 	"sync"
 )
 
@@ -23,13 +22,17 @@ func OutstandingRequests(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo 
 		if element.Status == 1 {
 
 			// TODO fetch IoT Data
+			fmt.Println("waiting in the outstanding requests")
 			utils.SimpleFetchIoT(&element.UnPackedDataType, element.RequestId)
-			fmt.Println(element.CommitHash)
-			// TODO send back to smart contract
-			utils.TxCommitResponse(client, nodeInfo, big.NewInt(int64(element.RequestId)), element.CommitHash)
-			// TODO send response
+			//fmt.Println("data fetched...")
+			//// TODO send back to smart contract
+			//fmt.Println("Sending to the commitResponse: ", element.RequestId, element.CommitHash)
+			//utils.TxCommitResponse(client, nodeInfo, big.NewInt(int64(element.RequestId)), element.CommitHash)
+			//// TODO send response
 			//EventCommitsPlaced(client, &w, nodeInfo)
-			// TODO Aggregation complete
+			//// TODO Aggregation complete
+			//EventRevealsPlaced(client, &w, nodeInfo)
+			//EventAggregationComplete(client, &w)
 		}
 
 	}
