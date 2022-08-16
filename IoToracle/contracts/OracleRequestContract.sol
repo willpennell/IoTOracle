@@ -237,10 +237,14 @@ contract OracleRequestContract {
 
         uint slashedRewards = 0; //pay honest nodes fees from the slashing
         // pay fees
-
+        for (uint i=0; i<timings[_requestID].timedOutOracles.length; i++) {
+            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
+            stakeBalance[_incorrectOracles[i]] -= penalty;
+            slashedRewards += penalty;
+            ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
+        }
         // add penalties and slash dishonest nodes stake
         for (uint i=0; i<_incorrectOracles.length; i++){
-
             // gets penalty fee from reputation contract penalty**rating
             uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
             stakeBalance[_incorrectOracles[i]] -= penalty;
