@@ -68,6 +68,7 @@ contract OracleRequestContract {
     uint GAS_PRICE = 2 * 10**10; // cost of gas
     uint FEE = GAS_PRICE * 3; // fee to cover other function calls and pay each oracle
     uint MIN_FEE = FEE + (GAS_PRICE * 5); // minimum needed to cover all costs
+    uint TIMER_ELAPSED_BIDDING = 300;
 
     // @notice constructor when first deployed
     constructor() {
@@ -161,7 +162,7 @@ contract OracleRequestContract {
     }
     // @notice
     function timeoutCommitsAppeal(uint256 _requestID)
-    timeHasElapsed(_requestID)
+    timeHasElapsed(_requestID, timings[_requestID].elapsedTime)
     onlySubmittedCommitsOracles(_requestID)
     external
     {
@@ -178,6 +179,7 @@ contract OracleRequestContract {
 
     function timeoutRevealsAppeal(uint _requestID)
     onlySubmittedRevealsOracles(_requestID)
+    timeHasElapsed(_requestID, timings[_requestID].elapsedTime)
     external
     {
         address[] memory unRespondedNodes = AggregatorContract(aggregatorAddr).getUnRespondedRevealOracles(_requestID);
@@ -185,6 +187,18 @@ contract OracleRequestContract {
             timings[_requestID].timedOutOracles.push(unRespondedNodes[i]);
         }
         AggregatorContract(aggregatorAddr).forceRevealsPlaced(_requestID, requests[_requestID].aggregationType);
+    }
+
+    function timeoutBiddingAppeal(uint _requestID)
+    onlyRequester(_requestID)
+    timeHasElapsed(_requestID, timings[_requestID].elapsedTime)
+    external
+    {
+        requests[_requestID].cancelFlag = 1;
+        payable(requests[_requestID].requester).transfer(requests[_requestID].fee);
+        AggregatorContract(aggregatorAddr).cancelRequest(_requestID);
+        requests[_requestID].status = Status.CANCELLED;
+        emit StatusChange(requests[_requestID].status, "CANCELLED");
     }
 
     // @notice off-chain oracle node places bid to fetch data, once threshold is reached, emits event details.
@@ -198,12 +212,12 @@ contract OracleRequestContract {
     cancelFlagZero(_requestID) // requires requests cancel flag is zero
     orcCountLessThanNum(_requestID) // requires that the oracle counter is still les than the number of oracles needed
     isNotBlacklisted() // requires the oracle has not exceed its penalty rating past 10
+    biddingTimeElapsed(_requestID)
     returns(bool)
     {
         requests[_requestID].oraclesForRequest[msg.sender] = true; // add true for oracle in request so we know they can vote
         requests[_requestID].oracleAddressAccess[requests[_requestID].oracleCounter] = address(msg.sender); // map addr for iteration
         requests[_requestID].oracleCounter++; // increment the counter
-        // TODO also add a timeout, if bids take to long
         emit BidPlaced(msg.sender); // send message to network that a bid has been placed
         if (requests[_requestID].numberOfOracles == requests[_requestID].oracleCounter) {
             // when the last oracle has submitted, we can emit the details
@@ -534,8 +548,8 @@ contract OracleRequestContract {
         require(block.timestamp < (timings[_requestID].timestamp + timings[_requestID].elapsedTime) );
         _;
     }
-    modifier timeHasElapsed(uint _requestID) {
-        require((timings[_requestID].timestamp + timings[_requestID].elapsedTime) > block.timestamp );
+    modifier timeHasElapsed(uint _requestID, uint elapsedTime) {
+        require((timings[_requestID].timestamp + elapsedTime) > block.timestamp );
         _;
     }
     modifier onlySubmittedCommitsOracles(uint256 _requestID) {
@@ -548,6 +562,11 @@ contract OracleRequestContract {
         require(AggregatorContract(aggregatorAddr).getCommitFlag(_requestID) == 1
         && AggregatorContract(aggregatorAddr).getOracleHasSubmittedReveal(_requestID, msg.sender)
         && AggregatorContract(aggregatorAddr).getRevealFlag(_requestID) == 0);
+        _;
+    }
+
+    modifier biddingTimeElapsed(uint256 _requestID) {
+        require(block.timestamp < (timings[_requestID].timestamp + TIMER_ELAPSED_BIDDING));
         _;
     }
 }
