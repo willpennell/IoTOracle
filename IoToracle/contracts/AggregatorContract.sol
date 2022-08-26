@@ -18,6 +18,7 @@ contract AggregatorContract {
         mapping (address => int256) oracleAverageReveals; // adds oracle answers to addresses
         mapping (uint256 => address) oracleAddresses; // uint to address to match counter and iterate through
         uint256 oracleCounter; // keep an index of the oracles
+        address[] oracleList;
         address[] correctRevealOracles; // dynamic array to keep track of correct oracle address to be passed to ORC
         address[] incorrectRevealOracles; // dynamic array to keep track of incorrect oracle address to be penalised
         address[] trueOracleResults; // oracles that answer true
@@ -39,6 +40,9 @@ contract AggregatorContract {
     event Logging(string);
     event LogBool(bool);
     event LogInt(int256);
+    event AddressLogging(address, string);
+    event LogNumOr(uint, string);
+    event PrintAddress(address, string);
 
 
     // @notice constructor called when deployed
@@ -55,10 +59,12 @@ contract AggregatorContract {
     commitFlagCheck(_requestID)
     returns(bool)
     {
+        emit AddressLogging(msg.sender, "Node placed a commit");
         if (answers[_requestID].requestID == 0) {
             answers[_requestID].requestID = _requestID; // assign correct id
             answers[_requestID].t = 0;
             answers[_requestID].f = 0;
+            answers[_requestID].oracleList = orc.getOracleAddresses(_requestID);
         }
         if (answers[_requestID].oracleCounter < orc.getNumberOfOracles(_requestID)) {
             answers[_requestID].oracleCommits[msg.sender] = _commitHash; // oracle nodes add commit to map
@@ -104,8 +110,11 @@ contract AggregatorContract {
             answers[_requestID].incorrectRevealOracles.push(msg.sender); // an incorrect match of commit and reveal hashes
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only vote once
         }
-
-        if (answers[_requestID].oracleCounter == (orc.getNumberOfOracles(_requestID) - 1)){
+        emit LogNumOr(orc.getNumberOfOracles(_requestID), "number of oracles");
+        emit LogNumOr(orc.getTimeoutOracleLength(_requestID), "number of timed out oracles");
+        emit LogNumOr(answers[_requestID].oracleCounter, "oracle counter");
+        if (answers[_requestID].oracleCounter == ((orc.getNumberOfOracles(_requestID) -
+        orc.getTimeoutOracleLength(_requestID))- 1)){
             emit RevealsPlaced(_requestID, "All reveals have been placed");
             answers[_requestID].revealsFlag = 1;
             voteAggregation(_requestID); // once number of oracles has been reached call voteAggregation
@@ -140,7 +149,8 @@ contract AggregatorContract {
             answers[_requestID].incorrectRevealOracles.push(msg.sender); // an incorrect match of commit and reveal hashes
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only respond once
         }
-        if (answers[_requestID].oracleCounter == (orc.getNumberOfOracles(_requestID) - 1)){
+        if (answers[_requestID].oracleCounter == ((orc.getNumberOfOracles(_requestID) -
+        orc.getTimeoutOracleLength(_requestID)) - 1)){
             emit RevealsPlaced(_requestID, "All reveals have been placed");
             averageAggregation(_requestID); // once number of oracles has been reached call averageAggregation
         }
@@ -171,7 +181,7 @@ contract AggregatorContract {
         // which ever is greater pass to call deliverVoteResponse in true(correct) then false(incorrect) order
         if (answers[_requestID].t > answers[_requestID].f) {
             // call
-            require(!(answers[_requestID].f > (answers[_requestID].oracleCounter) / 3), 'too many incorrect nodes');
+            //require(!(answers[_requestID].f > (answers[_requestID].oracleCounter) / 3), 'too many incorrect nodes');
             _result = true; // final result
             // pass in requestID the result, trueOracleResults as the correct field and falseOracleResults as the incorrect
             orc.deliverVoteResponse(_requestID, _result, answers[_requestID].trueOracleResults,
@@ -179,7 +189,7 @@ contract AggregatorContract {
                 answers[_requestID].incorrectRevealOracles);
         } else if (answers[_requestID].f > answers[_requestID].t) {
             // which ever is greater pass to call deliverVoteResponse in false(correct) then true(incorrect) order
-            require(!(answers[_requestID].t > (answers[_requestID].oracleCounter) / 3), 'too many incorrect nodes');
+            //require(!(answers[_requestID].t > (answers[_requestID].oracleCounter) / 3), 'too many incorrect nodes');
             _result = false;
             // pass in requestID the result, falseOracleResults as the correct field and trueOracleResults as the incorrect
             orc.deliverVoteResponse(_requestID, _result,
@@ -269,10 +279,12 @@ contract AggregatorContract {
     }
 
     function getUnRespondedCommitOracles(uint256 _requestID) onlyORC() external returns(address[] memory){
+        emit LogNumOr(answers[_requestID].oracleCounter, "len in un-respond call");
+        for (uint i = 0; i < orc.getNumberOfOracles(_requestID); i++) {
+            address orcAdd = answers[_requestID].oracleList[i];
 
-        for (uint i = 0; i < answers[_requestID].oracleCounter; i++) {
-            address orcAdd = answers[_requestID].oracleAddresses[i];
             if (answers[_requestID].oracleHasSubmittedCommit[orcAdd] == false){
+                emit PrintAddress(orcAdd, "address of un-responded oracle node");
                 answers[_requestID].unRespondedOracles.push(orcAdd);
             }
         }
@@ -280,7 +292,7 @@ contract AggregatorContract {
     }
 
     function getUnRespondedRevealOracles(uint256 _requestID) onlyORC() external returns(address[] memory){
-        for (uint i = 0; i < answers[_requestID].oracleCounter; i++) {
+        for (uint i = 0; i < orc.getNumberOfOracles(_requestID); i++) {
             address orcAdd = answers[_requestID].oracleAddresses[i];
             if (answers[_requestID].oracleHasSubmittedReveal[orcAdd] == false){
                 answers[_requestID].unRespondedOracles.push(orcAdd);
@@ -291,13 +303,14 @@ contract AggregatorContract {
 
     function forceCommitsPlaced(uint _requestID) onlyORC() external returns(bool) {
         answers[_requestID].commitsFlag = 1;
-        emit CommitsPlaced(_requestID, "commits are placed");
+        answers[_requestID].oracleCounter = 0;
+        emit CommitsPlaced(_requestID, "Force commits are placed");
         return true;
     }
 
     function forceRevealsPlaced(uint _requestID , uint256 _aggregationType ) onlyORC() external returns(bool) {
         answers[_requestID].revealsFlag = 1;
-        emit RevealsPlaced(_requestID, "All reveals have been placed");
+        emit RevealsPlaced(_requestID, "Force reveals have been placed");
         if (_aggregationType == 1) {
             voteAggregation(_requestID);
         } else if (_aggregationType == 2) {

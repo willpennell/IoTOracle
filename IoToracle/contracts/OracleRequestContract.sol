@@ -42,7 +42,7 @@ contract OracleRequestContract {
         //bytes requiredResult; // left this out for security reason, we only apply it to the hash
         uint32 numberOfOracles; // number of oracles needed to fetch the data
         mapping (address => bool) oraclesForRequest; // must be true in order for oracle node to participate
-        mapping (uint32 => address) oracleAddressAccess; // mapping so we can iterate through addresses
+        address[] oracleAddressAccess; // mapping so we can iterate through addresses
         uint256 aggregationType;
         uint32 oracleCounter; // index and counter for the number of oracles
         Status status; // status of the request
@@ -64,6 +64,10 @@ contract OracleRequestContract {
     event FinalResultLog(bool, string);
     event FinalInt(int256, string);
     event UpdateTimestamp(uint256, uint256, uint256);
+    event LogNumberOfOracles(uint, string);
+    event PrintAddress(address);
+    event PrintAddresses(address[]);
+    event LogTimeOutLen(uint, string);
     // ***payments***
     uint GAS_PRICE = 2 * 10**10; // cost of gas
     uint FEE = GAS_PRICE * 3; // fee to cover other function calls and pay each oracle
@@ -168,12 +172,16 @@ contract OracleRequestContract {
     {
         // call get un-responded nodes
         address[] memory unRespondedNodes = AggregatorContract(aggregatorAddr).getUnRespondedCommitOracles(_requestID);
+        emit LogTimeOutLen(unRespondedNodes.length, "unRespondedNodes list len");
         for (uint i=0; i<unRespondedNodes.length; i++) {
             timings[_requestID].timedOutOracles.push(unRespondedNodes[i]);
         }
+        emit LogTimeOutLen(timings[_requestID].timedOutOracles.length, "len of timeout oracle list");
+        emit PrintAddresses(unRespondedNodes);
         timings[_requestID].timestamp = block.timestamp; // reset timestamp
         timings[_requestID].elapsedTime = 150; // allow for 2.5 min send a reveal message
         emit UpdateTimestamp(_requestID, timings[_requestID].timestamp, timings[_requestID].elapsedTime);
+        emit LogNumberOfOracles(timings[_requestID].timedOutOracles.length, "number oracles in timeout");
         AggregatorContract(aggregatorAddr).forceCommitsPlaced(_requestID);
     }
 
@@ -186,6 +194,7 @@ contract OracleRequestContract {
         for (uint i=0; i<unRespondedNodes.length; i++) {
             timings[_requestID].timedOutOracles.push(unRespondedNodes[i]);
         }
+
         AggregatorContract(aggregatorAddr).forceRevealsPlaced(_requestID, requests[_requestID].aggregationType);
     }
 
@@ -216,7 +225,7 @@ contract OracleRequestContract {
     returns(bool)
     {
         requests[_requestID].oraclesForRequest[msg.sender] = true; // add true for oracle in request so we know they can vote
-        requests[_requestID].oracleAddressAccess[requests[_requestID].oracleCounter] = address(msg.sender); // map addr for iteration
+        requests[_requestID].oracleAddressAccess.push(msg.sender) ; // map addr for iteration
         requests[_requestID].oracleCounter++; // increment the counter
         emit BidPlaced(msg.sender); // send message to network that a bid has been placed
         if (requests[_requestID].numberOfOracles == requests[_requestID].oracleCounter) {
@@ -252,10 +261,11 @@ contract OracleRequestContract {
         uint slashedRewards = 0; //pay honest nodes fees from the slashing
         // pay fees
         for (uint i=0; i<timings[_requestID].timedOutOracles.length; i++) {
-            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
-            stakeBalance[_incorrectOracles[i]] -= penalty;
+            emit PrintAddress(timings[_requestID].timedOutOracles[i]);
+            uint penalty = ReputationContract(reputationAddr).getPenaltyFee(timings[_requestID].timedOutOracles[i]);
+            stakeBalance[timings[_requestID].timedOutOracles[i]] -= penalty;
             slashedRewards += penalty;
-            ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
+            ReputationContract(reputationAddr).incrementRating(timings[_requestID].timedOutOracles[i]);
         }
         // add penalties and slash dishonest nodes stake
         for (uint i=0; i<_incorrectOracles.length; i++){
@@ -425,6 +435,14 @@ contract OracleRequestContract {
         return requests[_requestID].numberOfOracles;
     }
 
+    function getTimeoutOracleLength(uint256 _requestID) external view onlyAggregator() returns(uint32) {
+        return uint32(timings[_requestID].timedOutOracles.length);
+    }
+
+    function getOracleAddresses(uint256 _requestID) external onlyAggregator() returns(address[] memory) {
+        return requests[_requestID].oracleAddressAccess;
+    }
+
     function getDataType(
         uint256 _requestID)
     external
@@ -549,7 +567,7 @@ contract OracleRequestContract {
         _;
     }
     modifier timeHasElapsed(uint _requestID, uint elapsedTime) {
-        require((timings[_requestID].timestamp + elapsedTime) > block.timestamp );
+        require((timings[_requestID].timestamp + elapsedTime) < block.timestamp );
         _;
     }
     modifier onlySubmittedCommitsOracles(uint256 _requestID) {
