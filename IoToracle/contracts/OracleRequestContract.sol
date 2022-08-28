@@ -56,7 +56,7 @@ contract OracleRequestContract {
     event OpenForBids(uint256, bytes, uint256, uint, uint); // tells oracle nodes there is a request that needs bidding on
     event BidPlaced(address); // tells nodes that a bid has been placed by another node
     event ReleaseRequestDetails(uint256, bytes, bytes); // the details the node needs to gather
-    event StatusChange(Status, string); // tells nodes in network of status change of requests
+    event StatusChange(uint256, Status, string); // tells nodes in network of status change of requests
     event OracleJoined(address, string); // tells network that a new oracle has joined the network
     event OracleLeft(address, string); // tells the network that another oracle has left
     event OraclePaid(address, uint, string); // tells the network when an oracle has been paid for its services
@@ -156,7 +156,7 @@ contract OracleRequestContract {
         requests[requestID].cancelFlag = 0;
         requests[requestID].fee = msg.value; // keeps track of the fee for the request
         requests[requestID].aggregationType = _aggregationType;
-        emit StatusChange(requests[requestID].status, "PENDING"); // tells nodes in network of status change of requests
+        emit StatusChange(requestID, requests[requestID].status, "PENDING"); // tells nodes in network of status change of requests
         // increment requestId ready for next create request function.
         requestCounter++;
         pendingCounter++;
@@ -207,7 +207,7 @@ contract OracleRequestContract {
         payable(requests[_requestID].requester).transfer(requests[_requestID].fee);
         AggregatorContract(aggregatorAddr).cancelRequest(_requestID);
         requests[_requestID].status = Status.CANCELLED;
-        emit StatusChange(requests[_requestID].status, "CANCELLED");
+        emit StatusChange(_requestID, requests[_requestID].status, "CANCELLED");
     }
 
     // @notice off-chain oracle node places bid to fetch data, once threshold is reached, emits event details.
@@ -295,7 +295,7 @@ contract OracleRequestContract {
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete
         completedRequests[_requestID] = true; // add request id to completedRequests
-        emit StatusChange(requests[_requestID].status, "COMPLETE"); // tell listeners that the status has changed
+        emit StatusChange(_requestID, requests[_requestID].status, "COMPLETE"); // tell listeners that the status has changed
         pendingCounter--; // no longer pending so countered can be decremented
         return true; // return true to so it has finished
     }
@@ -334,7 +334,7 @@ contract OracleRequestContract {
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete
         completedRequests[_requestID] = true; // add request id to completedRequests
-        emit StatusChange(requests[_requestID].status, "COMPLETE"); // tell listeners that the status has changed
+        emit StatusChange(_requestID, requests[_requestID].status, "COMPLETE"); // tell listeners that the status has changed
         pendingCounter--; // no longer pending so countered can be decremented
         return true; // return true to so it has finished
     }
@@ -349,7 +349,7 @@ contract OracleRequestContract {
     {
         requests[_requestID].cancelFlag = 1; // changes flag to 1, if 1 it will not pass other functions
         requests[_requestID].status = Status.CANCELLED; // status changed
-        emit StatusChange(requests[_requestID].status, "CANCELLED");
+        emit StatusChange(_requestID, requests[_requestID].status, "CANCELLED");
         AggregatorContract(aggregatorAddr).cancelRequest(_requestID); // call cancelled request in AggregatorContract
         return true;
     }
@@ -377,7 +377,7 @@ contract OracleRequestContract {
             ReputationContract(reputationAddr).incrementRating(_incorrectOracleReveals[i]);
         }
         payable(requests[_requestID].requester).transfer(requests[_requestID].fee);
-        emit StatusChange(requests[_requestID].status, "CANCELLED");
+        emit StatusChange(_requestID, requests[_requestID].status, "CANCELLED");
         return true;
     }
     // @notice blacklist oracle that misbehaves 10
@@ -439,7 +439,7 @@ contract OracleRequestContract {
         return uint32(timings[_requestID].timedOutOracles.length);
     }
 
-    function getOracleAddresses(uint256 _requestID) external onlyAggregator() returns(address[] memory) {
+    function getOracleAddresses(uint256 _requestID) external view onlyAggregator() returns(address[] memory) {
         return requests[_requestID].oracleAddressAccess;
     }
 

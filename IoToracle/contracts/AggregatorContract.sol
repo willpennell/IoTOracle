@@ -293,7 +293,7 @@ contract AggregatorContract {
 
     function getUnRespondedRevealOracles(uint256 _requestID) onlyORC() external returns(address[] memory){
         for (uint i = 0; i < orc.getNumberOfOracles(_requestID); i++) {
-            address orcAdd = answers[_requestID].oracleAddresses[i];
+            address orcAdd = answers[_requestID].oracleList[i];
             if (answers[_requestID].oracleHasSubmittedReveal[orcAdd] == false){
                 answers[_requestID].unRespondedOracles.push(orcAdd);
             }

@@ -75,8 +75,9 @@ func BIDPLACEDMEASSGE(eventBidPlaced *abi.OracleRequestContractBidPlaced) {
 func STATUSCHANGEMESSAGE(eventStatusChange *abi.OracleRequestContractStatusChange) {
 	color.Green("--------------------NEW STATUS---------------------")
 	color.Red("Request Status Change:\n")
-	color.Red("Status Code: %v\n", eventStatusChange.Arg0)
-	color.Red("TO: %v\n", eventStatusChange.Arg1)
+	color.Red("Request ID: %v\n", eventStatusChange.Arg0)
+	color.Red("Status Code: %v\n", eventStatusChange.Arg1)
+	color.Red("TO: %v\n", eventStatusChange.Arg2)
 	REQUESTLINE()
 }
 

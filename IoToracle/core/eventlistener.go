@@ -13,6 +13,7 @@ import (
 	"log"
 	"math/big"
 	"sync"
+	"time"
 )
 
 // ***TODOList*** (not yet needed)
@@ -33,7 +34,7 @@ func SubscribeToOracleRequestContractEvents(client *ethclient.Client,
 	go EventReleaseRequestDetails(client, &w, nodeInfo) // go routine for event that
 	// emits request details for nodes to fetch
 	go EventOraclePaid(client, &w) // go routine for paying oracles
-	go EventUpdateTimestamp(client, &w)
+	go EventUpdateTimestamp(client, &w, nodeInfo)
 	w.Wait() // waits indefinitely as these events are persistent
 }
 
@@ -70,14 +71,12 @@ func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo uti
 			utils.Requests[id].Status = 1 // change status to 1 to show this request is pending
 			utils.SaveRequestJson()
 
-			go utils.StampTimer(id, utils.Requests[id].Timestamp, utils.Requests[id].ElapsedTime)
+			go utils.StampTimer(id, utils.Requests[id].Timestamp, utils.Requests[id].ElapsedTime, client, nodeInfo)
 			//time.Sleep(time.Second)
 			// call tx function to send to orc contract and place bid
-			tx, err := utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
-			if err != nil {
-				log.Fatal(err)
-			}
-			utils.PRINTTXHASH(tx) // prints hash of tx
+			utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
+			//go EventReleaseRequestDetails(client, wg, nodeInfo)
+			//utils.PRINTTXHASH(tx) // prints hash of tx
 		}
 	}
 }
@@ -115,6 +114,7 @@ func EventBidPlaced(client *ethclient.Client, wg *sync.WaitGroup) {
 // EventReleaseRequestDetails subscribe to ReleaseRequestDetails
 func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
+
 	// creates a new orc contract instance that we can interact with
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
 	if err != nil {
@@ -136,26 +136,37 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventReleaseRequestDetails := <-channelReleaseRequestDetails:
-			id := eventReleaseRequestDetails.Arg0.Uint64()       // converts id to uint64
-			utils.AddIoTIDToRequests(eventReleaseRequestDetails) // adds IoTID to Requests map
-			utils.SaveRequestJson()
-			utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails) // prints message
-			// call fetch to IoT
-			utils.FetchIoTData(eventReleaseRequestDetails, id) // function to call MQTT broker
-			// need to convert the result to hex
-			utils.SaveRequestJson()
-			// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
-			// TODO change to commitResponse
-			utils.TxCommitResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, utils.Requests[id].CommitHash)
-			utils.Requests[id].AppealFlag = 1
-			utils.SaveRequestJson()
-			// utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.Hex2Bytes(hexedBytes))
+			time.Sleep(time.Second * 2)
+			id := eventReleaseRequestDetails.Arg0.Uint64() // converts id to uint64
+			if utils.Requests[id].Status == 1 {
+				utils.AddIoTIDToRequests(eventReleaseRequestDetails) // adds IoTID to Requests map
+				utils.SaveRequestJson()
+				utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails) // prints message
+				// call fetch to IoT
+				//time.Sleep(time.Second * 10)
+				utils.FetchIoTData(eventReleaseRequestDetails, id) // function to call MQTT broker
+				// need to convert the result to hex
+				utils.SaveRequestJson()
+				// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
+				// TODO change to commitResponse
+				txBool := utils.TxCommitResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, utils.Requests[id].CommitHash)
+				if txBool == true {
+					utils.Requests[id].CommitFlag = 1
+					utils.Requests[id].AppealFlag = 1
+					utils.SaveRequestJson()
+				}
+
+				// utils.TxReceiveResponse(client, nodeInfo, big.NewInt(int64(id)), common.
+			} else {
+				fmt.Println("Unlucky, didnt win bid for this request..")
+			}
+
 		}
 	}
 }
 
 // EventUpdateTimestamp subscribe to UpdateTimestamp
-func EventUpdateTimestamp(client *ethclient.Client, wg *sync.WaitGroup) {
+func EventUpdateTimestamp(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo utils.OracleNodeInfo) {
 	defer wg.Done()
 	// creates a new orc contract instance that we can interact with
 	orcInstance, err := abi.NewOracleRequestContract(c.ORACLEREQUESTCONTRACTADDRESS, client)
@@ -183,7 +194,7 @@ func EventUpdateTimestamp(client *ethclient.Client, wg *sync.WaitGroup) {
 			utils.Requests[id].Timestamp = newTimestamp
 			utils.Requests[id].ElapsedTime = newElapsedTime
 			utils.SaveRequestJson()
-			go utils.StampTimer(id, utils.Requests[id].Timestamp, utils.Requests[id].ElapsedTime)
+			go utils.StampTimer(id, utils.Requests[id].Timestamp, utils.Requests[id].ElapsedTime, client, nodeInfo)
 		}
 	}
 	// Receive events from the channel
@@ -214,6 +225,14 @@ func EventStatusChange(client *ethclient.Client, wg *sync.WaitGroup) {
 			log.Fatal(err)
 		case eventStatusChange := <-channelStatusChange:
 			utils.STATUSCHANGEMESSAGE(eventStatusChange) // prints status change message
+			id := eventStatusChange.Arg0.Uint64()
+			//if eventStatusChange.Arg1 == 0 {
+			//	utils.Requests[id].Status = 1
+			//} else
+			if eventStatusChange.Arg1 == 1 {
+				utils.Requests[id].Status = 2
+			}
+			utils.SaveRequestJson()
 		}
 	}
 }
@@ -284,22 +303,36 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 		case err := <-sub.Err():
 			log.Fatal(err)
 		case eventCommitsPlaced := <-channelCommitsPlaced:
-			utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
-			// TODO call reveal tx
+			time.Sleep(time.Second * 2)
 			id := eventCommitsPlaced.Arg0.Uint64()
+			if utils.Requests[id].Status == 1 && utils.Requests[id].CommitFlag == 1 {
+				utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
+				// TODO call reveal tx
 
-			if utils.Requests[id].AggregationType == 1 {
-				shaBoolEncode := solsha3.Bool(utils.UnpackBool(utils.Requests[id].IoTResult))
-				utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, shaBoolEncode, utils.Requests[id].Secret)
-			} else if utils.Requests[id].AggregationType == 2 {
-				shaIntEncode := solsha3.Int256(utils.UnpackInt(utils.Requests[id].IoTResult))
-				utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, shaIntEncode, utils.Requests[id].Secret)
+				if utils.Requests[id].AggregationType == 1 {
+					shaBoolEncode := solsha3.Bool(utils.UnpackBool(utils.Requests[id].IoTResult))
+					txBool := utils.TxRevealVoteResponse(client, nodeInfo, eventCommitsPlaced.Arg0, shaBoolEncode, utils.Requests[id].Secret)
+					if txBool == true {
+						utils.Requests[id].RevealFlag = 1
+						utils.SaveRequestJson()
+					}
 
+				} else if utils.Requests[id].AggregationType == 2 {
+					shaIntEncode := solsha3.Int256(utils.UnpackInt(utils.Requests[id].IoTResult))
+					txBool := utils.TxRevealAverageResponse(client, nodeInfo, eventCommitsPlaced.Arg0, shaIntEncode, utils.Requests[id].Secret)
+					if txBool == true {
+						utils.Requests[id].RevealFlag = 1
+						utils.SaveRequestJson()
+					}
+
+				}
+				utils.Requests[id].AppealFlag = 2
+				utils.SaveRequestJson()
+
+				// prints aggregation complete message
+			} else {
+				fmt.Println("Failed to submit reveal.")
 			}
-			utils.Requests[id].AppealFlag = 2
-			utils.SaveRequestJson()
-
-			// prints aggregation complete message
 
 		}
 	}

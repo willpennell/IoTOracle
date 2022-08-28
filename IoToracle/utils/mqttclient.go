@@ -45,8 +45,14 @@ func SetOpts(clientID string) *mqtt.ClientOptions {
 	return opts
 }
 
+var client1 mqtt.Client
+
+func setClient(client mqtt.Client) {
+	client1 = client
+}
+
 // StartMQTTClient connects to MQTT client and subscribes to particular topic
-func StartMQTTClient(topic string, clientID string) []byte {
+func StartMQTTClient(id uint64, topic string, clientID string) []byte {
 	fmt.Println(topic)
 	//defer w.Done()
 	subWait.Add(1)                 // add a counter to global sync.WaitGroup function
@@ -57,9 +63,12 @@ func StartMQTTClient(topic string, clientID string) []byte {
 		panic(token.Error())
 	}
 	// subscription to topic
-	sub(client, topic)     // pass in client and topic to subscribe
-	client.Disconnect(250) // disconnects after 250 milliseconds but sync.Wait() in sub will pause until complete first
-	return packedResult    // returns the message from pub
+	setClient(client)
+	sub(client, topic) // pass in client and topic to subscribe
+	//client.Unsubscribe(topic)
+	var tenSecs uint = 10 * 1000
+	client.Disconnect(uint((Requests[id].ElapsedTime*2)*1000) + tenSecs) // disconnects after 250 milliseconds but sync.Wait() in sub will pause until complete first
+	return packedResult                                                  // returns the message from pub
 }
 
 // sub function that subscribes to MQTT broker at requested topic
@@ -69,4 +78,9 @@ func sub(client mqtt.Client, topic string) {
 	token.Wait()         // waits for a response from publish handler
 	MQTTBROKERSUB(topic) // subscribed to topic
 	subWait.Wait()       // waits for the counter to be decremented in publishHandler callback function
+}
+
+func forceCloseConnection() {
+	fmt.Println("Closing connection, no longer required.")
+	client1.Disconnect(250)
 }

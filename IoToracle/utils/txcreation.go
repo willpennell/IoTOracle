@@ -5,6 +5,7 @@ import (
 	abi "IoToracle/abitogo"
 	c "IoToracle/config"
 	"crypto/ecdsa"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -98,6 +99,7 @@ func TxLeaveOracleNetwork(client *ethclient.Client, info OracleNodeInfo) *types.
 	orcLeaveOracle := OracleRequestContractInstance(client)          // orc contract instance
 	tx, err := orcLeaveOracle.LeaveOracleNetwork(Auth(client, info)) // call LeaveOracleNetwork function
 	if err != nil {
+		fmt.Println("TX Error: leave network")
 		log.Fatal(err)
 	}
 	TXLog(tx)
@@ -105,14 +107,41 @@ func TxLeaveOracleNetwork(client *ethclient.Client, info OracleNodeInfo) *types.
 }
 
 // TxPlaceBid creates tx to  place bid on request
-func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) (*types.Transaction, error) {
+func TxPlaceBid(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) bool {
 	orcPLaceBid := OracleRequestContractInstance(client)           // orc contract instance
 	tx, err := orcPLaceBid.PlaceBid(Auth(client, info), requestID) // call PlaceBid function
 	if err != nil {
-		log.Fatal(err)
+		Requests[requestID.Uint64()].Status = 2
+		SaveRequestJson()
+		return false
 	}
+
 	TXLog(tx)
-	return tx, nil // return tx types.Transaction and error value
+	return true // return tx types.Transaction and error value
+}
+
+func TXtimeoutCommitsAppeal(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) bool {
+	orcTimeoutCommitsAppeal := OracleRequestContractInstance(client)
+	tx, err := orcTimeoutCommitsAppeal.TimeoutCommitsAppeal(Auth(client, info), requestID)
+	if err != nil {
+		fmt.Println("Another oracle placed the commit appeal..")
+		return false
+	}
+	fmt.Println("commit appeal placed...")
+	TXLog(tx)
+	return true
+}
+
+func TXtimeoutRevealsAppeal(client *ethclient.Client, info OracleNodeInfo, requestID *big.Int) bool {
+	orcTimeoutRevealAppeal := OracleRequestContractInstance(client)
+	tx, err := orcTimeoutRevealAppeal.TimeoutRevealsAppeal(Auth(client, info), requestID)
+	if err != nil {
+		fmt.Println("Another oracle placed the reveal appeal")
+		return false
+	}
+	fmt.Println("reveal appeal placed...")
+	TXLog(tx)
+	return true
 }
 
 // ****AggregatorContract****
@@ -130,39 +159,43 @@ func AggregatorContractInstance(client *ethclient.Client) *abi.AggregatorContrac
 // TxCommitResponse generate tx to send result fetched to commit
 func TxCommitResponse(client *ethclient.Client, info OracleNodeInfo,
 	requestID *big.Int,
-	commitHash [32]byte) *types.Transaction {
+	commitHash [32]byte) bool {
 	aggCommitResponse := AggregatorContractInstance(client)                                // Aggregator contract instance
 	tx, err := aggCommitResponse.CommitResponse(Auth(client, info), requestID, commitHash) // call commitResponse function in Aggregator contract
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Cannot place commit, you make have been unresponsive..")
+		return false
 	}
+	fmt.Println("Commit placed, thanks!")
 	TXLog(tx)
-	return tx // return tx types.Transaction
+	return true // return tx types.Transaction
 
 }
 
 func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
-	requestID *big.Int, ioTresult []byte, secret []byte) *types.Transaction {
+	requestID *big.Int, ioTresult []byte, secret []byte) bool {
 	aggRevealVoteResponse := AggregatorContractInstance(client)
 	tx, err := aggRevealVoteResponse.RevealVoteResponse(Auth(client, info), requestID, ioTresult, secret)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println("Cannot place Vote Response")
+		return false
 	}
+	fmt.Println("Reveal placed, thanks!")
 	TXLog(tx)
-	return tx
+	return true
 }
 
 func TxRevealAverageResponse(client *ethclient.Client, info OracleNodeInfo,
-	requestID *big.Int, ioTresult []byte, secret []byte) *types.Transaction {
+	requestID *big.Int, ioTresult []byte, secret []byte) bool {
 	aggRevealAverageResponse := AggregatorContractInstance(client)
 	tx, err := aggRevealAverageResponse.RevealAverageResponse(Auth(client, info),
 		requestID, ioTresult, secret)
 	if err != nil {
-
-		log.Fatal(err)
+		fmt.Println("Cannot place reveal for this request..")
+		return false
 	}
 	TXLog(tx)
-	return tx
+	return true
 }
 
 // ***ToDoList***

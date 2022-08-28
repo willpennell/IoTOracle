@@ -23,6 +23,8 @@ type Request struct {
 	Timestamp        int64
 	ElapsedTime      int64
 	AppealFlag       uint8
+	CommitFlag       uint8
+	RevealFlag       uint8
 }
 
 // RequestsSingleton map of ids and Request structs

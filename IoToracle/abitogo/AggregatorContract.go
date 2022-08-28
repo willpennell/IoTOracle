@@ -30,7 +30,7 @@ var (
 
 // AggregatorContractMetaData contains all meta data concerning the AggregatorContract contract.
 var AggregatorContractMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"CommitsPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"name\":\"LogInt\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"Logging\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"RevealsPlaced\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"t\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"f\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commitsFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revealsFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_commitHash\",\"type\":\"bytes32\"}],\"name\":\"commitResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeBool\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"b\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeInt\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"i\",\"type\":\"int256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"forceCommitsPlaced\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_aggregationType\",\"type\":\"uint256\"}],\"name\":\"forceRevealsPlaced\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getCommitFlag\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_oracleAddr\",\"type\":\"address\"}],\"name\":\"getOracleHasSubmittedCommit\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_oracleAddr\",\"type\":\"address\"}],\"name\":\"getOracleHasSubmittedReveal\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getRevealFlag\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getUnRespondedCommitOracles\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getUnRespondedRevealOracles\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealAverageResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealVoteResponse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_addr\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AddressLogging\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"AggregationCompleted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"CommitsPlaced\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"name\":\"LogBool\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"},{\"indexed\":false,\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"name\":\"LogHashes\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"int256\",\"name\":\"\",\"type\":\"int256\"}],\"name\":\"LogInt\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"LogNumOr\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"Logging\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"PrintAddress\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"name\":\"RevealsPlaced\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"answers\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"dataType\",\"type\":\"bytes\"},{\"internalType\":\"uint256\",\"name\":\"oracleCounter\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"t\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"f\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"cancelFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"commitsFlag\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"revealsFlag\",\"type\":\"uint256\"},{\"internalType\":\"bool\",\"name\":\"lastOracle\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"cancelRequest\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes32\",\"name\":\"_commitHash\",\"type\":\"bytes32\"}],\"name\":\"commitResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeBool\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"b\",\"type\":\"bool\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"name\":\"decodeInt\",\"outputs\":[{\"internalType\":\"int256\",\"name\":\"i\",\"type\":\"int256\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"forceCommitsPlaced\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"_aggregationType\",\"type\":\"uint256\"}],\"name\":\"forceRevealsPlaced\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getCommitFlag\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_oracleAddr\",\"type\":\"address\"}],\"name\":\"getOracleHasSubmittedCommit\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"_oracleAddr\",\"type\":\"address\"}],\"name\":\"getOracleHasSubmittedReveal\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getRevealFlag\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getUnRespondedCommitOracles\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"}],\"name\":\"getUnRespondedRevealOracles\",\"outputs\":[{\"internalType\":\"address[]\",\"name\":\"\",\"type\":\"address[]\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealAverageResponse\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"_requestID\",\"type\":\"uint256\"},{\"internalType\":\"bytes\",\"name\":\"_result\",\"type\":\"bytes\"},{\"internalType\":\"bytes\",\"name\":\"_secret\",\"type\":\"bytes\"}],\"name\":\"revealVoteResponse\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // AggregatorContractABI is the input ABI used to generate the binding from.
@@ -642,6 +642,141 @@ func (_AggregatorContract *AggregatorContractSession) RevealVoteResponse(_reques
 // Solidity: function revealVoteResponse(uint256 _requestID, bytes _result, bytes _secret) returns()
 func (_AggregatorContract *AggregatorContractTransactorSession) RevealVoteResponse(_requestID *big.Int, _result []byte, _secret []byte) (*types.Transaction, error) {
 	return _AggregatorContract.Contract.RevealVoteResponse(&_AggregatorContract.TransactOpts, _requestID, _result, _secret)
+}
+
+// AggregatorContractAddressLoggingIterator is returned from FilterAddressLogging and is used to iterate over the raw logs and unpacked data for AddressLogging events raised by the AggregatorContract contract.
+type AggregatorContractAddressLoggingIterator struct {
+	Event *AggregatorContractAddressLogging // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *AggregatorContractAddressLoggingIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(AggregatorContractAddressLogging)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(AggregatorContractAddressLogging)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *AggregatorContractAddressLoggingIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *AggregatorContractAddressLoggingIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// AggregatorContractAddressLogging represents a AddressLogging event raised by the AggregatorContract contract.
+type AggregatorContractAddressLogging struct {
+	Arg0 common.Address
+	Arg1 string
+	Raw  types.Log // Blockchain specific contextual infos
+}
+
+// FilterAddressLogging is a free log retrieval operation binding the contract event 0xcebe62229293f3221e09170f6939e08a8a24f881105fbcd32f9413cd2b1d2a4c.
+//
+// Solidity: event AddressLogging(address arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) FilterAddressLogging(opts *bind.FilterOpts) (*AggregatorContractAddressLoggingIterator, error) {
+
+	logs, sub, err := _AggregatorContract.contract.FilterLogs(opts, "AddressLogging")
+	if err != nil {
+		return nil, err
+	}
+	return &AggregatorContractAddressLoggingIterator{contract: _AggregatorContract.contract, event: "AddressLogging", logs: logs, sub: sub}, nil
+}
+
+// WatchAddressLogging is a free log subscription operation binding the contract event 0xcebe62229293f3221e09170f6939e08a8a24f881105fbcd32f9413cd2b1d2a4c.
+//
+// Solidity: event AddressLogging(address arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) WatchAddressLogging(opts *bind.WatchOpts, sink chan<- *AggregatorContractAddressLogging) (event.Subscription, error) {
+
+	logs, sub, err := _AggregatorContract.contract.WatchLogs(opts, "AddressLogging")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(AggregatorContractAddressLogging)
+				if err := _AggregatorContract.contract.UnpackLog(event, "AddressLogging", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseAddressLogging is a log parse operation binding the contract event 0xcebe62229293f3221e09170f6939e08a8a24f881105fbcd32f9413cd2b1d2a4c.
+//
+// Solidity: event AddressLogging(address arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) ParseAddressLogging(log types.Log) (*AggregatorContractAddressLogging, error) {
+	event := new(AggregatorContractAddressLogging)
+	if err := _AggregatorContract.contract.UnpackLog(event, "AddressLogging", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
 }
 
 // AggregatorContractAggregationCompletedIterator is returned from FilterAggregationCompleted and is used to iterate over the raw logs and unpacked data for AggregationCompleted events raised by the AggregatorContract contract.
@@ -1317,6 +1452,141 @@ func (_AggregatorContract *AggregatorContractFilterer) ParseLogInt(log types.Log
 	return event, nil
 }
 
+// AggregatorContractLogNumOrIterator is returned from FilterLogNumOr and is used to iterate over the raw logs and unpacked data for LogNumOr events raised by the AggregatorContract contract.
+type AggregatorContractLogNumOrIterator struct {
+	Event *AggregatorContractLogNumOr // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *AggregatorContractLogNumOrIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(AggregatorContractLogNumOr)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(AggregatorContractLogNumOr)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *AggregatorContractLogNumOrIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *AggregatorContractLogNumOrIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// AggregatorContractLogNumOr represents a LogNumOr event raised by the AggregatorContract contract.
+type AggregatorContractLogNumOr struct {
+	Arg0 *big.Int
+	Arg1 string
+	Raw  types.Log // Blockchain specific contextual infos
+}
+
+// FilterLogNumOr is a free log retrieval operation binding the contract event 0x9dc8a8cab78f19e344d97e9a17a1655efc8d43e96b22a82d74f8199c70d142eb.
+//
+// Solidity: event LogNumOr(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) FilterLogNumOr(opts *bind.FilterOpts) (*AggregatorContractLogNumOrIterator, error) {
+
+	logs, sub, err := _AggregatorContract.contract.FilterLogs(opts, "LogNumOr")
+	if err != nil {
+		return nil, err
+	}
+	return &AggregatorContractLogNumOrIterator{contract: _AggregatorContract.contract, event: "LogNumOr", logs: logs, sub: sub}, nil
+}
+
+// WatchLogNumOr is a free log subscription operation binding the contract event 0x9dc8a8cab78f19e344d97e9a17a1655efc8d43e96b22a82d74f8199c70d142eb.
+//
+// Solidity: event LogNumOr(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) WatchLogNumOr(opts *bind.WatchOpts, sink chan<- *AggregatorContractLogNumOr) (event.Subscription, error) {
+
+	logs, sub, err := _AggregatorContract.contract.WatchLogs(opts, "LogNumOr")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(AggregatorContractLogNumOr)
+				if err := _AggregatorContract.contract.UnpackLog(event, "LogNumOr", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParseLogNumOr is a log parse operation binding the contract event 0x9dc8a8cab78f19e344d97e9a17a1655efc8d43e96b22a82d74f8199c70d142eb.
+//
+// Solidity: event LogNumOr(uint256 arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) ParseLogNumOr(log types.Log) (*AggregatorContractLogNumOr, error) {
+	event := new(AggregatorContractLogNumOr)
+	if err := _AggregatorContract.contract.UnpackLog(event, "LogNumOr", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
 // AggregatorContractLoggingIterator is returned from FilterLogging and is used to iterate over the raw logs and unpacked data for Logging events raised by the AggregatorContract contract.
 type AggregatorContractLoggingIterator struct {
 	Event *AggregatorContractLogging // Event containing the contract specifics and raw log
@@ -1445,6 +1715,141 @@ func (_AggregatorContract *AggregatorContractFilterer) WatchLogging(opts *bind.W
 func (_AggregatorContract *AggregatorContractFilterer) ParseLogging(log types.Log) (*AggregatorContractLogging, error) {
 	event := new(AggregatorContractLogging)
 	if err := _AggregatorContract.contract.UnpackLog(event, "Logging", log); err != nil {
+		return nil, err
+	}
+	event.Raw = log
+	return event, nil
+}
+
+// AggregatorContractPrintAddressIterator is returned from FilterPrintAddress and is used to iterate over the raw logs and unpacked data for PrintAddress events raised by the AggregatorContract contract.
+type AggregatorContractPrintAddressIterator struct {
+	Event *AggregatorContractPrintAddress // Event containing the contract specifics and raw log
+
+	contract *bind.BoundContract // Generic contract to use for unpacking event data
+	event    string              // Event name to use for unpacking event data
+
+	logs chan types.Log        // Log channel receiving the found contract events
+	sub  ethereum.Subscription // Subscription for errors, completion and termination
+	done bool                  // Whether the subscription completed delivering logs
+	fail error                 // Occurred error to stop iteration
+}
+
+// Next advances the iterator to the subsequent event, returning whether there
+// are any more events found. In case of a retrieval or parsing error, false is
+// returned and Error() can be queried for the exact failure.
+func (it *AggregatorContractPrintAddressIterator) Next() bool {
+	// If the iterator failed, stop iterating
+	if it.fail != nil {
+		return false
+	}
+	// If the iterator completed, deliver directly whatever's available
+	if it.done {
+		select {
+		case log := <-it.logs:
+			it.Event = new(AggregatorContractPrintAddress)
+			if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+				it.fail = err
+				return false
+			}
+			it.Event.Raw = log
+			return true
+
+		default:
+			return false
+		}
+	}
+	// Iterator still in progress, wait for either a data or an error event
+	select {
+	case log := <-it.logs:
+		it.Event = new(AggregatorContractPrintAddress)
+		if err := it.contract.UnpackLog(it.Event, it.event, log); err != nil {
+			it.fail = err
+			return false
+		}
+		it.Event.Raw = log
+		return true
+
+	case err := <-it.sub.Err():
+		it.done = true
+		it.fail = err
+		return it.Next()
+	}
+}
+
+// Error returns any retrieval or parsing error occurred during filtering.
+func (it *AggregatorContractPrintAddressIterator) Error() error {
+	return it.fail
+}
+
+// Close terminates the iteration process, releasing any pending underlying
+// resources.
+func (it *AggregatorContractPrintAddressIterator) Close() error {
+	it.sub.Unsubscribe()
+	return nil
+}
+
+// AggregatorContractPrintAddress represents a PrintAddress event raised by the AggregatorContract contract.
+type AggregatorContractPrintAddress struct {
+	Arg0 common.Address
+	Arg1 string
+	Raw  types.Log // Blockchain specific contextual infos
+}
+
+// FilterPrintAddress is a free log retrieval operation binding the contract event 0x530a3977f28343b356cd4d1f0b8b03c9b0bb4968bdf81b0f1d85ced49176e97b.
+//
+// Solidity: event PrintAddress(address arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) FilterPrintAddress(opts *bind.FilterOpts) (*AggregatorContractPrintAddressIterator, error) {
+
+	logs, sub, err := _AggregatorContract.contract.FilterLogs(opts, "PrintAddress")
+	if err != nil {
+		return nil, err
+	}
+	return &AggregatorContractPrintAddressIterator{contract: _AggregatorContract.contract, event: "PrintAddress", logs: logs, sub: sub}, nil
+}
+
+// WatchPrintAddress is a free log subscription operation binding the contract event 0x530a3977f28343b356cd4d1f0b8b03c9b0bb4968bdf81b0f1d85ced49176e97b.
+//
+// Solidity: event PrintAddress(address arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) WatchPrintAddress(opts *bind.WatchOpts, sink chan<- *AggregatorContractPrintAddress) (event.Subscription, error) {
+
+	logs, sub, err := _AggregatorContract.contract.WatchLogs(opts, "PrintAddress")
+	if err != nil {
+		return nil, err
+	}
+	return event.NewSubscription(func(quit <-chan struct{}) error {
+		defer sub.Unsubscribe()
+		for {
+			select {
+			case log := <-logs:
+				// New log arrived, parse the event and forward to the user
+				event := new(AggregatorContractPrintAddress)
+				if err := _AggregatorContract.contract.UnpackLog(event, "PrintAddress", log); err != nil {
+					return err
+				}
+				event.Raw = log
+
+				select {
+				case sink <- event:
+				case err := <-sub.Err():
+					return err
+				case <-quit:
+					return nil
+				}
+			case err := <-sub.Err():
+				return err
+			case <-quit:
+				return nil
+			}
+		}
+	}), nil
+}
+
+// ParsePrintAddress is a log parse operation binding the contract event 0x530a3977f28343b356cd4d1f0b8b03c9b0bb4968bdf81b0f1d85ced49176e97b.
+//
+// Solidity: event PrintAddress(address arg0, string arg1)
+func (_AggregatorContract *AggregatorContractFilterer) ParsePrintAddress(log types.Log) (*AggregatorContractPrintAddress, error) {
+	event := new(AggregatorContractPrintAddress)
+	if err := _AggregatorContract.contract.UnpackLog(event, "PrintAddress", log); err != nil {
 		return nil, err
 	}
 	event.Raw = log

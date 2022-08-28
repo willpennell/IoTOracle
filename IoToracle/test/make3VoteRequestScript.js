@@ -9,13 +9,13 @@ const callbackFID = Web3.utils.asciiToHex(cbfd)
 const iotid = 'rp41992'
 const iotidEncode = Web3.utils.asciiToHex(iotid)
 // dataType
-const dt = '{"topic": "TEmpSen", "tAfter": 1658686070, "tBefore": 1658858840}'
+const dt = '{"topic": "PIRSensor", "tAfter": 1658686070, "tBefore": 1658858840}'
 const dataTypeEncode = Web3.utils.asciiToHex(dt)
 
 //const dataTypeEncode = Web3.utils.asciiToHex()
 
 
-const aggregationType = 2;
+const aggregationType = 1;
 
 
 
@@ -38,9 +38,9 @@ const init = async () => {
         callbackFID,
         iotidEncode,
         dataTypeEncode,
-        2,
+        1,
         3,
-        600
+        20
     ).send({from: addr1, gas: 3000000, value: 10**12}).catch((error) => {
         console.log(error)
     });

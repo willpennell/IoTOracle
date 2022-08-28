@@ -11,7 +11,7 @@ func OutstandingRequests(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo 
 	wg.Done()
 	w := sync.WaitGroup{}
 	w.Add(2)
-	clientID := "request_oracle_catch_up"
+	clientID := "request_oracle_catch_up_3"
 	for _, element := range utils.Requests {
 
 		if element.Status == 1 {
