@@ -144,6 +144,7 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 				utils.RELEASEREQUESTDETAILS(eventReleaseRequestDetails) // prints message
 				// call fetch to IoT
 				//time.Sleep(time.Second * 10)
+
 				utils.FetchIoTData(eventReleaseRequestDetails, id) // function to call MQTT broker
 				// need to convert the result to hex
 				utils.SaveRequestJson()

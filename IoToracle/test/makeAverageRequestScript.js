@@ -40,7 +40,7 @@ const init = async () => {
         dataTypeEncode,
         2,
         3,
-        600
+        20
     ).send({from: addr1, gas: 3000000, value: 10**12}).catch((error) => {
         console.log(error)
     });

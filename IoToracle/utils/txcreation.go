@@ -177,6 +177,7 @@ func TxRevealVoteResponse(client *ethclient.Client, info OracleNodeInfo,
 	aggRevealVoteResponse := AggregatorContractInstance(client)
 	tx, err := aggRevealVoteResponse.RevealVoteResponse(Auth(client, info), requestID, ioTresult, secret)
 	if err != nil {
+		fmt.Println(Requests[requestID.Uint64()])
 		fmt.Println("Cannot place Vote Response")
 		return false
 	}

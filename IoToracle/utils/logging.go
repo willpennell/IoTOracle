@@ -15,8 +15,8 @@ func SetUpErrLog() {
 		log.Panic(err)
 	}
 	defer errLogFile.Close()
-	log.SetOutput(errLogFile)
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	//log.SetOutput(errLogFile)
+	//log.SetFlags(log.Lshortfile | log.LstdFlags)
 
 	log.Printf("Oracle Node error logging for address: %v\n", getNodeAddress())
 }

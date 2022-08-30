@@ -25,6 +25,7 @@ type Request struct {
 	AppealFlag       uint8
 	CommitFlag       uint8
 	RevealFlag       uint8
+	//Client           mqtt.Client
 }
 
 // RequestsSingleton map of ids and Request structs
