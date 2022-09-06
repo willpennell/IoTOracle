@@ -280,7 +280,7 @@ contract OracleRequestContract {
 
             uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]); // charge the fee of the request as a penalty
             slashedRewards += penalty;
-            stakeBalance[_incorrectRevealOracles[i]] += penalty; // deducted from oracle stake
+            stakeBalance[_incorrectRevealOracles[i]] -= penalty; // deducted from oracle stake
         }
         uint fee = requests[_requestID].fee / _correctOracles.length;
         uint slashShare = slashedRewards / _correctOracles.length;
