@@ -13,7 +13,7 @@ contract ReputationContract {
     uint constant MIN_RATING = 1;
     uint constant MAX_RATING = 10;
     // penalty fee
-    uint constant PENALTY_FEE = 35000;
+    uint constant PENALTY_FEE = 35 * 10**13;
 
     event OracleBlacklisted(address, string);
 

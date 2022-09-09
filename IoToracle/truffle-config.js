@@ -23,6 +23,7 @@
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
+
 module.exports = {
   /**
    * Networks define how you connect to your ethereum client and let you set the
@@ -44,7 +45,7 @@ module.exports = {
     development: {
      host: "127.0.0.1",     // Localhost (default: none)
      port: 8546,            // Standard Ethereum port (default: none)
-     network_id: "*",       // Any network (default: none)
+     network_id: "5777",       // Any network (default: none)
     },
 
     // An additional network, but with some advanced options…
@@ -56,6 +57,12 @@ module.exports = {
     //   from: <address>,        // Account to send transactions from (default: accounts[0])
     //   websocket: true         // Enable EventEmitter interface for web3 (default: false)
     // },
+    //   rinkeby: {
+    //       provider: () => new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/ddae5e7e94e04f899a5dec97f148110a"),
+    //       network_id: 4,
+    //       gas: 29999972,
+    //       gasPrice: 10000000000,
+    //   }
     //
     // Useful for deploying to a public network.
     // Note: It's important to wrap the provider as a function to ensure truffle uses a new provider every time.

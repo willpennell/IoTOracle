@@ -25,7 +25,7 @@ const aggregationType = 1;
 
 const init = async () => {
     const web3 = new Web3('http://localhost:8546');
-    const addr1 = "0x74A6518D1FAcc2b6C98Bd23dD0C47134d4143EF8"
+    const addr1 = "0x08C20eFB7d749baeF8f6B1Cd6cA88C357a75894C"
     const id = await web3.eth.net.getId();
 
     const deployedNetwork = MyContract.networks[id];

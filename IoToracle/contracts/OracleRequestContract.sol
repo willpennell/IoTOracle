@@ -69,9 +69,11 @@ contract OracleRequestContract {
     event PrintAddresses(address[]);
     event LogTimeOutLen(uint, string);
     // ***payments***
-    uint GAS_PRICE = 2 * 10**10; // cost of gas
-    uint FEE = GAS_PRICE * 3; // fee to cover other function calls and pay each oracle
-    uint MIN_FEE = FEE + (GAS_PRICE * 5); // minimum needed to cover all costs
+    uint GAS_PRICE = 7 * 10**6; // cost of gas
+    uint COST_OF_FUNCTION = GAS_PRICE * 30000; // fee to cover other function calls and pay each oracle
+    uint REWARD = COST_OF_FUNCTION * 500; //make it much of an incentive to carry out request.
+
+    //uint MIN_FEE; // minimum needed to cover all costs
     uint TIMER_ELAPSED_BIDDING = 300;
 
     // @notice constructor when first deployed
@@ -514,10 +516,12 @@ contract OracleRequestContract {
         _;
     }
     // @notice requires the value sent to be >= MIN_FEE set
-    modifier valueGTMinFeeCheck()
+    modifier valueGTMinFeeCheck(uint _numOracles)
     {
         // require msg.value has enough to pay oracles for each function call
-        require(msg.value >= MIN_FEE);
+        // COST_OF_FUNCTION is the average cost for all the calls a node must make
+        // REWARD is significantly high enough in comparison to costs of participating
+        require(msg.value >= (COST_OF_FUNCTION * _numOracles) + (REWARD * _numOracles));
         _;
     }
     // @notice requires an odd number of oracles so voting/aggregation doesnt become deadlocked

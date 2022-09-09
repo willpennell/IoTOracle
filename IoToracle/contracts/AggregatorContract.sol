@@ -30,7 +30,6 @@ contract AggregatorContract {
         uint commitsFlag; // 0 = needing commits still 1 = commits are complete
         uint revealsFlag; // 0 = needing reveals still 1 = reveals are complete
         bool lastOracle; // last oracle
-
     }
 
     event AggregationCompleted(uint256, string); // emits logs once the aggregation is complete

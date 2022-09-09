@@ -1,6 +1,6 @@
 const Web3 = require('web3');
 const util = require('util')
-const MyContract = require('../build/contracts/OracleRequesterContract.json');
+const MyContract = require('../build/contracts/OracleRequestContract.json');
 const AggCon = require('../build/contracts/AggregatorContract.json')
 
 
