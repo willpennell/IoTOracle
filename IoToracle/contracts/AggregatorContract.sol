@@ -36,12 +36,12 @@ contract AggregatorContract {
     event LogHashes(bytes32, bytes32); // emits logs of hashes
     event CommitsPlaced(uint, string); // emits a commits placed event
     event RevealsPlaced(uint, string); // emits reveals placed event
-    event Logging(string);
-    event LogBool(bool);
-    event LogInt(int256);
-    event AddressLogging(address, string);
-    event LogNumOr(uint, string);
-    event PrintAddress(address, string);
+    event Logging(string); // emits a debugging message
+    event LogBool(bool); // emits debugging message
+    event LogInt(int256); // emits debugging message
+    event AddressLogging(address, string); //emits debugging message
+    event LogNumOr(uint, string); // emits debugging message
+    event PrintAddress(address, string); // emits debugging message
 
 
     // @notice constructor called when deployed
@@ -51,7 +51,9 @@ contract AggregatorContract {
         orc = OracleRequestContract(_addr); // initialise the Oracle Request Contract contract
     }
     // @notice commitResponse oracles first commit a hash of their answer and a random string
-    function commitResponse(uint256 _requestID, bytes32 _commitHash )
+    function commitResponse(
+        uint256 _requestID,
+        bytes32 _commitHash )
     public
     onlyAuthorisedOraclesYetToCommit(_requestID)
     cancelFlagCheck(_requestID)
@@ -61,8 +63,8 @@ contract AggregatorContract {
         emit AddressLogging(msg.sender, "Node placed a commit");
         if (answers[_requestID].requestID == 0) {
             answers[_requestID].requestID = _requestID; // assign correct id
-            answers[_requestID].t = 0;
-            answers[_requestID].f = 0;
+            answers[_requestID].t = 0; // set counter to 0
+            answers[_requestID].f = 0; // set counter to 0
             answers[_requestID].oracleList = orc.getOracleAddresses(_requestID);
         }
         if (answers[_requestID].oracleCounter < orc.getNumberOfOracles(_requestID)) {
@@ -72,9 +74,9 @@ contract AggregatorContract {
             answers[_requestID].oracleCounter++; // once this is equal we know to enter next if statement
         }
         if (answers[_requestID].oracleCounter == orc.getNumberOfOracles(_requestID)) {
-            answers[_requestID].commitsFlag = 1;
-            answers[_requestID].oracleCounter = 0;
-            emit CommitsPlaced(_requestID, "commits are placed");
+            answers[_requestID].commitsFlag = 1; // all commits are in, change flag
+            answers[_requestID].oracleCounter = 0; // reset counter for reveal phase
+            emit CommitsPlaced(_requestID, "commits are placed"); // emits commitsPlaced message
         }
         return true;
     }
@@ -82,7 +84,10 @@ contract AggregatorContract {
     // @param _requestID
     // @param _result, the answer that was fetch by IoT
     // @param _secret, the string that was hashed with the IoT result in the commit
-    function revealVoteResponse(uint256 _requestID, bytes memory _result, bytes memory _secret)
+    function revealVoteResponse(
+        uint256 _requestID,
+        bytes memory _result,
+        bytes memory _secret)
     public
     onlyAuthorisedOraclesYetToReveal(_requestID) // only oracles yet to reveal
     cancelFlagCheck(_requestID) // make sure cancel flag = 0
@@ -94,28 +99,21 @@ contract AggregatorContract {
 
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
         bytes32 revealHash =  keccak256(abi.encodePacked(_secret, _result));// hash of _result and _secret
-        emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash);
-        bool decodedResult = decodeBool(_result);
-        emit LogBool(decodedResult);
+        emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash); // debugging, can see both hashes match
+        bool decodedResult = decodeBool(_result); // takes a bytes message and decodes it to a bool value
+        emit LogBool(decodedResult); // debugging emits the bool value
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
-
             answers[_requestID].oracleVoteReveals[msg.sender] = decodedResult; // add oracles answer to reveals
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only vote once
             answers[_requestID].correctRevealOracles.push(msg.sender); // adds to the correct reveals for aggregation
-            emit Logging("we are in the first if block");
-
         } else {
-            emit Logging("We are in the else block");
             answers[_requestID].incorrectRevealOracles.push(msg.sender); // an incorrect match of commit and reveal hashes
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // has submitted so can only vote once
         }
-        emit LogNumOr(orc.getNumberOfOracles(_requestID), "number of oracles");
-        emit LogNumOr(orc.getTimeoutOracleLength(_requestID), "number of timed out oracles");
-        emit LogNumOr(answers[_requestID].oracleCounter, "oracle counter");
         if (answers[_requestID].oracleCounter == ((orc.getNumberOfOracles(_requestID) -
         orc.getTimeoutOracleLength(_requestID))- 1)){
-            emit RevealsPlaced(_requestID, "All reveals have been placed");
-            answers[_requestID].revealsFlag = 1;
+            emit RevealsPlaced(_requestID, "All reveals have been placed"); // emits revealsPlaced message
+            answers[_requestID].revealsFlag = 1; // all reveals in, change flag
             voteAggregation(_requestID); // once number of oracles has been reached call voteAggregation
         }
         answers[_requestID].oracleCounter++; // increment counter for next oracle
@@ -138,8 +136,8 @@ contract AggregatorContract {
         // need to check the hash of the _result and _secret against answers[_requestID].oracleCommits[msg.sender]
         int256 decodeResult = decodeInt(_result);
         bytes32 revealHash = keccak256(abi.encodePacked(_secret, _result)); // hash of _result and _secret
-        emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash);
-        emit LogInt(decodeResult);
+        emit LogHashes(answers[_requestID].oracleCommits[msg.sender], revealHash); //debugging messages
+        emit LogInt(decodeResult); // debugging messages
         if (answers[_requestID].oracleCommits[msg.sender] == revealHash) {
             answers[_requestID].oracleAverageReveals[msg.sender] = decodeResult; // adds the int result to map
             answers[_requestID].oracleHasSubmittedReveal[msg.sender] = true; // can only submit once
@@ -159,7 +157,10 @@ contract AggregatorContract {
     // @notice vote aggregation, splits the correct reveals into true and false lists, then chooses the bool
     //         with the most votes as correct. and the others are penalised in ORC contract. Majority vote
     // @param _requestID
-    function voteAggregation(uint256 _requestID) internal returns(bool) {
+    function voteAggregation(
+        uint256 _requestID)
+    internal
+    returns(bool) {
         bool _result; // the final result to send to ORC contract
         address orcAddress; // placeholder oracle address var
         // loop through the oracles that provided a correct reveal
@@ -233,10 +234,10 @@ contract AggregatorContract {
     onlyORC() // only ORC contract can call this function
     returns(bool)
     {
-        answers[_requestID].cancelFlag = 1;
+        answers[_requestID].cancelFlag = 1; // cancelled change flag
         return true;
     }
-
+    // @notice gets the bool value as to whether an oracle node has already submitted a commit
     function getOracleHasSubmittedCommit(
         uint256 _requestID,
         address _oracleAddr)
@@ -246,7 +247,7 @@ contract AggregatorContract {
     returns(bool) {
         return answers[_requestID].oracleHasSubmittedCommit[_oracleAddr];
     }
-
+    // @notice gets the bool value as to whether an oracle node has already submitted a reveal
     function getOracleHasSubmittedReveal(
         uint256 _requestID,
         address _oracleAddr)
@@ -257,7 +258,7 @@ contract AggregatorContract {
     {
         return answers[_requestID].oracleHasSubmittedReveal[_oracleAddr];
     }
-
+    // @notice gets the value of the commit flag, if active should be 0, otherwise 1
     function getCommitFlag(
         uint256 _requestID)
     onlyORC()
@@ -267,7 +268,7 @@ contract AggregatorContract {
     {
         return answers[_requestID].commitsFlag;
     }
-
+    // @notice gets the value of the reveal flag, if active should be 0, otherwise 1
     function getRevealFlag(
         uint256 _requestID)
     onlyORC()
@@ -276,20 +277,20 @@ contract AggregatorContract {
     returns(uint) {
         return answers[_requestID].revealsFlag;
     }
-
+    // @notice returns and array of unresponded nodes, in commit phase for ORC-SC to penalise
     function getUnRespondedCommitOracles(uint256 _requestID) onlyORC() external returns(address[] memory){
-        emit LogNumOr(answers[_requestID].oracleCounter, "len in un-respond call");
+        emit LogNumOr(answers[_requestID].oracleCounter, "len in un-respond call"); //debugging
         for (uint i = 0; i < orc.getNumberOfOracles(_requestID); i++) {
-            address orcAdd = answers[_requestID].oracleList[i];
-
+            address orcAdd = answers[_requestID].oracleList[i]; // each address in list of nodes
+            //for request relating to _requestID
             if (answers[_requestID].oracleHasSubmittedCommit[orcAdd] == false){
-                emit PrintAddress(orcAdd, "address of un-responded oracle node");
-                answers[_requestID].unRespondedOracles.push(orcAdd);
+                emit PrintAddress(orcAdd, "address of un-responded oracle node"); // debugging
+                answers[_requestID].unRespondedOracles.push(orcAdd); // adds unresponded nodes to an array
             }
         }
-        return answers[_requestID].unRespondedOracles;
+        return answers[_requestID].unRespondedOracles; // returns array with unresponsive nodes
     }
-
+    // @notice returns and array of unresponded nodes, in reveal phase for ORC-SC to penalise
     function getUnRespondedRevealOracles(uint256 _requestID) onlyORC() external returns(address[] memory){
         for (uint i = 0; i < orc.getNumberOfOracles(_requestID); i++) {
             address orcAdd = answers[_requestID].oracleList[i];
@@ -299,14 +300,14 @@ contract AggregatorContract {
         }
         return answers[_requestID].unRespondedOracles;
     }
-
+    // @notice used in commits appeal phase to force through the reveal phase
     function forceCommitsPlaced(uint _requestID) onlyORC() external returns(bool) {
         answers[_requestID].commitsFlag = 1;
         answers[_requestID].oracleCounter = 0;
         emit CommitsPlaced(_requestID, "Force commits are placed");
         return true;
     }
-
+    // @notice used in commits appeal phase to force through the aggregation phase
     function forceRevealsPlaced(uint _requestID , uint256 _aggregationType ) onlyORC() external returns(bool) {
         answers[_requestID].revealsFlag = 1;
         emit RevealsPlaced(_requestID, "Force reveals have been placed");
@@ -373,6 +374,7 @@ contract AggregatorContract {
         require(orc.getAggregationType(_requestID) == 2);
         _;
     }
+    // @notice decode external bytes data to type bool
     function decodeBool(bytes memory data) public pure returns (bool b){
         assembly {
         // Load the length of data (first 32 bytes)
@@ -381,10 +383,10 @@ contract AggregatorContract {
             b := mload(add(data, 0x20))
         }
     }
+    // @notice decode external bytes data to type int256
     function decodeInt(bytes memory data) public pure returns (int256 i) {
         assembly {
             let len := mload(data)
-
             i := mload(add(data, 0x20))
         }
     }

@@ -11,15 +11,15 @@ import (
 
 // ConvertOpenForBidsData converts the input from events into a Request struct
 func ConvertOpenForBidsData(a interface{}, b interface{}, c interface{}, d interface{}, e interface{}) (Request, uint64) {
-	requestId, _ := a.(*big.Int)        // covert RequestId
-	requestIdConv := requestId.Uint64() // converts from big.Int to uint64 for ID index in Requests map
-	dataType, _ := b.([]byte)           // gets dataType info from event as []byte
-	aggType, _ := c.(*big.Int)
-	aggTypeConv := aggType.Int64()
-	timestamp, _ := d.(*big.Int)
-	timestampConv := timestamp.Int64()
-	elapsedTime, _ := e.(*big.Int)
-	elapsedTimeConv := elapsedTime.Int64()
+	requestId, _ := a.(*big.Int)           // covert RequestId
+	requestIdConv := requestId.Uint64()    // converts from big.Int to uint64 for ID index in Requests map
+	dataType, _ := b.([]byte)              // gets dataType info from event as []byte
+	aggType, _ := c.(*big.Int)             // aggregation type 1 or 2
+	aggTypeConv := aggType.Int64()         // convert incoming aggType
+	timestamp, _ := d.(*big.Int)           // timestamp value
+	timestampConv := timestamp.Int64()     // convert time stamp
+	elapsedTime, _ := e.(*big.Int)         // elapsed time form request
+	elapsedTimeConv := elapsedTime.Int64() // elapsedTime converter
 
 	// adds converted types to struct
 	request := Request{

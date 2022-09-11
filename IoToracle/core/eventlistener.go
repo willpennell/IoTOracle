@@ -76,7 +76,6 @@ func EventOpenForBids(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo uti
 			// call tx function to send to orc contract and place bid
 			utils.TxPlaceBid(client, nodeInfo, big.NewInt(int64(id)))
 			//go EventReleaseRequestDetails(client, wg, nodeInfo)
-			//utils.PRINTTXHASH(tx) // prints hash of tx
 		}
 	}
 }
@@ -149,7 +148,6 @@ func EventReleaseRequestDetails(client *ethclient.Client, wg *sync.WaitGroup, no
 				// need to convert the result to hex
 				utils.SaveRequestJson()
 				// send tx function call ReceiveResponse in Aggregator contract with the result as a hex string
-				// TODO change to commitResponse
 				txBool := utils.TxCommitResponse(client, nodeInfo, eventReleaseRequestDetails.Arg0, utils.Requests[id].CommitHash)
 				if txBool == true {
 					utils.Requests[id].CommitFlag = 1
@@ -308,7 +306,6 @@ func EventCommitsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			id := eventCommitsPlaced.Arg0.Uint64()
 			if utils.Requests[id].Status == 1 && utils.Requests[id].CommitFlag == 1 {
 				utils.COMMITSPLACEDMESSAGE(eventCommitsPlaced)
-				// TODO call reveal tx
 
 				if utils.Requests[id].AggregationType == 1 {
 					shaBoolEncode := solsha3.Bool(utils.UnpackBool(utils.Requests[id].IoTResult))
@@ -362,7 +359,7 @@ func EventRevealsPlaced(client *ethclient.Client, wg *sync.WaitGroup, nodeInfo u
 			log.Fatal(err)
 		case eventRevealsPlaced := <-channelRevealsPlaced:
 			utils.REVEALSPLACEDMESSAGE(eventRevealsPlaced)
-			// TODO call reveal tx
+
 		}
 	}
 }

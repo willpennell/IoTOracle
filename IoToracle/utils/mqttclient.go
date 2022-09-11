@@ -65,7 +65,6 @@ func StartMQTTClient(id uint64, topic string, clientID string) []byte {
 	// subscription to topic
 	setClient(client)
 	sub(client, topic) // pass in client and topic to subscribe
-	//client.Unsubscribe(topic)
 	var tenSecs uint = 10 * 1000
 	client.Disconnect(uint((Requests[id].ElapsedTime*2)*1000) + tenSecs) // disconnects after 250 milliseconds but sync.Wait() in sub will pause until complete first
 	return packedResult                                                  // returns the message from pub
@@ -80,6 +79,7 @@ func sub(client mqtt.Client, topic string) {
 	subWait.Wait()       // waits for the counter to be decremented in publishHandler callback function
 }
 
+// forceCloseConnection closes a connection used by timer
 func forceCloseConnection() {
 	fmt.Println("Closing connection, no longer required.")
 	client1.Disconnect(250)

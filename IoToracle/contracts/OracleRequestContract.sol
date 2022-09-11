@@ -60,21 +60,21 @@ contract OracleRequestContract {
     event OracleJoined(address, string); // tells network that a new oracle has joined the network
     event OracleLeft(address, string); // tells the network that another oracle has left
     event OraclePaid(address, uint, string); // tells the network when an oracle has been paid for its services
-    event Logging(string);
-    event FinalResultLog(bool, string);
-    event FinalInt(int256, string);
-    event UpdateTimestamp(uint256, uint256, uint256);
-    event LogNumberOfOracles(uint, string);
-    event PrintAddress(address);
-    event PrintAddresses(address[]);
-    event LogTimeOutLen(uint, string);
+    event Logging(string); // debugging messages
+    event FinalResultLog(bool, string); // debugging messages
+    event FinalInt(int256, string); // debugging messages
+    event UpdateTimestamp(uint256, uint256, uint256); // debugging messages
+    event LogNumberOfOracles(uint, string); // debugging messages
+    event PrintAddress(address); // debugging messages
+    event PrintAddresses(address[]); // debugging messages
+    event LogTimeOutLen(uint, string); // debugging messages
     // ***payments***
-    uint GAS_PRICE = 7 * 10**6; // cost of gas
-    uint COST_OF_FUNCTION = GAS_PRICE * 30000; // fee to cover other function calls and pay each oracle
-    uint REWARD = COST_OF_FUNCTION * 500; //make it much of an incentive to carry out request.
-
-    //uint MIN_FEE; // minimum needed to cover all costs
-    uint TIMER_ELAPSED_BIDDING = 300;
+    uint GAS_LIMIT = 6721975; // gas limit average
+    uint GAS_PRICE = 30000; // average gas price per function
+    uint COST_OF_FUNCTIONS = (GAS_LIMIT * GAS_PRICE) * 5; // fee to cover other function calls and pay each oracle
+    uint REWARD = COST_OF_FUNCTIONS * 150; //make it much of an incentive to carry out request.
+    // ***bidding timer***
+    uint TIMER_ELAPSED_BIDDING = 300; // timer for bidding window
 
     // @notice constructor when first deployed
     constructor() {
@@ -93,7 +93,7 @@ contract OracleRequestContract {
     isNotBlacklisted()
     //oracleCannotRejoin()
     returns(bool){
-        ReputationContract(reputationAddr).addOracle(msg.sender);
+        ReputationContract(reputationAddr).addOracle(msg.sender); // adds node address to reputation contract
         oracles[address(msg.sender)] = true; // set to true as is now in network
         stakeBalance[msg.sender] = msg.value; // added value to stakeBalance as a record
         emit OracleJoined(msg.sender, "Welcome new node!"); // emit event so listeners can be notified
@@ -166,52 +166,52 @@ contract OracleRequestContract {
             timings[requestID].timestamp, timings[requestID].elapsedTime);
         return requestID;
     }
-    // @notice
-    function timeoutCommitsAppeal(uint256 _requestID)
+    // @notice nodes call this to appeal against unresponive nodes
+    function timeoutCommitsAppeal(
+        uint256 _requestID)
     timeHasElapsed(_requestID, timings[_requestID].elapsedTime)
     onlySubmittedCommitsOracles(_requestID)
     external
     {
         // call get un-responded nodes
         address[] memory unRespondedNodes = AggregatorContract(aggregatorAddr).getUnRespondedCommitOracles(_requestID);
-        emit LogTimeOutLen(unRespondedNodes.length, "unRespondedNodes list len");
+        emit LogTimeOutLen(unRespondedNodes.length, "unRespondedNodes list len"); // debugging message
         for (uint i=0; i<unRespondedNodes.length; i++) {
-            timings[_requestID].timedOutOracles.push(unRespondedNodes[i]);
+            timings[_requestID].timedOutOracles.push(unRespondedNodes[i]); // keeps track of unresponive nodes
         }
-        emit LogTimeOutLen(timings[_requestID].timedOutOracles.length, "len of timeout oracle list");
-        emit PrintAddresses(unRespondedNodes);
         timings[_requestID].timestamp = block.timestamp; // reset timestamp
         timings[_requestID].elapsedTime = 150; // allow for 2.5 min send a reveal message
-        emit UpdateTimestamp(_requestID, timings[_requestID].timestamp, timings[_requestID].elapsedTime);
+        emit UpdateTimestamp(_requestID, timings[_requestID].timestamp, timings[_requestID].elapsedTime); // nodes now update their timers locally
         emit LogNumberOfOracles(timings[_requestID].timedOutOracles.length, "number oracles in timeout");
-        AggregatorContract(aggregatorAddr).forceCommitsPlaced(_requestID);
+        AggregatorContract(aggregatorAddr).forceCommitsPlaced(_requestID); // force reveal phase in Agg-SC
     }
-
-    function timeoutRevealsAppeal(uint _requestID)
+    // @notice nodes call this to appeal against unresponive nodes
+    function timeoutRevealsAppeal(
+        uint _requestID)
     onlySubmittedRevealsOracles(_requestID)
     timeHasElapsed(_requestID, timings[_requestID].elapsedTime)
     external
     {
+        // call get un-responded nodes
         address[] memory unRespondedNodes = AggregatorContract(aggregatorAddr).getUnRespondedRevealOracles(_requestID);
         for (uint i=0; i<unRespondedNodes.length; i++) {
-            timings[_requestID].timedOutOracles.push(unRespondedNodes[i]);
+            timings[_requestID].timedOutOracles.push(unRespondedNodes[i]); // keeps track of unresponive nodes
         }
-
         AggregatorContract(aggregatorAddr).forceRevealsPlaced(_requestID, requests[_requestID].aggregationType);
+        // force reveal phase in Agg-SC
     }
-
+    // @notice request can call an appeal if no bids occur after a time limit
     function timeoutBiddingAppeal(uint _requestID)
     onlyRequester(_requestID)
     timeHasElapsed(_requestID, timings[_requestID].elapsedTime)
     external
     {
         requests[_requestID].cancelFlag = 1;
-        payable(requests[_requestID].requester).transfer(requests[_requestID].fee);
-        AggregatorContract(aggregatorAddr).cancelRequest(_requestID);
-        requests[_requestID].status = Status.CANCELLED;
-        emit StatusChange(_requestID, requests[_requestID].status, "CANCELLED");
+        payable(requests[_requestID].requester).transfer(requests[_requestID].fee); //refund requester
+        AggregatorContract(aggregatorAddr).cancelRequest(_requestID); // cancel in Agg-SC
+        requests[_requestID].status = Status.CANCELLED; // change status
+        emit StatusChange(_requestID, requests[_requestID].status, "CANCELLED"); // informs other nodes
     }
-
     // @notice off-chain oracle node places bid to fetch data, once threshold is reached, emits event details.
     // @dev
     // @param requestId oracle node wishes to bid on
@@ -263,33 +263,46 @@ contract OracleRequestContract {
         uint slashedRewards = 0; //pay honest nodes fees from the slashing
         // pay fees
         for (uint i=0; i<timings[_requestID].timedOutOracles.length; i++) {
-            emit PrintAddress(timings[_requestID].timedOutOracles[i]);
+            emit PrintAddress(timings[_requestID].timedOutOracles[i]); //debug message
+            // get penalty fee from Rep-SC
             uint penalty = ReputationContract(reputationAddr).getPenaltyFee(timings[_requestID].timedOutOracles[i]);
-            stakeBalance[timings[_requestID].timedOutOracles[i]] -= penalty;
-            slashedRewards += penalty;
+            if (stakeBalance[timings[_requestID].timedOutOracles[i]] >= penalty) {
+                stakeBalance[timings[_requestID].timedOutOracles[i]] -= penalty; //deduct penalty from nodes stake stakeBalance
+            } else {
+                stakeBalance[timings[_requestID].timedOutOracles[i]] -=
+                stakeBalance[timings[_requestID].timedOutOracles[i]]; // not enough funds, remove rest of stake
+                blacklistedOracles[_requestID] = true; // now blacklist oracle as they have no funds
+            }
+            slashedRewards += penalty; // add penalty to slashedRewards
+            // increment rating of node
             ReputationContract(reputationAddr).incrementRating(timings[_requestID].timedOutOracles[i]);
         }
         // add penalties and slash dishonest nodes stake
         for (uint i=0; i<_incorrectOracles.length; i++){
             // gets penalty fee from reputation contract penalty**rating
             uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]);
-            stakeBalance[_incorrectOracles[i]] -= penalty;
-            slashedRewards += penalty;
+            stakeBalance[_incorrectOracles[i]] -= penalty; //deduct penalty from nodes stake stakeBalance
+            slashedRewards += penalty; // add penalty to slashedRewards
+            // increment rating of node
             ReputationContract(reputationAddr).incrementRating(_incorrectOracles[i]);
         }
         // small penalty for incorrect hashes, as this could be an error
         for (uint i=0; i<_incorrectRevealOracles.length; i++) {
-
             uint penalty = ReputationContract(reputationAddr).getPenaltyFee(_incorrectOracles[i]); // charge the fee of the request as a penalty
             slashedRewards += penalty;
-            stakeBalance[_incorrectRevealOracles[i]] -= penalty; // deducted from oracle stake
+            if (stakeBalance[_incorrectOracles[i]] >= penalty) {
+                stakeBalance[_incorrectOracles[i]] -= penalty;
+            } else {
+                stakeBalance[_incorrectOracles[i]] -=
+                stakeBalance[_incorrectOracles[i]]; // not enough funds, remove rest of stake
+                blacklistedOracles[_requestID] = true; // now blacklist oracle
+            }
         }
-        uint fee = requests[_requestID].fee / _correctOracles.length;
-        uint slashShare = slashedRewards / _correctOracles.length;
+        uint fee = requests[_requestID].fee / _correctOracles.length; // split fee
+        uint slashShare = slashedRewards / _correctOracles.length; // split slashes
         for (uint i=0; i<_correctOracles.length; i++) {
             // pay each share to each oracle
             uint fullReward = fee + slashShare;
-
             emit OraclePaid(_correctOracles[i], fullReward, "Oracle has been Paid!"); // tells listeners oracle node has been paid
             payable(_correctOracles[i]).transfer(fullReward); // pays oracle their fee
             requests[_requestID].fee -= fee; // deduct the oracles portion from the logged amount until it reaches 0
@@ -332,6 +345,13 @@ contract OracleRequestContract {
         }
         // small penalty for incorrect hashes, as this could be an error
         for (uint i=0; i<_incorrectOracles.length; i++) {
+            if (stakeBalance[_incorrectOracles[i]] >= penalty) {
+                stakeBalance[_incorrectOracles[i]] -= penalty;
+            } else {
+                stakeBalance[_incorrectOracles[i]] -=
+                stakeBalance[_incorrectOracles[i]]; // not enough funds, remove rest of stake
+                blacklistedOracles[_requestID] = true; // now blacklist oracle
+            }
             stakeBalance[_incorrectOracles[i]] -= fee; // deducted fee from stake
         }
         requests[_requestID].status = Status.COMPLETE; // request is complete

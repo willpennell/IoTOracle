@@ -1,0 +1,1 @@
+oraclecore.go - this is the go file we run to start to program
