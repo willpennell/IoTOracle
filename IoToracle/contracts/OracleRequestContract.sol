@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "./AggregatorContract.sol";
 import "./ReputationContract.sol";
 
+
 contract OracleRequestContract {
     //address that deploys contract
     address public owner;

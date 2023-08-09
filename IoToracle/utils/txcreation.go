@@ -6,6 +6,9 @@ import (
 	c "IoToracle/config"
 	"crypto/ecdsa"
 	"fmt"
+	"log"
+	"math/big"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/common/math"
@@ -13,8 +16,6 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"golang.org/x/net/context"
-	"log"
-	"math/big"
 )
 
 // ChainID network id used to interact with blockchain
@@ -198,5 +199,3 @@ func TxRevealAverageResponse(client *ethclient.Client, info OracleNodeInfo,
 	TXLog(tx)
 	return true
 }
-
-// ***ToDoList***

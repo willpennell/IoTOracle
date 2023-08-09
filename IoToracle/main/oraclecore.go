@@ -4,9 +4,10 @@ package main
 import (
 	"IoToracle/core"
 	p "IoToracle/utils"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"log"
 	"sync"
+
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 // establishConnection creates connection to Blockchain
